@@ -151,7 +151,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             //JAVA TO C# CONVERTER TODO TASK: Method reference constructor syntax is not converted by Java to C# Converter:
 
             decimal res = decimal.Zero;
-            foreach (IZugFeRdExportableItem currentItem in Trans.GetZfItems())
+            foreach (IZUGFeRDExportableItem currentItem in Trans.GetZfItems())
             {
                 LineCalculator lc = new LineCalculator(currentItem);
                 res += lc.GetItemTotalGrossAmount();
@@ -182,7 +182,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         {
             Dictionary<decimal, VatAmount> hm = new Dictionary<decimal, VatAmount>();
 
-            foreach (IZugFeRdExportableItem currentItem in Trans.GetZfItems())
+            foreach (IZUGFeRDExportableItem currentItem in Trans.GetZfItems())
             {
                 decimal percent = currentItem.GetProduct().GetVatPercent();
 

@@ -9,7 +9,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 	/// </summary>
 	//JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
 	//ORIGINAL LINE: @JsonIgnoreProperties(ignoreUnknown = true) public class TradeParty implements IZUGFeRDExportableTradeParty
-	public class TradeParty : IZugFeRdExportableTradeParty
+	public class TradeParty : IZUGFeRDExportableTradeParty
 	{
 
 		protected internal string Name, Zip, Street, Location, Country;
@@ -58,7 +58,17 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			return Id;
 		}
 
-		/// <summary>
+        public string GetGlobalId()
+        {
+            return null;
+        }
+
+        public string GetGlobalIdScheme()
+        {
+            return null;
+        }
+
+        /// <summary>
 		/// if it's a customer, this can e.g. be the customer ID
 		/// </summary>
 		/// <param name="id"> customer/seller number </param>
@@ -250,12 +260,12 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			return VatId;
 		}
 
-		public IZugFeRdExportableContact GetContact()
+		public IZUGFeRDExportableContact GetContact()
 		{
 			return Contact;
 		}
 
-		public virtual IZugFeRdTradeSettlement[]? GetAsTradeSettlement()
+		public virtual IZUGFeRDTradeSettlement[]? GetAsTradeSettlement()
 		{
 			if (BankDetails.Count == 0)
 			{

@@ -2,50 +2,35 @@
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
 
-	public interface IZugFeRdExportableTradeParty
+	public interface IZUGFeRDExportableTradeParty
 	{
 
 		/// <summary>
 		/// customer identification assigned by the seller
 		/// </summary>
 		/// <returns> customer identification </returns>
-		string GetId()
-		{
-			return null;
-		}
+		string GetId();
 
 		/// <summary>
 		/// customer global identification assigned by the seller
 		/// </summary>
 		/// <returns> customer identification </returns>
-		string GetGlobalId()
-		{
-			return null;
-		}
+		string GetGlobalId();
 
 		/// <summary>
 		///*
 		/// gets the official representation </summary>
 		/// <returns> the interface with the attributes of the legal organisation </returns>
-		/*	IZUGFeRDLegalOrganisation getLegalOrganisation()
-			{
-				return null;
-			}
+		/*	IZUGFeRDLegalOrganisation getLegalOrganisation();
 			*/
 		/// <summary>
 		/// customer global identification scheme
 		/// </summary>
 		/// <returns> customer identification </returns>
-		string GetGlobalIdScheme()
-		{
-			return null;
-		}
+		string GetGlobalIdScheme();
 
 
-		IZugFeRdExportableContact GetContact()
-		{
-			return null;
-		}
+		IZUGFeRDExportableContact GetContact();
 
 		/// <summary>
 		/// First and last name of the recipient
@@ -61,10 +46,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// VAT ID (Umsatzsteueridentifikationsnummer) of the contact
 		/// </summary>
 		/// <returns> VAT ID (Umsatzsteueridentifikationsnummer) of the contact </returns>
-		string GetVatid()
-		{
-			return null;
-		}
+		string GetVatid();
 		/// <summary>
 		/// two-letter country code of the contact
 		/// </summary>
@@ -84,17 +66,11 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// returns additional address information which is display in xml tag "LineTwo"
 		/// </summary>
 		/// <returns> additional address information </returns>
-		string GetAdditionalAddress()
-		{
-			return null;
-		}
+		string GetAdditionalAddress();
 		/// <summary>
 		///*
 		/// obligatory for sender but not for recipient </summary>
 		/// <returns> the tax id as string </returns>
-		string GetTaxId()
-		{
-			return null;
-		}
+		string GetTaxId();
 	}
 }

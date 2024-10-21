@@ -14,7 +14,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 		//JAVA TO C# CONVERTER WARNING: The following constructor is declared outside of its associated class:
 		//ORIGINAL LINE: public LineCalculator(ZUGFeRDExportableItem currentItem)
-		public LineCalculator(ZUGFeRDExportableItem currentItem)
+		public LineCalculator(IZUGFeRDExportableItem currentItem)
 		{
 			/*
 					if (currentItem.getItemAllowances() != null && currentItem.getItemAllowances().length > 0)
@@ -38,10 +38,10 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			//JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
 			//ORIGINAL LINE: @decimal multiplicator = currentItem.getProduct().getVATPercent().divide(100);
 			*/
-			decimal multiplicator = currentItem.getProduct().getVATPercent() / 100;
-			_priceGross = currentItem.getPrice(); // see https://github.com/ZUGFeRD/mustangproject/issues/159
+			decimal multiplicator = currentItem.GetProduct().GetVatPercent() / 100;
+			_priceGross = currentItem.GetPrice(); // see https://github.com/ZUGFeRD/mustangproject/issues/159
 			_price = _priceGross - _allowance + _charge;
-			_itemTotalNetAmount = Math.Round(currentItem.getQuantity() * _price / currentItem.getBasisQuantity(), 2, MidpointRounding.AwayFromZero);
+			_itemTotalNetAmount = Math.Round(currentItem.GetQuantity() * _price / currentItem.GetBasisQuantity(), 2, MidpointRounding.AwayFromZero);
 			_itemTotalVatAmount = _itemTotalNetAmount * multiplicator;
 
 		}

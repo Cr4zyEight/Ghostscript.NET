@@ -303,9 +303,9 @@ namespace Ghostscript.NET.Processor
                                                 new StdErrorEventHandler(OnStdIoError));
 
                 int rcStdio = _gs.GsapiSetStdio(instance,
-                                        _internalStdIoCallback._std_in,
-                                        _internalStdIoCallback._std_out,
-                                        _internalStdIoCallback.StdErr);
+                                        _internalStdIoCallback.StdInCallback,
+                                        _internalStdIoCallback.StdOutCallback,
+                                        _internalStdIoCallback.StdErrCallback);
 
                 _poolCallBack = new GsapiPoolCallback(Pool);
 

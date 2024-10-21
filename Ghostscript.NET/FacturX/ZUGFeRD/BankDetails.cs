@@ -5,7 +5,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 	/// <summary>
 	/// provides e.g. the IBAN to transfer money to :-)
 	/// </summary>
-	public class BankDetails : IZugFeRdTradeSettlementPayment
+	public class BankDetails : IZUGFeRDTradeSettlementPayment
 	{
 		protected internal string Iban, Bic, AccountName = null;
 
@@ -49,7 +49,12 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			return this;
 		}
 
-		/// <summary>
+        public string GetOwnPaymentInfoText()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
 		///*
 		///  getOwn... methods will be removed in the future in favor of Tradeparty (e.g. Sender) class
 		/// 
@@ -96,7 +101,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			return xml;
 		}
 
-
-
-	}
+        public string GetPaymentXml()
+        {
+            return null;
+        }
+    }
 }

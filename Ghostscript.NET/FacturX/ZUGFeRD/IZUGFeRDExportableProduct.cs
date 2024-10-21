@@ -1,7 +1,7 @@
 
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
-	public interface IZugFeRdExportableProduct
+	public interface IZUGFeRDExportableProduct
 	{
 
 		/// 
@@ -45,20 +45,14 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// identify the product
 		/// </summary>
 		/// <returns> seller assigned product ID </returns>
-		string GetSellerAssignedId()
-		{
-			return null;
-		}
+		string GetSellerAssignedId();
 
 		/// <summary>
 		/// Get the ID that had been assigned by the buyer to
 		/// identify the product
 		/// </summary>
 		/// <returns> buyer assigned product ID </returns>
-		string GetBuyerAssignedId()
-		{
-			return null;
-		}
+		string GetBuyerAssignedId();
 
 		/// <summary>
 		/// VAT percent of the product (e.g. 19, or 5.1 if you like)
@@ -66,49 +60,12 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// <returns> VAT percent of the product </returns>
 		decimal GetVatPercent();
 
-		bool GetIntraCommunitySupply()
-		{
-			return false;
-		}
+		bool GetIntraCommunitySupply();
 
-		bool GetReverseCharge()
-		{
-			return false;
-		}
+		bool GetReverseCharge();
 
-		string GetTaxCategoryCode()
-		{
-			/*	if (isIntraCommunitySupply())
-				{
-					return "K"; // "K"; // within europe
-				}
-				else if (isReverseCharge())
-				{
-					return "AE"; // "AE"; // to out of europe...
-				}
-				else if (getVATPercent().compareTo(decimal.Zero) == 0)
-				{
-					return "Z"; // "Z"; // zero rated goods
-				}
-				else
-				{*/
-			return "S"; // "S"; // one of the "standard" rates (not
-						// neccessarily a rate, even a deducted VAT
-						// is standard calculation)
-						//}
-		}
+        string GetTaxCategoryCode();
 
-		string GetTaxExemptionReason()
-		{
-			/*	if (isIntraCommunitySupply())
-				{
-					return "Intra-community supply";
-				}
-				else if (isReverseCharge())
-				{
-					return "Reverse Charge";
-				}*/
-			return null;
-		}
-	}
+        string GetTaxExemptionReason();
+    }
 }

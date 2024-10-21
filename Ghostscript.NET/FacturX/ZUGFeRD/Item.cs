@@ -13,7 +13,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
     //JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
     //ORIGINAL LINE: @JsonIgnoreProperties(ignoreUnknown = true) public class Item implements org.mustangproject.ZUGFeRD.IZUGFeRDExportableItem
-    public class Item : IZugFeRdExportableItem
+    public class Item : IZUGFeRDExportableItem
 	{
 		protected internal decimal Price, Quantity, Tax, GrossPrice, LineTotalAmount;
 		protected internal DateTime? DetailedDeliveryPeriodFrom = null, DetailedDeliveryPeriodTo = null;
@@ -154,7 +154,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			return this;
 		}
 
-		public IZugFeRdExportableProduct GetProduct()
+		public IZUGFeRDExportableProduct GetProduct()
 		{
 			return Product;
 		}

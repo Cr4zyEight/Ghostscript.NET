@@ -69,7 +69,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// <param name="isSender"> some attributes are allowed only for senders in certain profiles </param>
         /// <param name="isShipToTradeParty"> some attributes are allowed only for senders or recipients
         /// @return </param>
-        protected internal virtual string GetTradePartyAsXml(IZugFeRdExportableTradeParty party, bool isSender, bool isShipToTradeParty)
+        protected internal virtual string GetTradePartyAsXml(IZUGFeRDExportableTradeParty party, bool isSender, bool isShipToTradeParty)
         {
             string xml = "";
             // According EN16931 either GlobalID or seller assigned ID might be present for BuyerTradeParty
@@ -212,7 +212,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             }
             string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<rsm:CrossIndustryInvoice xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:rsm=\"urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100\"" + " xmlns:ram=\"urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100\"" + " xmlns:udt=\"urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100\">\n" + "	<rsm:ExchangedDocumentContext>\n" + "		<ram:GuidelineSpecifiedDocumentContextParameter>\n" + "			<ram:ID>" + GetProfile().GetId() + "</ram:ID>\n" + "		</ram:GuidelineSpecifiedDocumentContextParameter>\n" + "	</rsm:ExchangedDocumentContext>\n" + "	<rsm:ExchangedDocument>\n" + "		<ram:ID>" + XmlTools.EncodeXml(trans.GetNumber()) + "</ram:ID>\n" + "		<ram:TypeCode>" + typecode + "</ram:TypeCode>\n" + "		<ram:IssueDateTime><udt:DateTimeString format=\"102\">" + ((DateTime)trans.GetIssueDate()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:IssueDateTime>\n" + notes + subjectNote + rebateAgreement + senderReg + "	</rsm:ExchangedDocument>\n" + "	<rsm:SupplyChainTradeTransaction>\n";
             int lineId = 0;
-            foreach (IZugFeRdExportableItem currentItem in trans.GetZfItems())
+            foreach (IZUGFeRDExportableItem currentItem in trans.GetZfItems())
             {
                 lineId++;
                 if (currentItem.GetProduct().GetTaxExemptionReason() != null)
@@ -338,7 +338,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
             if (trans.GetTradeSettlementPayment() != null)
             {
-                foreach (IZugFeRdTradeSettlementPayment payment in trans.GetTradeSettlementPayment())
+                foreach (IZUGFeRDTradeSettlementPayment payment in trans.GetTradeSettlementPayment())
                 {
                     if (payment != null)
                     {
@@ -349,11 +349,11 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             }
             if (trans.GetTradeSettlement() != null)
             {
-                foreach (IZugFeRdTradeSettlement payment in trans.GetTradeSettlement())
+                foreach (IZUGFeRDTradeSettlement payment in trans.GetTradeSettlement())
                 {
                     if (payment != null)
                     {
-                        if (payment is IZugFeRdTradeSettlementPayment)
+                        if (payment is IZUGFeRDTradeSettlementPayment)
                         {
                             hasDueDate = true;
                         }
@@ -482,7 +482,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         {
             string paymentTermsXml = "<ram:SpecifiedTradePaymentTerms>";
 
-            IZugFeRdPaymentTerms paymentTerms = Trans.GetPaymentTerms();
+            IZUGFeRDPaymentTerms paymentTerms = Trans.GetPaymentTerms();
             //IZUGFeRDPaymentDiscountTerms discountTerms = paymentTerms.getDiscountTerms();
             DateTime dueDate = paymentTerms.GetDueDate();
             if (dueDate != null /*&& discountTerms != null && discountTerms.getBaseDate() != null*/)

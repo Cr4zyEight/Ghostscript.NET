@@ -2,13 +2,13 @@ using System;
 
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
-	public interface IZugFeRdExportableItem
+	public interface IZUGFeRDExportableItem
 	{
         /// <summary>
-        /// Gets the <see cref="IZugFeRdExportableProduct"/>
+        /// Gets the <see cref="IZUGFeRDExportableProduct"/>
         /// </summary>
         /// <returns></returns>
-        IZugFeRdExportableProduct GetProduct();
+        IZUGFeRDExportableProduct GetProduct();
 
         /// <summary>
         /// item level discounts </summary>

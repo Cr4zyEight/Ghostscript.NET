@@ -23,62 +23,37 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
     /// </summary>
 
 
-    public interface IZugFeRdTradeSettlementPayment : IZugFeRdTradeSettlement
+    public interface IZUGFeRDTradeSettlementPayment : IZUGFeRDTradeSettlement
     {
 
         /// <summary>
         /// get payment information text. e.g. Bank transfer
         /// </summary>
         /// <returns> payment information text </returns>
-        string GetOwnPaymentInfoText()
-        {
-            return null;
-        }
+        string GetOwnPaymentInfoText();
 
         /// <summary>
         /// BIC of the sender
         /// </summary>
         /// <returns> the BIC code of the recipient sender's bank </returns>
-        string GetOwnBic()
-        {
-            return null;
-        }
+        string GetOwnBic();
 
 
         /// <summary>
         /// IBAN of the sender
         /// </summary>
         /// <returns> the IBAN of the invoice sender's bank account </returns>
-        string GetOwnIban()
-        {
-            return null;
-        }
+        string GetOwnIban();
 
         /// <summary>
         ///*
         /// Account name
         /// </summary>
         /// <returns> the name of the account holder (if not identical to sender) </returns>
-        string GetAccountName()
-        {
-            return null;
-        }
+        string GetAccountName();
 
 
-        public string GetSettlementXml()
-        {
-            string accountNameStr = "";
-            if (GetAccountName() != null)
-            {
-                accountNameStr = "<ram:AccountName>" + XmlTools.EncodeXml(GetAccountName()) + "</ram:AccountName>\n";
-
-            }
-
-            string xml = "			<ram:SpecifiedTradeSettlementPaymentMeans>\n" + "				<ram:TypeCode>58</ram:TypeCode>\n" + "				<ram:Information>SEPA credit transfer</ram:Information>\n" + "				<ram:PayeePartyCreditorFinancialAccount>\n" + "					<ram:IBANID>" + XmlTools.EncodeXml(GetOwnIban()) + "</ram:IBANID>\n";
-            xml += accountNameStr;
-            xml += "				</ram:PayeePartyCreditorFinancialAccount>\n" + "				<ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "					<ram:BICID>" + XmlTools.EncodeXml(GetOwnBic()) + "</ram:BICID>\n" + "				</ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "			</ram:SpecifiedTradeSettlementPaymentMeans>\n";
-            return xml;
-        }
+        public string GetSettlementXml();
 
 
         /* I'd love to implement getPaymentXML() and put <ram:DueDateDateTime> there because this is where it belongs

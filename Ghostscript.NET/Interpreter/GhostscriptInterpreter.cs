@@ -216,9 +216,9 @@ namespace Ghostscript.NET.Interpreter
                 {
                     // GSAPI: set the stdio callback handlers
                     int rcStdio = _gs.GsapiSetStdio(_gsInstance,
-                                            stdIo != null ? stdIo._std_in : null,
-                                            stdIo != null ? stdIo._std_out : null,
-                                            stdIo != null ? stdIo.StdErr : null);
+                                            stdIo != null ? stdIo.StdInCallback : null,
+                                            stdIo != null ? stdIo.StdOutCallback : null,
+                                            stdIo != null ? stdIo.StdErrCallback : null);
 
                     // check if the stdio callback handlers are set correctly
                     if (Ierrors.IsError(rcStdio))

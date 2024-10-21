@@ -8,7 +8,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 	/// </summary>
 //JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
 //ORIGINAL LINE: @JsonIgnoreProperties(ignoreUnknown = true) public class Product implements org.mustangproject.ZUGFeRD.IZUGFeRDExportableProduct
-	public class Product : IZugFeRdExportableProduct
+	public class Product : IZUGFeRDExportableProduct
 	{
 		protected internal string Unit, Name, Description, SellerAssignedId, BuyerAssignedId;
 		protected internal decimal VatPercent;
@@ -160,7 +160,53 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			return VatPercent;
 		}
 
-		/// <summary>
+        public bool GetIntraCommunitySupply()
+        {
+            return false;
+        }
+
+        public bool GetReverseCharge()
+        {
+            return false;
+        }
+
+        public string GetTaxCategoryCode()
+        {
+			if (IsIntraCommunitySupply())
+			{
+				return "K"; // "K"; // within europe
+			}
+			else if (IsReverseCharge())
+			{
+				return "AE"; // "AE"; // to out of europe...
+			}
+			else if (GetVatPercent().Equals(decimal.Zero))
+			{
+				return "Z"; // "Z"; // zero rated goods
+			}
+			else
+			{
+                // "S" - one of the "standard" rates (not
+                // neccessarily a rate, even a deducted VAT
+                // is standard calculation)
+				return "S"; 
+            }
+        }
+
+        public string GetTaxExemptionReason()
+        {
+			if (IsIntraCommunitySupply())
+			{
+				return "Intra-community supply";
+			}
+			else if (IsReverseCharge())
+			{
+				return "Reverse Charge";
+			}
+			return null;
+        }
+
+        /// <summary>
 		///**
 		/// VAT rate of the product </summary>
 		/// <param name="vatPercent"> vat rate of the product </param>

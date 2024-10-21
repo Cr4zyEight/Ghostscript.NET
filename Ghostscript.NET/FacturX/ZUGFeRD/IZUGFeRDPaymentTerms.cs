@@ -4,7 +4,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
 
 
-    public interface IZugFeRdPaymentTerms
+    public interface IZUGFeRDPaymentTerms
     {
 
         string GetDescription();

@@ -51,7 +51,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
          *
          * @return the contact person at the supplier side
          */
-        IZugFeRdExportableTradeParty GetSender();
+        IZUGFeRDExportableTradeParty GetSender();
 
 
         /**
@@ -78,7 +78,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			}
 		*/
 
-		IZugFeRdExportableItem[] GetZfItems();
+		IZUGFeRDExportableItem[] GetZfItems();
 
 
 		/**
@@ -86,7 +86,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		 *
 		 * @return the recipient of the invoice
 		 */
-		IZugFeRdExportableTradeParty GetRecipient();
+		IZUGFeRDExportableTradeParty GetRecipient();
 
 
         /**
@@ -94,14 +94,14 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
          * @deprecated use getTradeSettlement
          * @return an array of IZUGFeRDTradeSettlementPayment
          */
-        IZugFeRdTradeSettlementPayment[]? GetTradeSettlementPayment();
+        IZUGFeRDTradeSettlementPayment[]? GetTradeSettlementPayment();
 
         /**
          * the payment information for any payment means
          *
          * @return an array of IZUGFeRDTradeSettlement
          */
-        IZugFeRdTradeSettlement[]? GetTradeSettlement();
+        IZUGFeRDTradeSettlement[]? GetTradeSettlement();
 
 
         /**
@@ -155,7 +155,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
          *
          * @return the IZUGFeRDPaymentTerms of the invoice
          **/
-        IZugFeRdPaymentTerms GetPaymentTerms();
+        IZUGFeRDPaymentTerms GetPaymentTerms();
 
         /**
          * returns if a rebate agreements exists
@@ -264,7 +264,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		 * @return the IZUGFeRDExportableTradeParty delivery address
 		 */
 
-        IZugFeRdExportableTradeParty GetDeliveryAddress();
+        IZUGFeRDExportableTradeParty GetDeliveryAddress();
 
 
 		/***

@@ -39,7 +39,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         protected internal TradeParty Sender = null, Recipient = null, DeliveryAddress = null;
         //JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
         //ORIGINAL LINE: @JsonDeserialize(contentAs=Item.class) protected java.util.ArrayList<IZUGFeRDExportableItem> ZFItems = null;
-        protected internal List<IZugFeRdExportableItem> ZfItems = null;
+        protected internal List<IZUGFeRDExportableItem> ZfItems = null;
         protected internal List<string> Notes = null;
         protected internal string SellerOrderReferencedDocumentId;
         protected internal string ContractReferencedDocument = null;
@@ -49,14 +49,14 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         protected internal DateTime? DetailedDeliveryPeriodEnd = null;
 
         //protected internal List<IZUGFeRDAllowanceCharge> Allowances = new List<IZUGFeRDAllowanceCharge>(), Charges = new List<IZUGFeRDAllowanceCharge>(), LogisticsServiceCharges = new List<IZUGFeRDAllowanceCharge>();
-        protected internal IZugFeRdPaymentTerms PaymentTerms = null;
+        protected internal IZUGFeRDPaymentTerms PaymentTerms = null;
         protected internal DateTime InvoiceReferencedIssueDate;
         protected internal string SpecifiedProcuringProjectId = null;
         protected internal string SpecifiedProcuringProjectName = null;
 
         public Invoice()
         {
-            ZfItems = new List<IZugFeRdExportableItem>();
+            ZfItems = new List<IZUGFeRDExportableItem>();
             SetCurrency("EUR");
         }
 
@@ -107,12 +107,12 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
             }
             */
-        public IZugFeRdExportableTradeParty GetRecipient()
+        public IZUGFeRDExportableTradeParty GetRecipient()
         {
             return Recipient;
         }
 
-        public IZugFeRdTradeSettlementPayment[] GetTradeSettlementPayment()
+        public IZUGFeRDTradeSettlementPayment[] GetTradeSettlementPayment()
         {
             return null;
         }
@@ -332,7 +332,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             this.BuyerOrderReferencedDocumentIssueDateTime = buyerOrderReferencedDocumentIssueDateTime;
             return this;
         }
-        public IZugFeRdExportableTradeParty GetSender()
+        public IZUGFeRDExportableTradeParty GetSender()
         {
             return Sender;
         }
@@ -379,7 +379,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 
 
-        public virtual void SetZfItems(List<IZugFeRdExportableItem> ims)
+        public virtual void SetZfItems(List<IZUGFeRDExportableItem> ims)
         {
             ZfItems = ims;
         }
@@ -593,7 +593,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             }
 
         */
-        public IZugFeRdTradeSettlement[]? GetTradeSettlement()
+        public IZUGFeRDTradeSettlement[]? GetTradeSettlement()
         {
             if (GetSender() == null)
             {
@@ -604,20 +604,20 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
 
-        public IZugFeRdPaymentTerms GetPaymentTerms()
+        public IZUGFeRDPaymentTerms GetPaymentTerms()
         {
 
             return PaymentTerms;
 
         }
 
-        public virtual Invoice SetPaymentTerms(IZugFeRdPaymentTerms paymentTerms)
+        public virtual Invoice SetPaymentTerms(IZUGFeRDPaymentTerms paymentTerms)
         {
             this.PaymentTerms = paymentTerms;
             return this;
         }
 
-        public IZugFeRdExportableTradeParty GetDeliveryAddress()
+        public IZUGFeRDExportableTradeParty GetDeliveryAddress()
         {
 
             return DeliveryAddress;
@@ -635,7 +635,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             return this;
         }
 
-        public IZugFeRdExportableItem[] GetZfItems()
+        public IZUGFeRDExportableItem[] GetZfItems()
         {
             return ZfItems.ToArray();
 
@@ -648,7 +648,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// <seealso cref="Item"/>
         /// <param name="item"> the invoice line </param>
         /// <returns> fluent setter </returns>
-        public virtual Invoice AddItem(IZugFeRdExportableItem item)
+        public virtual Invoice AddItem(IZUGFeRDExportableItem item)
         {
             ZfItems.Add(item);
             return this;

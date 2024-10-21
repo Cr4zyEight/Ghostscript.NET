@@ -10,7 +10,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 	/// <seealso cref="TradeParty"/>
 	//JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
 	//ORIGINAL LINE: @JsonIgnoreProperties(ignoreUnknown = true) public class Contact implements org.mustangproject.ZUGFeRD.IZUGFeRDExportableContact
-	public class Contact : IZugFeRdExportableContact
+	public class Contact : IZUGFeRDExportableContact
 	{
 
 		protected internal string Name, Phone, Email, Zip, Street, Location, Country;
@@ -120,6 +120,11 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
 
+        public string GetId()
+        {
+            return null;
+        }
+
         public string GetName()
 		{
 			return Name;
@@ -189,7 +194,12 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			return Zip;
 		}
 
-		/// <summary>
+        public string GetVatid()
+        {
+            return null;
+        }
+
+        /// <summary>
 		///*
 		/// the postcode, if the address is different to the organisation </summary>
 		/// <param name="zip"> the postcode of the contact </param>
@@ -205,7 +215,12 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			return Street;
 		}
 
-		/// <summary>
+        public string GetAdditionalAddress()
+        {
+            return null;
+        }
+
+        /// <summary>
 		/// street and number, if the address is different to the organisation
 		/// </summary>
 		/// <param name="street"> street and number of the contact </param>
