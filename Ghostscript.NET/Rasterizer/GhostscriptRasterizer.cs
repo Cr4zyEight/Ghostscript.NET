@@ -46,7 +46,7 @@ namespace Ghostscript.NET.Rasterizer
 
         #region Constructor
 
-        public GhostscriptRasterizer(GhostscriptStdIO stdIo)
+        public GhostscriptRasterizer(GhostscriptStdIo stdIo)
         {
             _viewer = new GhostscriptViewer();
             _viewer.ShowPageAfterOpen = false;
@@ -55,12 +55,12 @@ namespace Ghostscript.NET.Rasterizer
 
             if (stdIo != null)
             {
-                _viewer.AttachStdIO(stdIo);
+                _viewer.AttachStdIo(stdIo);
             }
         }
 
         public GhostscriptRasterizer()
-            : this(default(GhostscriptStdIO))
+            : this(default(GhostscriptStdIo))
         {
         }
 
@@ -143,7 +143,7 @@ namespace Ghostscript.NET.Rasterizer
                 throw new ArgumentNullException("stream");
             }
 
-            this.Open(stream, GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL), false);
+            this.Open(stream, GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl), false);
         }
 
         #endregion
@@ -157,7 +157,7 @@ namespace Ghostscript.NET.Rasterizer
                 throw new FileNotFoundException("Could not find input file.", path);
             }
 
-            this.Open(path, GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL), false);
+            this.Open(path, GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl), false);
         }
 
         #endregion
@@ -328,15 +328,15 @@ namespace Ghostscript.NET.Rasterizer
 
         #region EPSClip
 
-        public bool EPSClip
+        public bool EpsClip
         {
             get
             {
-                return _viewer.EPSClip;
+                return _viewer.EpsClip;
             }
             set
             {
-                _viewer.EPSClip = value;
+                _viewer.EpsClip = value;
             }
         }
 

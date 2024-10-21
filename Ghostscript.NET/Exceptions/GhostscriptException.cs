@@ -54,7 +54,7 @@ namespace Ghostscript.NET
                     return string.Empty;
                 }
 
-                return ierrors.GetErrorName(_code);
+                return Ierrors.GetErrorName(_code);
             }
         }
     }

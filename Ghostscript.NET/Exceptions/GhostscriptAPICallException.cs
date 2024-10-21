@@ -28,9 +28,9 @@ using System;
 
 namespace Ghostscript.NET
 {
-    public class GhostscriptAPICallException : GhostscriptException
+    public class GhostscriptApiCallException : GhostscriptException
     {
-        public GhostscriptAPICallException(string function, int code) 
+        public GhostscriptApiCallException(string function, int code) 
             : base(string.Format("An error occured when call to '{0}' is made: {1}", function, code))
         { }
     }

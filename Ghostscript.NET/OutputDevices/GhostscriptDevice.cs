@@ -247,18 +247,18 @@ namespace Ghostscript.NET
 
         #region Process - stdIO_callback
 
-        public void Process(GhostscriptStdIO stdIO_callback)
+        public void Process(GhostscriptStdIo stdIoCallback)
         {
-            this.Process(GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL), 
+            this.Process(GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl), 
                          true,
-                         stdIO_callback); 
+                         stdIoCallback); 
         }
 
         #endregion
 
         #region Process - ghostscriptVersion, fromMemory, stdIO_callback
 
-        public void Process(GhostscriptVersionInfo ghostscriptVersion, bool fromMemory, GhostscriptStdIO stdIO_callback)
+        public void Process(GhostscriptVersionInfo ghostscriptVersion, bool fromMemory, GhostscriptStdIo stdIoCallback)
         {
             if (ghostscriptVersion == null)
             {
@@ -267,7 +267,7 @@ namespace Ghostscript.NET
 
             using (GhostscriptProcessor processor = new GhostscriptProcessor(ghostscriptVersion, fromMemory))
             {
-                processor.StartProcessing(this.GetSwitches(), stdIO_callback);
+                processor.StartProcessing(this.GetSwitches(), stdIoCallback);
             }
         }
 

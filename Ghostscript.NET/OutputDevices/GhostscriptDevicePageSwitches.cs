@@ -62,7 +62,7 @@ namespace Ghostscript.NET
         /// with the -dFIXEDMEDIA option. This option is also set by the -dFitPage option.
         /// </summary>
         [GhostscriptSwitch("-dPSFitPage")]
-        public GhostscriptOptionalSwitch? PSFitPage { get; set; }
+        public GhostscriptOptionalSwitch? PsFitPage { get; set; }
 
         #endregion
 

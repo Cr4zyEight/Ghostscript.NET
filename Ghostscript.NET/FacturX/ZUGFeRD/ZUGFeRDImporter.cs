@@ -28,37 +28,37 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
     using Item = Ghostscript.NET.FacturX.ZUGFeRD.Item;
     using Product = Ghostscript.NET.FacturX.ZUGFeRD.Product;
 
-    public class ZUGFeRDImporter
+    public class ZugFeRdImporter
     {
 
         /// <summary>
         /// if metadata has been found
         /// </summary>
         //JAVA TO C# CONVERTER NOTE: Fields cannot have the same name as methods of the current type:
-        protected internal bool containsMeta_Conflict = false;
-        protected System.Xml.XmlDocument xmlDoc;
+        protected internal bool ContainsMetaConflict = false;
+        protected System.Xml.XmlDocument XmlDoc;
         /// <summary>
         /// map filenames of additional XML files to their contents
         /// </summary>
-        private Dictionary<string, sbyte[]> additionalXMLs = new Dictionary<string, sbyte[]>();
+        private Dictionary<string, sbyte[]> _additionalXmLs = new Dictionary<string, sbyte[]>();
         /// <summary>
         /// Raw XML form of the extracted data - may be directly obtained.
         /// </summary>
-        private byte[] rawXML = null;
+        private byte[] _rawXml = null;
         /// <summary>
         /// XMP metadata
         /// </summary>
-        private string xmpString = null; // XMP metadata
+        private string _xmpString = null; // XMP metadata
 
-        private readonly ILogger<ZUGFeRDImporter> _logger;
+        private readonly ILogger<ZugFeRdImporter> _logger;
 
 
-        protected internal ZUGFeRDImporter()
+        protected internal ZugFeRdImporter()
         {
             //constructor for extending classes
         }
 
-        public ZUGFeRDImporter(string pdfFilename)
+        public ZugFeRdImporter(string pdfFilename)
         {
             using var loggerFactory = LoggerFactory.Create(builder =>
         {
@@ -72,19 +72,19 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                 throw new Exception("File not found");
             }
 
-            _logger = loggerFactory.CreateLogger<ZUGFeRDImporter>();
+            _logger = loggerFactory.CreateLogger<ZugFeRdImporter>();
             _logger.LogInformation("Example log message");
-            FromPDF(pdfFilename);
+            FromPdf(pdfFilename);
             //FileStream fs = File.OpenRead(pdfFilename);
             //		extractLowLevel(fs);
         }
 
 
-        public ZUGFeRDImporter(Stream pdfStream)
+        public ZugFeRdImporter(Stream pdfStream)
         {
             try
             {
-                extractLowLevel(pdfStream);
+                ExtractLowLevel(pdfStream);
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
             //ORIGINAL LINE: catch (final java.io.IOException e)
@@ -103,7 +103,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// <param name="pdfStream"> a inputstream of a pdf file </param>
         //JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in C#:
         //ORIGINAL LINE: private void extractLowLevel(java.io.InputStream pdfStream) throws java.io.IOException
-        private void extractLowLevel(Stream pdfStream)
+        private void ExtractLowLevel(Stream pdfStream)
         {
 
         }
@@ -118,15 +118,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
         ///     ''' </summary>
 
-        ///     ''' <param name="pPDFFile"></param>
+        ///     ''' <param name="pPdfFile"></param>
 
         ///     ''' <returns></returns>
-        protected PdfStream GetStreamFromPDF(string pPDFFile)
+        protected PdfStream GetStreamFromPdf(string pPdfFile)
         {
             PdfReader reader = null/* TODO Change to default(_) if this is not a reference type */;
             try
             {
-                reader = new PdfReader(pPDFFile);
+                reader = new PdfReader(pPdfFile);
             }
             catch (Exception ex)
             {
@@ -136,8 +136,8 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
             PdfDocument doc = new PdfDocument(reader);
 
-            PdfAConformanceLevel PDFConfLevel = doc.GetReader().GetPdfAConformanceLevel();
-            if (PDFConfLevel == null)
+            PdfAConformanceLevel pdfConfLevel = doc.GetReader().GetPdfAConformanceLevel();
+            if (pdfConfLevel == null)
                 return null/* TODO Change to default(_) if this is not a reference type */;// kein PDF/A
                                                                                            //mPDFFileInfo.isPDFA = true;
 
@@ -145,7 +145,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             //mPDFFileInfo.levelPart = PDFConfLevel.GetPart();
             //mPDFFileInfo.isPDFA3 = System.Convert.ToBoolean(mPDFFileInfo.levelPart == "3"); // True
 
-            if ((PDFConfLevel.GetPart() != "3") && (PDFConfLevel.GetPart() != "4"))
+            if ((pdfConfLevel.GetPart() != "3") && (pdfConfLevel.GetPart() != "4"))
                 return null/* TODO Change to default(_) if this is not a reference type */;// kein PDF/A-3
 
 
@@ -219,16 +219,16 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// <summary>
         ///     ''' Lesen der ZUGFeRD-XML-Struktur aus einer PDF-Datei in eine Zieldatei
         ///     ''' </summary>
-        ///     ''' <param name="pPDFFile"></param>
+        ///     ''' <param name="pPdfFile"></param>
         ///     ''' <returns>false, falls nicht gelesen werden kann. Probleme können in dem Fall mPDFInfo entnommen werden, dort muss alles auf True bzw. 1 stehen</returns>
-        public bool FromPDF(string pPDFFile)
+        public bool FromPdf(string pPdfFile)
         {
-            PdfStream stream = GetStreamFromPDF(pPDFFile);
+            PdfStream stream = GetStreamFromPdf(pPdfFile);
             if (stream == null)
                 return false; // details in mPDFInfo
             else
             {
-                xmlDoc = new System.Xml.XmlDocument();
+                XmlDoc = new System.Xml.XmlDocument();
                 // Dim encoding As New System.Text.UTF8Encoding(True) ' The boolean parameter controls BOM
                 // Dim reader As New System.IO.StreamReader("your file path", encoding)
 
@@ -248,9 +248,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                     xml = xml.Substring(1);
 
 
-                xmlDoc.LoadXml(xml);
+                XmlDoc.LoadXml(xml);
 
-                rawXML = xmlBytes;
+                _rawXml = xmlBytes;
                 //            FromXML(xmlDoc);
 
                 return true;
@@ -263,9 +263,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// Returns the raw XML data as extracted from the ZUGFeRD PDF file.
         /// </summary>
         /// <returns> the raw ZUGFeRD XML data </returns>
-        public virtual byte[] getRawXML()
+        public virtual byte[] GetRawXml()
         {
-            return rawXML;
+            return _rawXml;
         }
         /*
                 protected internal virtual Document getDocument()
@@ -303,9 +303,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 
         */
-        protected internal virtual string extractString(string xpathStr)
+        protected internal virtual string ExtractString(string xpathStr)
         {
-            XmlNode resultNode = xmlDoc.SelectSingleNode(xpathStr);
+            XmlNode resultNode = XmlDoc.SelectSingleNode(xpathStr);
 
 
 
@@ -326,20 +326,20 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
         }
         /// <returns> the reference (purpose) the sender specified for this invoice </returns>
-        public virtual string getForeignReference()
+        public virtual string GetForeignReference()
         {
-            string result = extractString("//*[local-name() = 'ApplicableHeaderTradeSettlement']/*[local-name() = 'PaymentReference']");
+            string result = ExtractString("//*[local-name() = 'ApplicableHeaderTradeSettlement']/*[local-name() = 'PaymentReference']");
             if (string.ReferenceEquals(result, null) || result.Length == 0)
             {
-                result = extractString("//*[local-name() = 'ApplicableSupplyChainTradeSettlement']/*[local-name() = 'PaymentReference']");
+                result = ExtractString("//*[local-name() = 'ApplicableSupplyChainTradeSettlement']/*[local-name() = 'PaymentReference']");
             }
             return result;
         }
 
         /// <returns> the ZUGFeRD Profile </returns>
-        public virtual string getZUGFeRDProfil()
+        public virtual string GetZugFeRdProfil()
         {
-            switch (extractString("//*[local-name() = 'GuidelineSpecifiedDocumentContextParameter']//*[local-name() = 'ID']"))
+            switch (ExtractString("//*[local-name() = 'GuidelineSpecifiedDocumentContextParameter']//*[local-name() = 'ID']"))
             {
                 case "urn:cen.eu:en16931:2017":
                 case "urn:ferd:CrossIndustryDocument:invoice:1p0:comfort":
@@ -359,17 +359,17 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> the Invoice Currency Code </returns>
-        public virtual string getInvoiceCurrencyCode()
+        public virtual string GetInvoiceCurrencyCode()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'ApplicableSupplyChainTradeSettlement']//*[local-name() = 'InvoiceCurrencyCode']");
+                    return ExtractString("//*[local-name() = 'ApplicableSupplyChainTradeSettlement']//*[local-name() = 'InvoiceCurrencyCode']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'ApplicableHeaderTradeSettlement']//*[local-name() = 'InvoiceCurrencyCode']");
+                    return ExtractString("//*[local-name() = 'ApplicableHeaderTradeSettlement']//*[local-name() = 'InvoiceCurrencyCode']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -384,34 +384,34 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> the IssuerAssigned ID </returns>
-        public virtual string getIssuerAssignedID()
+        public virtual string GetIssuerAssignedId()
         {
-            return extractIssuerAssignedID("BuyerOrderReferencedDocument");
+            return ExtractIssuerAssignedId("BuyerOrderReferencedDocument");
         }
 
         /// <returns> the SellerOrderReferencedDocument IssuerAssigned ID </returns>
-        public virtual string getSellerOrderReferencedDocumentIssuerAssignedID()
+        public virtual string GetSellerOrderReferencedDocumentIssuerAssignedId()
         {
-            return extractIssuerAssignedID("SellerOrderReferencedDocument");
+            return ExtractIssuerAssignedId("SellerOrderReferencedDocument");
         }
 
         /// <returns> the IssuerAssigned ID </returns>
-        public virtual string getContractOrderReferencedDocumentIssuerAssignedID()
+        public virtual string GetContractOrderReferencedDocumentIssuerAssignedId()
         {
-            return extractIssuerAssignedID("ContractReferencedDocument");
+            return ExtractIssuerAssignedId("ContractReferencedDocument");
         }
 
-        private string extractIssuerAssignedID(string propertyName)
+        private string ExtractIssuerAssignedId(string propertyName)
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'BuyerOrderReferencedDocument']//*[local-name() = 'ID']");
+                    return ExtractString("//*[local-name() = 'BuyerOrderReferencedDocument']//*[local-name() = 'ID']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'BuyerOrderReferencedDocument']//*[local-name() = 'IssuerAssignedID']");
+                    return ExtractString("//*[local-name() = 'BuyerOrderReferencedDocument']//*[local-name() = 'IssuerAssignedID']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -425,23 +425,23 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> the BuyerTradeParty ID </returns>
-        public virtual string getBuyerTradePartyID()
+        public virtual string GetBuyerTradePartyId()
         {
-            return extractString("//*[local-name() = 'BuyerTradeParty']//*[local-name() = 'ID']");
+            return ExtractString("//*[local-name() = 'BuyerTradeParty']//*[local-name() = 'ID']");
         }
 
         /// <returns> the Issue Date() </returns>
-        public virtual string getIssueDate()
+        public virtual string GetIssueDate()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'HeaderExchangedDocument']//*[local-name() = 'IssueDateTime']//*[local-name() = 'DateTimeString']");
+                    return ExtractString("//*[local-name() = 'HeaderExchangedDocument']//*[local-name() = 'IssueDateTime']//*[local-name() = 'DateTimeString']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'ExchangedDocument']//*[local-name() = 'IssueDateTime']//*[local-name() = 'DateTimeString']");
+                    return ExtractString("//*[local-name() = 'ExchangedDocument']//*[local-name() = 'IssueDateTime']//*[local-name() = 'DateTimeString']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -455,17 +455,17 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> the TaxBasisTotalAmount </returns>
-        public virtual string getTaxBasisTotalAmount()
+        public virtual string GetTaxBasisTotalAmount()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'SpecifiedTradeSettlementMonetarySummation']//*[local-name() = 'TaxBasisTotalAmount']");
+                    return ExtractString("//*[local-name() = 'SpecifiedTradeSettlementMonetarySummation']//*[local-name() = 'TaxBasisTotalAmount']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']//*[local-name() = 'TaxBasisTotalAmount']");
+                    return ExtractString("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']//*[local-name() = 'TaxBasisTotalAmount']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -479,17 +479,17 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> the TaxTotalAmount </returns>
-        public virtual string getTaxTotalAmount()
+        public virtual string GetTaxTotalAmount()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'SpecifiedTradeSettlementMonetarySummation']//*[local-name() = 'TaxTotalAmount']");
+                    return ExtractString("//*[local-name() = 'SpecifiedTradeSettlementMonetarySummation']//*[local-name() = 'TaxTotalAmount']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']//*[local-name() = 'TaxTotalAmount']");
+                    return ExtractString("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']//*[local-name() = 'TaxTotalAmount']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -503,17 +503,17 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> the RoundingAmount </returns>
-        public virtual string getRoundingAmount()
+        public virtual string GetRoundingAmount()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'SpecifiedTradeSettlementMonetarySummation']//*[local-name() = 'RoundingAmount']");
+                    return ExtractString("//*[local-name() = 'SpecifiedTradeSettlementMonetarySummation']//*[local-name() = 'RoundingAmount']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']//*[local-name() = 'RoundingAmount']");
+                    return ExtractString("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']//*[local-name() = 'RoundingAmount']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -527,17 +527,17 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> the TotalPrepaidAmount </returns>
-        public virtual string getPaidAmount()
+        public virtual string GetPaidAmount()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'SpecifiedTradeSettlementMonetarySummation']//*[local-name() = 'TotalPrepaidAmount']");
+                    return ExtractString("//*[local-name() = 'SpecifiedTradeSettlementMonetarySummation']//*[local-name() = 'TotalPrepaidAmount']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']//*[local-name() = 'TotalPrepaidAmount']");
+                    return ExtractString("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']//*[local-name() = 'TotalPrepaidAmount']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -551,36 +551,36 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> SellerTradeParty GlobalID </returns>
-        public virtual string getSellerTradePartyGlobalID()
+        public virtual string GetSellerTradePartyGlobalId()
         {
-            return extractString("//*[local-name() = 'SellerTradeParty']//*[local-name() = 'GlobalID']");
+            return ExtractString("//*[local-name() = 'SellerTradeParty']//*[local-name() = 'GlobalID']");
         }
 
         /// <returns> the BuyerTradeParty GlobalID </returns>
-        public virtual string getBuyerTradePartyGlobalID()
+        public virtual string GetBuyerTradePartyGlobalId()
         {
-            return extractString("//*[local-name() = 'BuyerTradeParty']//*[local-name() = 'GlobalID']");
+            return ExtractString("//*[local-name() = 'BuyerTradeParty']//*[local-name() = 'GlobalID']");
         }
 
         /// <returns> the BuyerTradeParty SpecifiedTaxRegistration ID </returns>
-        public virtual string getBuyertradePartySpecifiedTaxRegistrationID()
+        public virtual string GetBuyertradePartySpecifiedTaxRegistrationId()
         {
-            return extractString("//*[local-name() = 'BuyerTradeParty']//*[local-name() = 'SpecifiedTaxRegistration']//*[local-name() = 'ID']");
+            return ExtractString("//*[local-name() = 'BuyerTradeParty']//*[local-name() = 'SpecifiedTaxRegistration']//*[local-name() = 'ID']");
         }
 
 
         /// <returns> the IncludedNote </returns>
-        public virtual string getIncludedNote()
+        public virtual string GetIncludedNote()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'HeaderExchangedDocument']//*[local-name() = 'IncludedNote']");
+                    return ExtractString("//*[local-name() = 'HeaderExchangedDocument']//*[local-name() = 'IncludedNote']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'ExchangedDocument']//*[local-name() = 'IncludedNote']");
+                    return ExtractString("//*[local-name() = 'ExchangedDocument']//*[local-name() = 'IncludedNote']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -594,25 +594,25 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> the BuyerTradeParty Name </returns>
-        public virtual string getBuyerTradePartyName()
+        public virtual string GetBuyerTradePartyName()
         {
-            return extractString("//*[local-name() = 'BuyerTradeParty']//*[local-name() = 'Name']");
+            return ExtractString("//*[local-name() = 'BuyerTradeParty']//*[local-name() = 'Name']");
         }
 
 
 
         /// <returns> the line Total Amount </returns>
-        public virtual string getLineTotalAmount()
+        public virtual string GetLineTotalAmount()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'SpecifiedTradeSettlementMonetarySummation']//*[local-name() = 'LineTotalAmount']");
+                    return ExtractString("//*[local-name() = 'SpecifiedTradeSettlementMonetarySummation']//*[local-name() = 'LineTotalAmount']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']//*[local-name() = 'LineTotalAmount']");
+                    return ExtractString("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']//*[local-name() = 'LineTotalAmount']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -626,23 +626,23 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> the Payment Terms </returns>
-        public virtual string getPaymentTerms()
+        public virtual string GetPaymentTerms()
         {
-            return extractString("//*[local-name() = 'SpecifiedTradePaymentTerms']//*[local-name() = 'Description']");
+            return ExtractString("//*[local-name() = 'SpecifiedTradePaymentTerms']//*[local-name() = 'Description']");
         }
 
         /// <returns> the Taxpoint Date </returns>
-        public virtual string getTaxPointDate()
+        public virtual string GetTaxPointDate()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'ActualDeliverySupplyChainEvent']//*[local-name() = 'OccurrenceDateTime']//*[local-name() = 'DateTimeString']");
+                    return ExtractString("//*[local-name() = 'ActualDeliverySupplyChainEvent']//*[local-name() = 'OccurrenceDateTime']//*[local-name() = 'DateTimeString']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'ActualDeliverySupplyChainEvent']//*[local-name() = 'OccurrenceDateTime']//*[local-name() = 'DateTimeString']");
+                    return ExtractString("//*[local-name() = 'ActualDeliverySupplyChainEvent']//*[local-name() = 'OccurrenceDateTime']//*[local-name() = 'DateTimeString']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -656,17 +656,17 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> the Invoice ID </returns>
-        public virtual string getInvoiceID()
+        public virtual string GetInvoiceId()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'HeaderExchangedDocument']//*[local-name() = 'ID']");
+                    return ExtractString("//*[local-name() = 'HeaderExchangedDocument']//*[local-name() = 'ID']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'ExchangedDocument']//*[local-name() = 'ID']");
+                    return ExtractString("//*[local-name() = 'ExchangedDocument']//*[local-name() = 'ID']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -682,17 +682,17 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 
         /// <returns> the document code </returns>
-        public virtual string getDocumentCode()
+        public virtual string GetDocumentCode()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'HeaderExchangedDocument']/*[local-name() = 'TypeCode']");
+                    return ExtractString("//*[local-name() = 'HeaderExchangedDocument']/*[local-name() = 'TypeCode']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'ExchangedDocument']/*[local-name() = 'TypeCode']");
+                    return ExtractString("//*[local-name() = 'ExchangedDocument']/*[local-name() = 'TypeCode']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -707,17 +707,17 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 
         /// <returns> the referred document </returns>
-        public virtual string getReference()
+        public virtual string GetReference()
         {
             try
             {
-                if (getVersion() == 1)
+                if (GetVersion() == 1)
                 {
-                    return extractString("//*[local-name() = 'ApplicableSupplyChainTradeAgreement']/*[local-name() = 'BuyerReference']");
+                    return ExtractString("//*[local-name() = 'ApplicableSupplyChainTradeAgreement']/*[local-name() = 'BuyerReference']");
                 }
                 else
                 {
-                    return extractString("//*[local-name() = 'ApplicableHeaderTradeAgreement']/*[local-name() = 'BuyerReference']");
+                    return ExtractString("//*[local-name() = 'ApplicableHeaderTradeAgreement']/*[local-name() = 'BuyerReference']");
                 }
             }
             //JAVA TO C# CONVERTER WARNING: 'final' catch parameters are not available in C#:
@@ -732,39 +732,39 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 
         /// <returns> the sender's bank's BIC code </returns>
-        public virtual string getBIC()
+        public virtual string GetBic()
         {
-            return extractString("//*[local-name() = 'PayeeSpecifiedCreditorFinancialInstitution']/*[local-name() = 'BICID']");
+            return ExtractString("//*[local-name() = 'PayeeSpecifiedCreditorFinancialInstitution']/*[local-name() = 'BICID']");
         }
 
 
         /// <returns> the sender's bank name </returns>
-        public virtual string getBankName()
+        public virtual string GetBankName()
         {
-            return extractString("//*[local-name() = 'PayeeSpecifiedCreditorFinancialInstitution']/*[local-name() = 'Name']");
+            return ExtractString("//*[local-name() = 'PayeeSpecifiedCreditorFinancialInstitution']/*[local-name() = 'Name']");
         }
 
 
         /// <returns> the sender's account IBAN code </returns>
-        public virtual string getIBAN()
+        public virtual string GetIban()
         {
-            return extractString("//*[local-name() = 'PayeePartyCreditorFinancialAccount']/*[local-name() = 'IBANID']");
+            return ExtractString("//*[local-name() = 'PayeePartyCreditorFinancialAccount']/*[local-name() = 'IBANID']");
         }
 
 
-        public virtual string getHolder()
+        public virtual string GetHolder()
         {
-            return extractString("//*[local-name() = 'SellerTradeParty']/*[local-name() = 'Name']");
+            return ExtractString("//*[local-name() = 'SellerTradeParty']/*[local-name() = 'Name']");
         }
 
 
         /// <returns> the total payable amount </returns>
-        public virtual string getAmount()
+        public virtual string GetAmount()
         {
 
             // xmlDoc property is a  XmlDocument
             // 
-            XmlNode amountNode = xmlDoc.SelectSingleNode("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']/*[local-name() = 'DuePayableAmount']");
+            XmlNode amountNode = XmlDoc.SelectSingleNode("//*[local-name() = 'SpecifiedTradeSettlementHeaderMonetarySummation']/*[local-name() = 'DuePayableAmount']");
 
 
 
@@ -785,36 +785,36 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 
         /// <returns> when the payment is due </returns>
-        public virtual string getDueDate()
+        public virtual string GetDueDate()
         {
-            return extractString("//*[local-name() = 'SpecifiedTradePaymentTerms']/*[local-name() = 'DueDateDateTime']/*[local-name() = 'DateTimeString']");
+            return ExtractString("//*[local-name() = 'SpecifiedTradePaymentTerms']/*[local-name() = 'DueDateDateTime']/*[local-name() = 'DateTimeString']");
         }
-        public virtual int getVersion()
+        public virtual int GetVersion()
         {
-            if (!containsMeta_Conflict)
+            if (!ContainsMetaConflict)
             {
                 throw new Exception("Not yet parsed");
             }
-            if (getUTF8().Contains("<rsm:CrossIndustryDocument"))
+            if (GetUtf8().Contains("<rsm:CrossIndustryDocument"))
             {
                 return 1;
             }
-            else if (getUTF8().Contains("<rsm:CrossIndustryInvoice"))
+            else if (GetUtf8().Contains("<rsm:CrossIndustryInvoice"))
             {
                 return 2;
             }
             throw new Exception("ZUGFeRD version could not be determined");
         }
 
-        public virtual string getUTF8()
+        public virtual string GetUtf8()
         {
-            if (rawXML == null)
+            if (_rawXml == null)
             {
                 return null;
             }
             System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
 
-            return encoding.GetString(rawXML);
+            return encoding.GetString(_rawXml);
 
         }
 

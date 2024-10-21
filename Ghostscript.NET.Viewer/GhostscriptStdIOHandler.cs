@@ -32,12 +32,12 @@ using Ghostscript.NET;
 
 namespace Ghostscript.NET.Viewer
 {
-    public class GhostscriptStdIOHandler : GhostscriptStdIO
+    public class GhostscriptStdIoHandler : GhostscriptStdIo
     {
         private StringBuilder _stdOut;
         private StringBuilder _stdErr;
 
-        public GhostscriptStdIOHandler(StringBuilder stdOut, StringBuilder stdErr) : base(false, true, true)
+        public GhostscriptStdIoHandler(StringBuilder stdOut, StringBuilder stdErr) : base(false, true, true)
         {
             _stdOut = stdOut;
             _stdErr = stdErr;

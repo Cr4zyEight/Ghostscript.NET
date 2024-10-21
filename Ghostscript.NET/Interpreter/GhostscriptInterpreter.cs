@@ -39,7 +39,7 @@ namespace Ghostscript.NET.Interpreter
 
         #region Private constants
 
-        private const int RUN_STRING_MAX_LENGTH = 65535;
+        private const int RunStringMaxLength = 65535;
 
         #endregion
 
@@ -47,10 +47,10 @@ namespace Ghostscript.NET.Interpreter
 
         private bool _disposed = false;
         private GhostscriptLibrary _gs = null;
-        private IntPtr _gs_instance = IntPtr.Zero;
-        private GhostscriptStdIO _stdIO = null;
+        private IntPtr _gsInstance = IntPtr.Zero;
+        private GhostscriptStdIo _stdIo = null;
         private GhostscriptDisplayDeviceHandler _displayDevice = null;
-        private IntPtr _displayDevice_callback_handle = IntPtr.Zero;
+        private IntPtr _displayDeviceCallbackHandle = IntPtr.Zero;
 
         #endregion
 
@@ -60,7 +60,7 @@ namespace Ghostscript.NET.Interpreter
         /// Initializes a new instance of the Ghostscript.NET.GhostscriptInterpreter class.
         /// </summary>
         public GhostscriptInterpreter()
-            : this(GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL), false)
+            : this(GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl), false)
         { }
 
         #endregion
@@ -157,20 +157,20 @@ namespace Ghostscript.NET.Interpreter
                 if (disposing)
                 {
                     // GSAPI: exit the interpreter
-                    _gs.gsapi_exit(_gs_instance);
+                    _gs.GsapiExit(_gsInstance);
 
                     // GSAPI: destroy an instance of Ghostscript
-                    _gs.gsapi_delete_instance(_gs_instance);
+                    _gs.GsapiDeleteInstance(_gsInstance);
 
                     // release all resource used by Ghostscript library
                     _gs.Dispose();
                 }
 
                 // check if the display device callback handler is attached
-                if (_displayDevice_callback_handle != IntPtr.Zero)
+                if (_displayDeviceCallbackHandle != IntPtr.Zero)
                 {
                     // free earlier allocated memory used for the display device callback
-                    Marshal.FreeCoTaskMem(_displayDevice_callback_handle);
+                    Marshal.FreeCoTaskMem(_displayDeviceCallbackHandle);
                 }
 
                 _disposed = true;
@@ -189,11 +189,11 @@ namespace Ghostscript.NET.Interpreter
         private void Initialize()
         {
             // GSAPI: create a new instance of Ghostscript
-            int rc_ins = _gs.gsapi_new_instance(out _gs_instance, IntPtr.Zero);
+            int rcIns = _gs.GsapiNewInstance(out _gsInstance, IntPtr.Zero);
 
-            if (ierrors.IsError(rc_ins))
+            if (Ierrors.IsError(rcIns))
             {
-                throw new GhostscriptAPICallException("gsapi_new_instance", rc_ins);
+                throw new GhostscriptApiCallException("gsapi_new_instance", rcIns);
             }
         }
 
@@ -204,30 +204,30 @@ namespace Ghostscript.NET.Interpreter
         /// <summary>
         /// Sets the stdio and display device callback handlers.
         /// </summary>
-        /// <param name="stdIO">Stdio callback handler.</param>
+        /// <param name="stdIo">Stdio callback handler.</param>
         /// <param name="displayDevice">DisplayDevice callback handler.</param>
-        public void Setup(GhostscriptStdIO stdIO, GhostscriptDisplayDeviceHandler displayDevice)
+        public void Setup(GhostscriptStdIo stdIo, GhostscriptDisplayDeviceHandler displayDevice)
         {
             // check if we need to set stdio handler
-            if (stdIO != null)
+            if (stdIo != null)
             {
                 // check if stdio handler is not already set
-                if (_stdIO == null)
+                if (_stdIo == null)
                 {
                     // GSAPI: set the stdio callback handlers
-                    int rc_stdio = _gs.gsapi_set_stdio(_gs_instance,
-                                            stdIO != null ? stdIO._std_in : null,
-                                            stdIO != null ? stdIO._std_out : null,
-                                            stdIO != null ? stdIO._std_err : null);
+                    int rcStdio = _gs.GsapiSetStdio(_gsInstance,
+                                            stdIo != null ? stdIo._std_in : null,
+                                            stdIo != null ? stdIo._std_out : null,
+                                            stdIo != null ? stdIo.StdErr : null);
 
                     // check if the stdio callback handlers are set correctly
-                    if (ierrors.IsError(rc_stdio))
+                    if (Ierrors.IsError(rcStdio))
                     {
-                        throw new GhostscriptAPICallException("gsapi_set_stdio", rc_stdio);
+                        throw new GhostscriptApiCallException("gsapi_set_stdio", rcStdio);
                     }
 
                     // remember it
-                    _stdIO = stdIO;
+                    _stdIo = stdIo;
                 }
                 else
                 {
@@ -242,18 +242,18 @@ namespace Ghostscript.NET.Interpreter
                 if (_displayDevice == null)
                 {
                     // allocate a memory for the display device callback handler
-                    _displayDevice_callback_handle = Marshal.AllocCoTaskMem(displayDevice._callback.size);
+                    _displayDeviceCallbackHandle = Marshal.AllocCoTaskMem(displayDevice.Callback.size);
 
                     // copy display device callback structure content to the pre-allocated block of memory
-                    Marshal.StructureToPtr(displayDevice._callback, _displayDevice_callback_handle, true);
+                    Marshal.StructureToPtr(displayDevice.Callback, _displayDeviceCallbackHandle, true);
 
                     // GSAPI: set the display device callback handler
-                    int rc_dev = _gs.gsapi_set_display_callback(_gs_instance, _displayDevice_callback_handle);
+                    int rcDev = _gs.GsapiSetDisplayCallback(_gsInstance, _displayDeviceCallbackHandle);
 
                     // check if the display callback handler is set correctly
-                    if (ierrors.IsError(rc_dev))
+                    if (Ierrors.IsError(rcDev))
                     {
-                        throw new GhostscriptAPICallException("gsapi_set_display_callback", rc_dev);
+                        throw new GhostscriptApiCallException("gsapi_set_display_callback", rcDev);
                     }
 
                     // remember it
@@ -277,26 +277,26 @@ namespace Ghostscript.NET.Interpreter
         /// </summary>
         public void InitArgs(string[] args)
         {
-            if (_gs.is_gsapi_set_arg_encoding_supported)
+            if (_gs.IsGsapiSetArgEncodingSupported)
             {
                 // set the encoding to UTF8
-                int rc_enc = _gs.gsapi_set_arg_encoding(_gs_instance, GS_ARG_ENCODING.UTF8);
+                int rcEnc = _gs.GsapiSetArgEncoding(_gsInstance, GsArgEncoding.Utf8);
             }
 
-            string[] utf8args = new string[args.Length];
+            string[] utf8Args = new string[args.Length];
 
             for(int i = 0; i < args.Length; i++)
             {
-                utf8args[i] = StringHelper.ToUtf8String(args[i]);
+                utf8Args[i] = StringHelper.ToUtf8String(args[i]);
             }
             
             // GSAPI: initialize the interpreter
-            int rc_init = _gs.gsapi_init_with_args(_gs_instance, utf8args.Length, utf8args);
+            int rcInit = _gs.GsapiInitWithArgs(_gsInstance, utf8Args.Length, utf8Args);
 
             // check if the interpreter is initialized correctly
-            if (ierrors.IsError(rc_init))
+            if (Ierrors.IsError(rcInit))
             {
-                throw new GhostscriptAPICallException("gsapi_init_with_args", rc_init);
+                throw new GhostscriptApiCallException("gsapi_init_with_args", rcInit);
             }
         }
 
@@ -311,59 +311,59 @@ namespace Ghostscript.NET.Interpreter
         {
             lock (this)
             {
-                int exit_code;
+                int exitCode;
 
                 // check if the string we are trying to run doesn't exceed max length for the 'run_string' function
-                if (str.Length < RUN_STRING_MAX_LENGTH)
+                if (str.Length < RunStringMaxLength)
                 {
                     // GSAPI: run the string
-                    int rc_run = _gs.gsapi_run_string(_gs_instance, str, 0, out exit_code);
+                    int rcRun = _gs.GsapiRunString(_gsInstance, str, 0, out exitCode);
 
-                    if (ierrors.IsFatalIgnoreNeedInput(rc_run))
+                    if (Ierrors.IsFatalIgnoreNeedInput(rcRun))
                     {
-                        throw new GhostscriptAPICallException("gsapi_run_string", rc_run);
+                        throw new GhostscriptApiCallException("gsapi_run_string", rcRun);
                     }
 
-                    return rc_run;
+                    return rcRun;
                 }
                 else // we need to split a string into chunks
                 {
                     // GSAPI: prepare a Ghostscript for running string in chunks
-                    int rc_run_beg = _gs.gsapi_run_string_begin(_gs_instance, 0, out exit_code);
+                    int rcRunBeg = _gs.GsapiRunStringBegin(_gsInstance, 0, out exitCode);
 
-                    if (ierrors.IsFatalIgnoreNeedInput(rc_run_beg))
+                    if (Ierrors.IsFatalIgnoreNeedInput(rcRunBeg))
                     {
-                        throw new GhostscriptAPICallException("gsapi_run_string_begin", rc_run_beg);
+                        throw new GhostscriptApiCallException("gsapi_run_string_begin", rcRunBeg);
                     }
 
                     int chunkStart = 0;
 
                     // start splitting a string into chunks
-                    for (int size = str.Length; size > 0; size -= RUN_STRING_MAX_LENGTH)
+                    for (int size = str.Length; size > 0; size -= RunStringMaxLength)
                     {
-                        int chunkSize = (size < RUN_STRING_MAX_LENGTH) ? size : RUN_STRING_MAX_LENGTH;
+                        int chunkSize = (size < RunStringMaxLength) ? size : RunStringMaxLength;
                         string chunk = str.Substring(chunkStart, chunkSize);
 
                         // GSAPI: run a chunk
-                        int rc_run_con = _gs.gsapi_run_string_continue(_gs_instance, chunk, (uint)chunkSize, 0, out exit_code);
+                        int rcRunCon = _gs.GsapiRunStringContinue(_gsInstance, chunk, (uint)chunkSize, 0, out exitCode);
 
-                        if (ierrors.IsFatalIgnoreNeedInput(rc_run_con))
+                        if (Ierrors.IsFatalIgnoreNeedInput(rcRunCon))
                         {
-                            throw new GhostscriptAPICallException("gsapi_run_string_continue", rc_run_con);
+                            throw new GhostscriptApiCallException("gsapi_run_string_continue", rcRunCon);
                         }
 
                         chunkStart += chunkSize;
                     }
 
                     // GSAPI: notify Ghostscript we are done with running chunked string
-                    int rc_run_end = _gs.gsapi_run_string_end(_gs_instance, 0, out exit_code);
+                    int rcRunEnd = _gs.GsapiRunStringEnd(_gsInstance, 0, out exitCode);
 
-                    if (ierrors.IsFatalIgnoreNeedInput(rc_run_end))
+                    if (Ierrors.IsFatalIgnoreNeedInput(rcRunEnd))
                     {
-                        throw new GhostscriptAPICallException("gsapi_run_string_end", rc_run_end);
+                        throw new GhostscriptApiCallException("gsapi_run_string_end", rcRunEnd);
                     }
 
-                    return rc_run_end;
+                    return rcRunEnd;
                 }
             }
         }
@@ -379,16 +379,16 @@ namespace Ghostscript.NET.Interpreter
         {
             lock (this)
             {
-                int exit_code;
+                int exitCode;
 
-                int rc_run = _gs.gsapi_run_ptr_string(_gs_instance, str, 0, out exit_code);
+                int rcRun = _gs.GsapiRunPtrString(_gsInstance, str, 0, out exitCode);
 
-                if (ierrors.IsFatalIgnoreNeedInput(rc_run))
+                if (Ierrors.IsFatalIgnoreNeedInput(rcRun))
                 {
-                    throw new GhostscriptAPICallException("gsapi_run_string", rc_run);
+                    throw new GhostscriptApiCallException("gsapi_run_string", rcRun);
                 }
 
-                return rc_run;
+                return rcRun;
             }
         }
 
@@ -406,14 +406,14 @@ namespace Ghostscript.NET.Interpreter
                 throw new FileNotFoundException("Couldn't find input file.", path);
             }
 
-            int exit_code;
+            int exitCode;
 
             // GSAPI: tell a Ghostscript to run a file
-            int rc_run = _gs.gsapi_run_file(_gs_instance, path, 0, out exit_code);
+            int rcRun = _gs.GsapiRunFile(_gsInstance, path, 0, out exitCode);
 
-            if (ierrors.IsFatal(rc_run))
+            if (Ierrors.IsFatal(rcRun))
             {
-                throw new GhostscriptAPICallException("gsapi_run_file", rc_run);
+                throw new GhostscriptApiCallException("gsapi_run_file", rcRun);
             }
         }
 

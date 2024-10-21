@@ -34,21 +34,21 @@ namespace Ghostscript.NET
 
     #region gdevdsp
 
-    public class gdevdsp
+    public class Gdevdsp
     {
-        public const int DISPLAY_VERSION_MAJOR_V3 = 3;
-        public const int DISPLAY_VERSION_MINOR_V3 = 0;
+        public const int DisplayVersionMajorV3 = 3;
+        public const int DisplayVersionMinorV3 = 0;
 
-        public const int DISPLAY_VERSION_MAJOR_V2 = 2;
-        public const int DISPLAY_VERSION_MINOR_V2 = 0;
+        public const int DisplayVersionMajorV2 = 2;
+        public const int DisplayVersionMinorV2 = 0;
 
-        public const long DISPLAY_COLORS_MASK = 0x8000fL;
-        public const long DISPLAY_ALPHA_MASK = 0x00f0L;
-        public const long DISPLAY_DEPTH_MASK = 0xff00L;
-        public const long DISPLAY_ENDIAN_MASK = 0x00010000L;
-        public const long DISPLAY_FIRSTROW_MASK = 0x00020000L;
-        public const long DISPLAY_555_MASK = 0x00040000L;
-        public const long DISPLAY_ROW_ALIGN_MASK = 0x00700000L;
+        public const long DisplayColorsMask = 0x8000fL;
+        public const long DisplayAlphaMask = 0x00f0L;
+        public const long DisplayDepthMask = 0xff00L;
+        public const long DisplayEndianMask = 0x00010000L;
+        public const long DisplayFirstrowMask = 0x00020000L;
+        public const long Display555Mask = 0x00040000L;
+        public const long DisplayRowAlignMask = 0x00700000L;
     }
 
     #endregion
@@ -60,13 +60,13 @@ namespace Ghostscript.NET
     /// <summary>
     /// Define the color space alternatives.
     /// </summary>
-    public enum DISPLAY_FORMAT_COLOR : long
+    public enum DisplayFormatColor : long
     {
-        DISPLAY_COLORS_NATIVE = (1 << 0),
-        DISPLAY_COLORS_GRAY = (1 << 1),
-        DISPLAY_COLORS_RGB = (1 << 2),
-        DISPLAY_COLORS_CMYK = (1 << 3),
-        DISPLAY_COLORS_SEPARATION = (1 << 19),
+        DisplayColorsNative = (1 << 0),
+        DisplayColorsGray = (1 << 1),
+        DisplayColorsRgb = (1 << 2),
+        DisplayColorsCmyk = (1 << 3),
+        DisplayColorsSeparation = (1 << 19),
     }
 
     #endregion
@@ -77,13 +77,13 @@ namespace Ghostscript.NET
     /// Define whether alpha information, or an extra unused bytes is included
     /// DISPLAY_ALPHA_FIRST and DISPLAY_ALPHA_LAST are not implemented
     /// </summary>
-    public enum DISPLAY_FORMAT_ALPHA : long
+    public enum DisplayFormatAlpha : long
     {
-        DISPLAY_ALPHA_NONE   = (0<<4),
-        DISPLAY_ALPHA_FIRST  = (1<<4),
-        DISPLAY_ALPHA_LAST   = (1<<5),
-        DISPLAY_UNUSED_FIRST = (1<<6),	/* e.g. Mac xRGB */
-        DISPLAY_UNUSED_LAST  = (1<<7)	/* e.g. Windows BGRx */
+        DisplayAlphaNone   = (0<<4),
+        DisplayAlphaFirst  = (1<<4),
+        DisplayAlphaLast   = (1<<5),
+        DisplayUnusedFirst = (1<<6),	/* e.g. Mac xRGB */
+        DisplayUnusedLast  = (1<<7)	/* e.g. Windows BGRx */
     }
 
     #endregion
@@ -96,14 +96,14 @@ namespace Ghostscript.NET
     /// or the depth per pixel for DISPLAY_COLORS_NATIVE
     /// DISPLAY_DEPTH_2 and DISPLAY_DEPTH_12 have not been tested.
     /// </summary>
-    public enum DISPLAY_FORMAT_DEPTH : long
+    public enum DisplayFormatDepth : long
     {
-        DISPLAY_DEPTH_1 = (1 << 8),
-        DISPLAY_DEPTH_2 = (1 << 9),
-        DISPLAY_DEPTH_4 = (1 << 10),
-        DISPLAY_DEPTH_8 = (1 << 11),
-        DISPLAY_DEPTH_12 = (1 << 12),
-        DISPLAY_DEPTH_16 = (1 << 13)
+        DisplayDepth1 = (1 << 8),
+        DisplayDepth2 = (1 << 9),
+        DisplayDepth4 = (1 << 10),
+        DisplayDepth8 = (1 << 11),
+        DisplayDepth12 = (1 << 12),
+        DisplayDepth16 = (1 << 13)
         /* unused (1<<14) */
         /* unused (1<<15) */
     }
@@ -116,10 +116,10 @@ namespace Ghostscript.NET
     /// Define whether Red/Cyan should come first,
     /// or whether Blue/Black should come first
     /// </summary>
-    public enum DISPLAY_FORMAT_ENDIAN
+    public enum DisplayFormatEndian
     {
-        DISPLAY_BIGENDIAN = (0 << 16),	/* Red/Cyan first */
-        DISPLAY_LITTLEENDIAN = (1 << 16)	/* Blue/Black first */
+        DisplayBigendian = (0 << 16),	/* Red/Cyan first */
+        DisplayLittleendian = (1 << 16)	/* Blue/Black first */
     }
 
     #endregion
@@ -129,10 +129,10 @@ namespace Ghostscript.NET
     /// <summary>
     /// Define whether the raster starts at the top or bottom of the bitmap
     /// </summary>
-    public enum DISPLAY_FORMAT_FIRSTROW
+    public enum DisplayFormatFirstrow
     {
-        DISPLAY_TOPFIRST = (0 << 17),	/* Unix, Mac */
-        DISPLAY_BOTTOMFIRST = (1 << 17)	/* Windows */
+        DisplayTopfirst = (0 << 17),	/* Unix, Mac */
+        DisplayBottomfirst = (1 << 17)	/* Windows */
     }
 
     #endregion
@@ -143,10 +143,10 @@ namespace Ghostscript.NET
     /// Define whether packing RGB in 16-bits should use 555
     /// or 565 (extra bit for green)
     /// </summary>
-    public enum DISPLAY_FORMAT_555
+    public enum DisplayFormat555
     {
-        DISPLAY_NATIVE_555 = (0 << 18),
-        DISPLAY_NATIVE_565 = (1 << 18)
+        DisplayNative555 = (0 << 18),
+        DisplayNative565 = (1 << 18)
     }
 
     #endregion
@@ -160,18 +160,18 @@ namespace Ghostscript.NET
     /// 4 bytes (DISPLAY_ROW_ALIGN_4) on 32-bit systems or 8 bytes
     /// (DISPLAY_ROW_ALIGN_8) on 64-bit systems.
     /// </summary>
-    public enum DISPLAY_FORMAT_ROW_ALIGN
+    public enum DisplayFormatRowAlign
     {
-        DISPLAY_ROW_ALIGN_DEFAULT = (0 << 20),
+        DisplayRowAlignDefault = (0 << 20),
         /* DISPLAY_ROW_ALIGN_1 = (1<<20), */
         /* not currently possible */
         /* DISPLAY_ROW_ALIGN_2 = (2<<20), */
         /* not currently possible */
-        DISPLAY_ROW_ALIGN_4 = (3 << 20),
-        DISPLAY_ROW_ALIGN_8 = (4 << 20),
-        DISPLAY_ROW_ALIGN_16 = (5 << 20),
-        DISPLAY_ROW_ALIGN_32 = (6 << 20),
-        DISPLAY_ROW_ALIGN_64 = (7 << 20)
+        DisplayRowAlign4 = (3 << 20),
+        DisplayRowAlign8 = (4 << 20),
+        DisplayRowAlign16 = (5 << 20),
+        DisplayRowAlign32 = (6 << 20),
+        DisplayRowAlign64 = (7 << 20)
     }
 
     #endregion
@@ -185,7 +185,7 @@ namespace Ghostscript.NET
     /// cdecl, not stdcall.  This differs from those in iapi.h.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public class display_callback_v3 : display_callback
+    public class DisplayCallbackV3 : DisplayCallback
     {
         /// <summary>
         /// Added in V3 */
@@ -205,7 +205,7 @@ namespace Ghostscript.NET
         /// 
         /// Return the adjusted bandheight (or 0 for no change).
         /// </summary>
-        public display_adjust_band_height display_adjust_band_height;
+        public DisplayAdjustBandHeight display_adjust_band_height;
 
         /// <summary>
         /// Ask the callback for a rectangle to render (and a block to render
@@ -225,7 +225,7 @@ namespace Ghostscript.NET
         ///   component 1 of Pixel(*ox,*oy), if in planar mode, 0 otherwise.
         ///   *x, *y, *w, *h = rectangle requested within that memory block.
         /// </summary>
-        public display_rectangle_request display_rectangle_request;
+        public DisplayRectangleRequest display_rectangle_request;
 
     }
 
@@ -241,7 +241,7 @@ namespace Ghostscript.NET
     /// cdecl, not stdcall.  This differs from those in iapi.h.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public class display_callback
+    public class DisplayCallback
     {
         /// <summary>
         /// Size of this structure
@@ -267,19 +267,19 @@ namespace Ghostscript.NET
         /// New device has been opened 
         /// This is the first event from this device.
         /// </summary>
-        public display_open_callback display_open;
+        public DisplayOpenCallback display_open;
 
         /// <summary>
         /// Device is about to be closed. 
         /// Device will not be closed until this function returns. 
         /// </summary>
-        public display_preclose_callback display_preclose;
+        public DisplayPrecloseCallback display_preclose;
 
         /// <summary>
         /// Device has been closed. 
         /// This is the last event from this device. 
         /// </summary>
-        public display_close_callback display_close;
+        public DisplayCloseCallback display_close;
 
 
         /// <summary>
@@ -287,24 +287,24 @@ namespace Ghostscript.NET
         /// Resize will only occur if this function returns 0. 
         /// raster is byte count of a row.
         /// </summary>
-        public display_presize_callback display_presize;
+        public DisplayPresizeCallback display_presize;
 
         /// <summary>
         /// Device has been resized. 
         /// New pointer to raster returned in pimage
         /// </summary>
-        public display_size_callback display_size;
+        public DisplaySizeCallback display_size;
 
         /// <summary>
         /// flushpage
         /// </summary>
-        public display_sync_callback display_sync;
+        public DisplaySyncCallback display_sync;
 
         /// <summary>
         /// showpage 
         /// If you want to pause on showpage, then don't return immediately
         /// </summary>
-        public display_page_callback display_page;
+        public DisplayPageCallback display_page;
 
         /// <summary>
         /// Notify the caller whenever a portion of the raster is updated.
@@ -312,7 +312,7 @@ namespace Ghostscript.NET
         /// progressive update of the display.
         /// This function pointer may be set to NULL if not required.
         /// </summary>
-        public display_update_callback display_update;
+        public DisplayUpdateCallback display_update;
 
         /// <summary>
         /// Allocate memory for bitmap 
@@ -322,13 +322,13 @@ namespace Ghostscript.NET
         /// image buffer. The first row will be placed at the address
         /// returned by display_memalloc.
         /// </summary>
-        public display_memalloc_callback display_memalloc;
+        public DisplayMemallocCallback display_memalloc;
 
         /// <summary>
         /// Free memory for bitmap 
         /// If this is NULL, the Ghostscript memory device will free the bitmap
         /// </summary>
-        public display_memfree_callback display_memfree;
+        public DisplayMemfreeCallback display_memfree;
 
         /// <summary>
         /// Added in V2 
@@ -344,7 +344,7 @@ namespace Ghostscript.NET
         /// The unsigned short c,m,y,k values are 65535 = 1.0.
         /// This function pointer may be set to NULL if not required.
         /// </summary>
-        public display_separation_callback display_separation;
+        public DisplaySeparationCallback display_separation;
     }
 
     #endregion

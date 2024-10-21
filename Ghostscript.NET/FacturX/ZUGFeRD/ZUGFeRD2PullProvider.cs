@@ -9,54 +9,54 @@ using System.Reflection;
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
 
-    public class ZUGFeRD2PullProvider
+    public class ZugFeRd2PullProvider
     {
 
         //// MAIN CLASS
-        protected internal string zugferdDateFormatting = "yyyyMMdd";
-        protected internal byte[] zugferdData;
-        protected internal IExportableTransaction trans;
-        protected internal TransactionCalculator calc;
-        private string paymentTermsDescription;
-        protected internal Profile profile = Profiles.getByName("EN16931");
+        protected internal string ZugferdDateFormatting = "yyyyMMdd";
+        protected internal byte[] ZugferdData;
+        protected internal IExportableTransaction Trans;
+        protected internal TransactionCalculator Calc;
+        private string _paymentTermsDescription;
+        protected internal Profile Profile = Profiles.GetByName("EN16931");
 
 
         /// <summary>
         /// enables the flag to indicate a test invoice in the XML structure
         /// </summary>
-        public void setTest()
+        public void SetTest()
         {
         }
 
-        private string vatFormat(decimal value)
+        private string VatFormat(decimal value)
         {
-            return XMLTools.ScaleDecimal(value, 2);
+            return XmlTools.ScaleDecimal(value, 2);
         }
 
-        private string currencyFormat(decimal value)
+        private string CurrencyFormat(decimal value)
         {
-            return XMLTools.ScaleDecimal(value, 2);
+            return XmlTools.ScaleDecimal(value, 2);
         }
 
-        private string priceFormat(decimal value)
+        private string PriceFormat(decimal value)
         {
-            return XMLTools.ScaleDecimal(value, 4);
+            return XmlTools.ScaleDecimal(value, 4);
         }
 
-        private string quantityFormat(decimal value)
+        private string QuantityFormat(decimal value)
         {
-            return XMLTools.ScaleDecimal(value, 4);
+            return XmlTools.ScaleDecimal(value, 4);
         }
 
-        public byte[] getXML()
+        public byte[] GetXml()
         {
-            return zugferdData;
+            return ZugferdData;
         }
 
 
-        public Profile getProfile()
+        public Profile GetProfile()
         {
-            return profile;
+            return Profile;
         }
 
         // @todo check if the two boolean args can be refactored
@@ -69,56 +69,56 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// <param name="isSender"> some attributes are allowed only for senders in certain profiles </param>
         /// <param name="isShipToTradeParty"> some attributes are allowed only for senders or recipients
         /// @return </param>
-        protected internal virtual string getTradePartyAsXML(IZUGFeRDExportableTradeParty party, bool isSender, bool isShipToTradeParty)
+        protected internal virtual string GetTradePartyAsXml(IZugFeRdExportableTradeParty party, bool isSender, bool isShipToTradeParty)
         {
             string xml = "";
             // According EN16931 either GlobalID or seller assigned ID might be present for BuyerTradeParty
             // and ShipToTradeParty, but not both. Prefer seller assigned ID for now.
-            if (party.getID() != null)
+            if (party.GetId() != null)
             {
-                xml += "	<ram:ID>" + XMLTools.encodeXML(party.getID()) + "</ram:ID>\n";
+                xml += "	<ram:ID>" + XmlTools.EncodeXml(party.GetId()) + "</ram:ID>\n";
             }
-            else if ((party.getGlobalIDScheme() != null) && (party.getGlobalID() != null))
+            else if ((party.GetGlobalIdScheme() != null) && (party.GetGlobalId() != null))
             {
-                xml = xml + "           <ram:GlobalID schemeID=\"" + XMLTools.encodeXML(party.getGlobalIDScheme()) + "\">" + XMLTools.encodeXML(party.getGlobalID()) + "</ram:GlobalID>\n";
+                xml = xml + "           <ram:GlobalID schemeID=\"" + XmlTools.EncodeXml(party.GetGlobalIdScheme()) + "\">" + XmlTools.EncodeXml(party.GetGlobalId()) + "</ram:GlobalID>\n";
             }
-            xml += "	<ram:Name>" + XMLTools.encodeXML(party.getName()) + "</ram:Name>\n"; //$NON-NLS-2$
+            xml += "	<ram:Name>" + XmlTools.EncodeXml(party.GetName()) + "</ram:Name>\n"; //$NON-NLS-2$
 
-            if ((party.getContact() != null) && (isSender || profile == Profiles.getByName("Extended")))
+            if ((party.GetContact() != null) && (isSender || Profile == Profiles.GetByName("Extended")))
             {
-                xml = xml + "<ram:DefinedTradeContact>\n" + "     <ram:PersonName>" + XMLTools.encodeXML(party.getContact().getName()) + "</ram:PersonName>\n";
-                if (party.getContact().getPhone() != null)
+                xml = xml + "<ram:DefinedTradeContact>\n" + "     <ram:PersonName>" + XmlTools.EncodeXml(party.GetContact().GetName()) + "</ram:PersonName>\n";
+                if (party.GetContact().GetPhone() != null)
                 {
 
-                    xml = xml + "     <ram:TelephoneUniversalCommunication>\n" + "        <ram:CompleteNumber>" + XMLTools.encodeXML(party.getContact().getPhone()) + "</ram:CompleteNumber>\n" + "     </ram:TelephoneUniversalCommunication>\n";
+                    xml = xml + "     <ram:TelephoneUniversalCommunication>\n" + "        <ram:CompleteNumber>" + XmlTools.EncodeXml(party.GetContact().GetPhone()) + "</ram:CompleteNumber>\n" + "     </ram:TelephoneUniversalCommunication>\n";
                 }
 
-                if ((party.getContact().getFax() != null) && (profile == Profiles.getByName("Extended")))
+                if ((party.GetContact().GetFax() != null) && (Profile == Profiles.GetByName("Extended")))
                 {
-                    xml = xml + "     <ram:FaxUniversalCommunication>\n" + "        <ram:CompleteNumber>" + XMLTools.encodeXML(party.getContact().getFax()) + "</ram:CompleteNumber>\n" + "     </ram:FaxUniversalCommunication>\n";
+                    xml = xml + "     <ram:FaxUniversalCommunication>\n" + "        <ram:CompleteNumber>" + XmlTools.EncodeXml(party.GetContact().GetFax()) + "</ram:CompleteNumber>\n" + "     </ram:FaxUniversalCommunication>\n";
                 }
-                if (party.getContact().getEMail() != null)
+                if (party.GetContact().GetEMail() != null)
                 {
 
-                    xml = xml + "     <ram:EmailURIUniversalCommunication>\n" + "        <ram:URIID>" + XMLTools.encodeXML(party.getContact().getEMail()) + "</ram:URIID>\n" + "     </ram:EmailURIUniversalCommunication>\n";
+                    xml = xml + "     <ram:EmailURIUniversalCommunication>\n" + "        <ram:URIID>" + XmlTools.EncodeXml(party.GetContact().GetEMail()) + "</ram:URIID>\n" + "     </ram:EmailURIUniversalCommunication>\n";
                 }
 
                 xml = xml + "  </ram:DefinedTradeContact>";
 
             }
-            xml += "				<ram:PostalTradeAddress>\n" + "					<ram:PostcodeCode>" + XMLTools.encodeXML(party.getZIP()) + "</ram:PostcodeCode>\n" + "					<ram:LineOne>" + XMLTools.encodeXML(party.getStreet()) + "</ram:LineOne>\n";
-            if (party.getAdditionalAddress() != null)
+            xml += "				<ram:PostalTradeAddress>\n" + "					<ram:PostcodeCode>" + XmlTools.EncodeXml(party.GetZip()) + "</ram:PostcodeCode>\n" + "					<ram:LineOne>" + XmlTools.EncodeXml(party.GetStreet()) + "</ram:LineOne>\n";
+            if (party.GetAdditionalAddress() != null)
             {
-                xml += "				<ram:LineTwo>" + XMLTools.encodeXML(party.getAdditionalAddress()) + "</ram:LineTwo>\n";
+                xml += "				<ram:LineTwo>" + XmlTools.EncodeXml(party.GetAdditionalAddress()) + "</ram:LineTwo>\n";
             }
-            xml += "					<ram:CityName>" + XMLTools.encodeXML(party.getLocation()) + "</ram:CityName>\n" + "					<ram:CountryID>" + XMLTools.encodeXML(party.getCountry()) + "</ram:CountryID>\n" + "				</ram:PostalTradeAddress>\n";
-            if ((party.getVATID() != null) && (!isShipToTradeParty))
+            xml += "					<ram:CityName>" + XmlTools.EncodeXml(party.GetLocation()) + "</ram:CityName>\n" + "					<ram:CountryID>" + XmlTools.EncodeXml(party.GetCountry()) + "</ram:CountryID>\n" + "				</ram:PostalTradeAddress>\n";
+            if ((party.GetVatid() != null) && (!isShipToTradeParty))
             {
-                xml += "				<ram:SpecifiedTaxRegistration>\n" + "					<ram:ID schemeID=\"VA\">" + XMLTools.encodeXML(party.getVATID()) + "</ram:ID>\n" + "				</ram:SpecifiedTaxRegistration>\n";
+                xml += "				<ram:SpecifiedTaxRegistration>\n" + "					<ram:ID schemeID=\"VA\">" + XmlTools.EncodeXml(party.GetVatid()) + "</ram:ID>\n" + "				</ram:SpecifiedTaxRegistration>\n";
             }
-            if ((party.getTaxID() != null) && (!isShipToTradeParty))
+            if ((party.GetTaxId() != null) && (!isShipToTradeParty))
             {
-                xml += "				<ram:SpecifiedTaxRegistration>\n" + "					<ram:ID schemeID=\"FC\">" + XMLTools.encodeXML(party.getTaxID()) + "</ram:ID>\n" + "				</ram:SpecifiedTaxRegistration>\n";
+                xml += "				<ram:SpecifiedTaxRegistration>\n" + "					<ram:ID schemeID=\"FC\">" + XmlTools.EncodeXml(party.GetTaxId()) + "</ram:ID>\n" + "				</ram:SpecifiedTaxRegistration>\n";
 
             }
             return xml;
@@ -156,24 +156,24 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                 return allowanceChargeStr;
             }*/
 
-        public void generateXML(IExportableTransaction trans)
+        public void GenerateXml(IExportableTransaction trans)
         {
-            this.trans = trans;
-            this.calc = new TransactionCalculator(trans);
+            this.Trans = trans;
+            this.Calc = new TransactionCalculator(trans);
 
             bool hasDueDate = false;
             string germanDateFormatting = "dd.MM.yyyy";
 
             string exemptionReason = "";
 
-            if (trans.getPaymentTermDescription() != null)
+            if (trans.GetPaymentTermDescription() != null)
             {
-                paymentTermsDescription = trans.getPaymentTermDescription();
+                _paymentTermsDescription = trans.GetPaymentTermDescription();
             }
 
-            if ((string.ReferenceEquals(paymentTermsDescription, null)) /*&& (trans.getDocumentCode() != org.mustangproject.ZUGFeRD.model.DocumentCodeTypeConstants.CORRECTEDINVOICE)*/)
+            if ((string.ReferenceEquals(_paymentTermsDescription, null)) /*&& (trans.getDocumentCode() != org.mustangproject.ZUGFeRD.model.DocumentCodeTypeConstants.CORRECTEDINVOICE)*/)
             {
-                paymentTermsDescription = "Zahlbar ohne Abzug bis " + ((DateTime)trans.getDueDate()).ToString(germanDateFormatting);
+                _paymentTermsDescription = "Zahlbar ohne Abzug bis " + ((DateTime)trans.GetDueDate()).ToString(germanDateFormatting);
 
             }
 
@@ -185,15 +185,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                     }
             */
             string rebateAgreement = "";
-            if (trans.rebateAgreementExists())
+            if (trans.RebateAgreementExists())
             {
                 rebateAgreement = "<ram:IncludedNote>\n" + "		<ram:Content>" + "Es bestehen Rabatt- und Bonusvereinbarungen.</ram:Content>\n" + "<ram:SubjectCode>AAK</ram:SubjectCode>\n" + "</ram:IncludedNote>\n";
             }
 
             string subjectNote = "";
-            if (trans.getSubjectNote() != null)
+            if (trans.GetSubjectNote() != null)
             {
-                subjectNote = "<ram:IncludedNote>\n" + "		<ram:Content>" + XMLTools.encodeXML(trans.getSubjectNote()) + "</ram:Content>\n" + "</ram:IncludedNote>\n";
+                subjectNote = "<ram:IncludedNote>\n" + "		<ram:Content>" + XmlTools.EncodeXml(trans.GetSubjectNote()) + "</ram:Content>\n" + "</ram:IncludedNote>\n";
             }
 
             string typecode = "380";
@@ -202,42 +202,42 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                         typecode = trans.getDocumentCode();
                     }*/
             string notes = "";
-            if (trans.getNotes() != null)
+            if (trans.GetNotes() != null)
             {
-                foreach (string currentNote in trans.getNotes())
+                foreach (string currentNote in trans.GetNotes())
                 {
-                    notes = notes + "<ram:IncludedNote><ram:Content>" + XMLTools.encodeXML(currentNote) + "</ram:Content></ram:IncludedNote>";
+                    notes = notes + "<ram:IncludedNote><ram:Content>" + XmlTools.EncodeXml(currentNote) + "</ram:Content></ram:IncludedNote>";
 
                 }
             }
-            string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<rsm:CrossIndustryInvoice xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:rsm=\"urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100\"" + " xmlns:ram=\"urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100\"" + " xmlns:udt=\"urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100\">\n" + "	<rsm:ExchangedDocumentContext>\n" + "		<ram:GuidelineSpecifiedDocumentContextParameter>\n" + "			<ram:ID>" + getProfile().getID() + "</ram:ID>\n" + "		</ram:GuidelineSpecifiedDocumentContextParameter>\n" + "	</rsm:ExchangedDocumentContext>\n" + "	<rsm:ExchangedDocument>\n" + "		<ram:ID>" + XMLTools.encodeXML(trans.getNumber()) + "</ram:ID>\n" + "		<ram:TypeCode>" + typecode + "</ram:TypeCode>\n" + "		<ram:IssueDateTime><udt:DateTimeString format=\"102\">" + ((DateTime)trans.getIssueDate()).ToString(zugferdDateFormatting) + "</udt:DateTimeString></ram:IssueDateTime>\n" + notes + subjectNote + rebateAgreement + senderReg + "	</rsm:ExchangedDocument>\n" + "	<rsm:SupplyChainTradeTransaction>\n";
-            int lineID = 0;
-            foreach (IZUGFeRDExportableItem currentItem in trans.getZFItems())
+            string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<rsm:CrossIndustryInvoice xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:rsm=\"urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100\"" + " xmlns:ram=\"urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100\"" + " xmlns:udt=\"urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100\">\n" + "	<rsm:ExchangedDocumentContext>\n" + "		<ram:GuidelineSpecifiedDocumentContextParameter>\n" + "			<ram:ID>" + GetProfile().GetId() + "</ram:ID>\n" + "		</ram:GuidelineSpecifiedDocumentContextParameter>\n" + "	</rsm:ExchangedDocumentContext>\n" + "	<rsm:ExchangedDocument>\n" + "		<ram:ID>" + XmlTools.EncodeXml(trans.GetNumber()) + "</ram:ID>\n" + "		<ram:TypeCode>" + typecode + "</ram:TypeCode>\n" + "		<ram:IssueDateTime><udt:DateTimeString format=\"102\">" + ((DateTime)trans.GetIssueDate()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:IssueDateTime>\n" + notes + subjectNote + rebateAgreement + senderReg + "	</rsm:ExchangedDocument>\n" + "	<rsm:SupplyChainTradeTransaction>\n";
+            int lineId = 0;
+            foreach (IZugFeRdExportableItem currentItem in trans.GetZfItems())
             {
-                lineID++;
-                if (currentItem.getProduct().getTaxExemptionReason() != null)
+                lineId++;
+                if (currentItem.GetProduct().GetTaxExemptionReason() != null)
                 {
-                    exemptionReason = "<ram:ExemptionReason>" + XMLTools.encodeXML(currentItem.getProduct().getTaxExemptionReason()) + "</ram:ExemptionReason>";
+                    exemptionReason = "<ram:ExemptionReason>" + XmlTools.EncodeXml(currentItem.GetProduct().GetTaxExemptionReason()) + "</ram:ExemptionReason>";
                 }
                 notes = "";
-                if (currentItem.getNotes() != null)
+                if (currentItem.GetNotes() != null)
                 {
-                    foreach (string currentNote in currentItem.getNotes())
+                    foreach (string currentNote in currentItem.GetNotes())
                     {
-                        notes = notes + "<ram:IncludedNote><ram:Content>" + XMLTools.encodeXML(currentNote) + "</ram:Content></ram:IncludedNote>";
+                        notes = notes + "<ram:IncludedNote><ram:Content>" + XmlTools.EncodeXml(currentNote) + "</ram:Content></ram:IncludedNote>";
 
                     }
                 }
                 LineCalculator lc = new LineCalculator(currentItem);
-                xml = xml + "		<ram:IncludedSupplyChainTradeLineItem>\n" + "			<ram:AssociatedDocumentLineDocument>\n" + "				<ram:LineID>" + lineID + "</ram:LineID>\n" + notes + "			</ram:AssociatedDocumentLineDocument>\n" + "			<ram:SpecifiedTradeProduct>\n";
+                xml = xml + "		<ram:IncludedSupplyChainTradeLineItem>\n" + "			<ram:AssociatedDocumentLineDocument>\n" + "				<ram:LineID>" + lineId + "</ram:LineID>\n" + notes + "			</ram:AssociatedDocumentLineDocument>\n" + "			<ram:SpecifiedTradeProduct>\n";
                 // + " <GlobalID schemeID=\"0160\">4012345001235</GlobalID>\n"
-                if (currentItem.getProduct().getSellerAssignedID() != null)
+                if (currentItem.GetProduct().GetSellerAssignedId() != null)
                 {
-                    xml = xml + "				<ram:SellerAssignedID>" + XMLTools.encodeXML(currentItem.getProduct().getSellerAssignedID()) + "</ram:SellerAssignedID>\n";
+                    xml = xml + "				<ram:SellerAssignedID>" + XmlTools.EncodeXml(currentItem.GetProduct().GetSellerAssignedId()) + "</ram:SellerAssignedID>\n";
                 }
-                if (currentItem.getProduct().getBuyerAssignedID() != null)
+                if (currentItem.GetProduct().GetBuyerAssignedId() != null)
                 {
-                    xml = xml + "				<ram:BuyerAssignedID>" + XMLTools.encodeXML(currentItem.getProduct().getBuyerAssignedID()) + "</ram:BuyerAssignedID>\n";
+                    xml = xml + "				<ram:BuyerAssignedID>" + XmlTools.EncodeXml(currentItem.GetProduct().GetBuyerAssignedId()) + "</ram:BuyerAssignedID>\n";
                 }
                 string allowanceChargeStr = "";
                 /*			if (currentItem.getItemAllowances() != null && currentItem.getItemAllowances().length > 0)
@@ -257,26 +257,26 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                             }
                 */
 
-                xml = xml + "					<ram:Name>" + XMLTools.encodeXML(currentItem.getProduct().getName()) + "</ram:Name>\n" + "				<ram:Description>" + XMLTools.encodeXML(currentItem.getProduct().getDescription()) + "</ram:Description>\n" + "			</ram:SpecifiedTradeProduct>\n" + "			<ram:SpecifiedLineTradeAgreement>\n" + "				<ram:GrossPriceProductTradePrice>\n" + "					<ram:ChargeAmount>" + priceFormat(lc.getPriceGross()) + "</ram:ChargeAmount>\n" + "<ram:BasisQuantity unitCode=\"" + XMLTools.encodeXML(currentItem.getProduct().getUnit()) + "\">" + quantityFormat(currentItem.getBasisQuantity()) + "</ram:BasisQuantity>\n" + allowanceChargeStr + "				</ram:GrossPriceProductTradePrice>\n" + "				<ram:NetPriceProductTradePrice>\n" + "					<ram:ChargeAmount>" + priceFormat(lc.getPrice()) + "</ram:ChargeAmount>\n" + "					<ram:BasisQuantity unitCode=\"" + XMLTools.encodeXML(currentItem.getProduct().getUnit()) + "\">" + quantityFormat(currentItem.getBasisQuantity()) + "</ram:BasisQuantity>\n" + "				</ram:NetPriceProductTradePrice>\n" + "			</ram:SpecifiedLineTradeAgreement>\n" + "			<ram:SpecifiedLineTradeDelivery>\n" + "				<ram:BilledQuantity unitCode=\"" + XMLTools.encodeXML(currentItem.getProduct().getUnit()) + "\">" + quantityFormat(currentItem.getQuantity()) + "</ram:BilledQuantity>\n" + "			</ram:SpecifiedLineTradeDelivery>\n" + "			<ram:SpecifiedLineTradeSettlement>\n" + "				<ram:ApplicableTradeTax>\n" + "					<ram:TypeCode>VAT</ram:TypeCode>\n" + exemptionReason + "					<ram:CategoryCode>" + currentItem.getProduct().getTaxCategoryCode() + "</ram:CategoryCode>\n" + "					<ram:RateApplicablePercent>" + vatFormat(currentItem.getProduct().getVATPercent()) + "</ram:RateApplicablePercent>\n" + "				</ram:ApplicableTradeTax>\n";
-                if ((currentItem.getDetailedDeliveryPeriodFrom() != null) || (currentItem.getDetailedDeliveryPeriodTo() != null))
+                xml = xml + "					<ram:Name>" + XmlTools.EncodeXml(currentItem.GetProduct().GetName()) + "</ram:Name>\n" + "				<ram:Description>" + XmlTools.EncodeXml(currentItem.GetProduct().GetDescription()) + "</ram:Description>\n" + "			</ram:SpecifiedTradeProduct>\n" + "			<ram:SpecifiedLineTradeAgreement>\n" + "				<ram:GrossPriceProductTradePrice>\n" + "					<ram:ChargeAmount>" + PriceFormat(lc.GetPriceGross()) + "</ram:ChargeAmount>\n" + "<ram:BasisQuantity unitCode=\"" + XmlTools.EncodeXml(currentItem.GetProduct().GetUnit()) + "\">" + QuantityFormat(currentItem.GetBasisQuantity()) + "</ram:BasisQuantity>\n" + allowanceChargeStr + "				</ram:GrossPriceProductTradePrice>\n" + "				<ram:NetPriceProductTradePrice>\n" + "					<ram:ChargeAmount>" + PriceFormat(lc.GetPrice()) + "</ram:ChargeAmount>\n" + "					<ram:BasisQuantity unitCode=\"" + XmlTools.EncodeXml(currentItem.GetProduct().GetUnit()) + "\">" + QuantityFormat(currentItem.GetBasisQuantity()) + "</ram:BasisQuantity>\n" + "				</ram:NetPriceProductTradePrice>\n" + "			</ram:SpecifiedLineTradeAgreement>\n" + "			<ram:SpecifiedLineTradeDelivery>\n" + "				<ram:BilledQuantity unitCode=\"" + XmlTools.EncodeXml(currentItem.GetProduct().GetUnit()) + "\">" + QuantityFormat(currentItem.GetQuantity()) + "</ram:BilledQuantity>\n" + "			</ram:SpecifiedLineTradeDelivery>\n" + "			<ram:SpecifiedLineTradeSettlement>\n" + "				<ram:ApplicableTradeTax>\n" + "					<ram:TypeCode>VAT</ram:TypeCode>\n" + exemptionReason + "					<ram:CategoryCode>" + currentItem.GetProduct().GetTaxCategoryCode() + "</ram:CategoryCode>\n" + "					<ram:RateApplicablePercent>" + VatFormat(currentItem.GetProduct().GetVatPercent()) + "</ram:RateApplicablePercent>\n" + "				</ram:ApplicableTradeTax>\n";
+                if ((currentItem.GetDetailedDeliveryPeriodFrom() != null) || (currentItem.GetDetailedDeliveryPeriodTo() != null))
                 {
                     xml = xml + "<ram:BillingSpecifiedPeriod>";
-                    if (currentItem.getDetailedDeliveryPeriodFrom() != null)
+                    if (currentItem.GetDetailedDeliveryPeriodFrom() != null)
                     {
-                        xml = xml + "<ram:StartDateTime><udt:DateTimeString format='102'>" + ((DateTime)currentItem.getDetailedDeliveryPeriodFrom()).ToString(zugferdDateFormatting) + "</udt:DateTimeString></ram:StartDateTime>";
+                        xml = xml + "<ram:StartDateTime><udt:DateTimeString format='102'>" + ((DateTime)currentItem.GetDetailedDeliveryPeriodFrom()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:StartDateTime>";
                     }
-                    if (currentItem.getDetailedDeliveryPeriodTo() != null)
+                    if (currentItem.GetDetailedDeliveryPeriodTo() != null)
                     {
-                        xml = xml + "<ram:EndDateTime><udt:DateTimeString format='102'>" + ((DateTime)currentItem.getDetailedDeliveryPeriodTo()).ToString(zugferdDateFormatting) + "</udt:DateTimeString></ram:EndDateTime>";
+                        xml = xml + "<ram:EndDateTime><udt:DateTimeString format='102'>" + ((DateTime)currentItem.GetDetailedDeliveryPeriodTo()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:EndDateTime>";
                     }
                     xml = xml + "</ram:BillingSpecifiedPeriod>";
 
                 }
 
-                xml = xml + "				<ram:SpecifiedTradeSettlementLineMonetarySummation>\n" + "					<ram:LineTotalAmount>" + currencyFormat(lc.getItemTotalNetAmount()) + "</ram:LineTotalAmount>\n" + "				</ram:SpecifiedTradeSettlementLineMonetarySummation>\n";
-                if (currentItem.getAdditionalReferencedDocumentID() != null)
+                xml = xml + "				<ram:SpecifiedTradeSettlementLineMonetarySummation>\n" + "					<ram:LineTotalAmount>" + CurrencyFormat(lc.GetItemTotalNetAmount()) + "</ram:LineTotalAmount>\n" + "				</ram:SpecifiedTradeSettlementLineMonetarySummation>\n";
+                if (currentItem.GetAdditionalReferencedDocumentId() != null)
                 {
-                    xml = xml + "			<ram:AdditionalReferencedDocument><ram:IssuerAssignedID>" + currentItem.getAdditionalReferencedDocumentID() + "</ram:IssuerAssignedID><ram:TypeCode>130</ram:TypeCode></ram:AdditionalReferencedDocument>\n";
+                    xml = xml + "			<ram:AdditionalReferencedDocument><ram:IssuerAssignedID>" + currentItem.GetAdditionalReferencedDocumentId() + "</ram:IssuerAssignedID><ram:TypeCode>130</ram:TypeCode></ram:AdditionalReferencedDocument>\n";
 
                 }
                 xml = xml + "			</ram:SpecifiedLineTradeSettlement>\n" + "		</ram:IncludedSupplyChainTradeLineItem>\n";
@@ -284,25 +284,25 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             }
 
             xml = xml + "		<ram:ApplicableHeaderTradeAgreement>\n";
-            if (trans.getReferenceNumber() != null)
+            if (trans.GetReferenceNumber() != null)
             {
-                xml = xml + "			<ram:BuyerReference>" + XMLTools.encodeXML(trans.getReferenceNumber()) + "</ram:BuyerReference>\n";
+                xml = xml + "			<ram:BuyerReference>" + XmlTools.EncodeXml(trans.GetReferenceNumber()) + "</ram:BuyerReference>\n";
 
             }
-            xml = xml + "			<ram:SellerTradeParty>\n" + getTradePartyAsXML(trans.getSender(), true, false) + "			</ram:SellerTradeParty>\n" + "			<ram:BuyerTradeParty>\n";
+            xml = xml + "			<ram:SellerTradeParty>\n" + GetTradePartyAsXml(trans.GetSender(), true, false) + "			</ram:SellerTradeParty>\n" + "			<ram:BuyerTradeParty>\n";
             // + " <ID>GE2020211</ID>\n"
             // + " <GlobalID schemeID=\"0088\">4000001987658</GlobalID>\n"
 
-            xml += getTradePartyAsXML(trans.getRecipient(), false, false);
+            xml += GetTradePartyAsXml(trans.GetRecipient(), false, false);
             xml += "			</ram:BuyerTradeParty>\n";
 
-            if (trans.getBuyerOrderReferencedDocumentID() != null)
+            if (trans.GetBuyerOrderReferencedDocumentId() != null)
             {
-                xml = xml + "   <ram:BuyerOrderReferencedDocument>\n" + "       <ram:IssuerAssignedID>" + XMLTools.encodeXML(trans.getBuyerOrderReferencedDocumentID()) + "</ram:IssuerAssignedID>\n" + "   </ram:BuyerOrderReferencedDocument>\n";
+                xml = xml + "   <ram:BuyerOrderReferencedDocument>\n" + "       <ram:IssuerAssignedID>" + XmlTools.EncodeXml(trans.GetBuyerOrderReferencedDocumentId()) + "</ram:IssuerAssignedID>\n" + "   </ram:BuyerOrderReferencedDocument>\n";
             }
-            if (trans.getContractReferencedDocument() != null)
+            if (trans.GetContractReferencedDocument() != null)
             {
-                xml = xml + "   <ram:ContractReferencedDocument>\n" + "       <ram:IssuerAssignedID>" + XMLTools.encodeXML(trans.getContractReferencedDocument()) + "</ram:IssuerAssignedID>\n" + "    </ram:ContractReferencedDocument>\n";
+                xml = xml + "   <ram:ContractReferencedDocument>\n" + "       <ram:IssuerAssignedID>" + XmlTools.EncodeXml(trans.GetContractReferencedDocument()) + "</ram:IssuerAssignedID>\n" + "    </ram:ContractReferencedDocument>\n";
             }
 
             // Additional Documents of XRechnung (Rechnungsbegruendende Unterlagen - BG-24 XRechnung)
@@ -318,46 +318,46 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                     }
             */
             xml = xml + "		</ram:ApplicableHeaderTradeAgreement>\n" + "		<ram:ApplicableHeaderTradeDelivery>\n";
-            if (this.trans.getDeliveryAddress() != null)
+            if (this.Trans.GetDeliveryAddress() != null)
             {
-                xml += "<ram:ShipToTradeParty>" + getTradePartyAsXML(this.trans.getDeliveryAddress(), false, true) + "</ram:ShipToTradeParty>";
+                xml += "<ram:ShipToTradeParty>" + GetTradePartyAsXml(this.Trans.GetDeliveryAddress(), false, true) + "</ram:ShipToTradeParty>";
             }
 
             xml += "			<ram:ActualDeliverySupplyChainEvent>\n" + "				<ram:OccurrenceDateTime>";
 
-            if (trans.getDeliveryDate() != null)
+            if (trans.GetDeliveryDate() != null)
             {
-                xml += "<udt:DateTimeString format=\"102\">" + ((DateTime)trans.getDeliveryDate()).ToString(zugferdDateFormatting) + "</udt:DateTimeString>";
+                xml += "<udt:DateTimeString format=\"102\">" + ((DateTime)trans.GetDeliveryDate()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString>";
             }
             else
             {
                 throw new System.InvalidOperationException("No delivery date provided");
             }
             xml += "</ram:OccurrenceDateTime>\n";
-            xml += "			</ram:ActualDeliverySupplyChainEvent>\n" + "		</ram:ApplicableHeaderTradeDelivery>\n" + "		<ram:ApplicableHeaderTradeSettlement>\n" + "			<ram:PaymentReference>" + XMLTools.encodeXML(trans.getNumber()) + "</ram:PaymentReference>\n" + "			<ram:InvoiceCurrencyCode>" + trans.getCurrency() + "</ram:InvoiceCurrencyCode>\n";
+            xml += "			</ram:ActualDeliverySupplyChainEvent>\n" + "		</ram:ApplicableHeaderTradeDelivery>\n" + "		<ram:ApplicableHeaderTradeSettlement>\n" + "			<ram:PaymentReference>" + XmlTools.EncodeXml(trans.GetNumber()) + "</ram:PaymentReference>\n" + "			<ram:InvoiceCurrencyCode>" + trans.GetCurrency() + "</ram:InvoiceCurrencyCode>\n";
 
-            if (trans.getTradeSettlementPayment() != null)
+            if (trans.GetTradeSettlementPayment() != null)
             {
-                foreach (IZUGFeRDTradeSettlementPayment payment in trans.getTradeSettlementPayment())
+                foreach (IZugFeRdTradeSettlementPayment payment in trans.GetTradeSettlementPayment())
                 {
                     if (payment != null)
                     {
                         hasDueDate = true;
-                        xml += payment.getSettlementXML();
+                        xml += payment.GetSettlementXml();
                     }
                 }
             }
-            if (trans.getTradeSettlement() != null)
+            if (trans.GetTradeSettlement() != null)
             {
-                foreach (IZUGFeRDTradeSettlement payment in trans.getTradeSettlement())
+                foreach (IZugFeRdTradeSettlement payment in trans.GetTradeSettlement())
                 {
                     if (payment != null)
                     {
-                        if (payment is IZUGFeRDTradeSettlementPayment)
+                        if (payment is IZugFeRdTradeSettlementPayment)
                         {
                             hasDueDate = true;
                         }
-                        xml += payment.getSettlementXML();
+                        xml += payment.GetSettlementXml();
                     }
                 }
             }
@@ -366,26 +366,26 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                         hasDueDate = false;
                     }
             */
-            Dictionary<decimal, VATAmount> VATPercentAmountMap = calc.getVATPercentAmountMap();
-            foreach (decimal currentTaxPercent in VATPercentAmountMap.Keys)
+            Dictionary<decimal, VatAmount> vatPercentAmountMap = Calc.GetVatPercentAmountMap();
+            foreach (decimal currentTaxPercent in vatPercentAmountMap.Keys)
             {
-                VATAmount amount = VATPercentAmountMap[currentTaxPercent];
+                VatAmount amount = vatPercentAmountMap[currentTaxPercent];
                 if (amount != null)
                 {
-                    xml += "			<ram:ApplicableTradeTax>\n" + "				<ram:CalculatedAmount>" + currencyFormat(amount.getCalculated()) + "</ram:CalculatedAmount>\n" + "				<ram:TypeCode>VAT</ram:TypeCode>\n" + exemptionReason + "				<ram:BasisAmount>" + currencyFormat(amount.getBasis()) + "</ram:BasisAmount>\n" + "				<ram:CategoryCode>" + amount.getCategoryCode() + "</ram:CategoryCode>\n" + "				<ram:RateApplicablePercent>" + vatFormat(currentTaxPercent) + "</ram:RateApplicablePercent>\n" + "			</ram:ApplicableTradeTax>\n"; //$NON-NLS-2$
+                    xml += "			<ram:ApplicableTradeTax>\n" + "				<ram:CalculatedAmount>" + CurrencyFormat(amount.GetCalculated()) + "</ram:CalculatedAmount>\n" + "				<ram:TypeCode>VAT</ram:TypeCode>\n" + exemptionReason + "				<ram:BasisAmount>" + CurrencyFormat(amount.GetBasis()) + "</ram:BasisAmount>\n" + "				<ram:CategoryCode>" + amount.GetCategoryCode() + "</ram:CategoryCode>\n" + "				<ram:RateApplicablePercent>" + VatFormat(currentTaxPercent) + "</ram:RateApplicablePercent>\n" + "			</ram:ApplicableTradeTax>\n"; //$NON-NLS-2$
 
                 }
             }
-            if ((trans.getDetailedDeliveryPeriodFrom() != null) || (trans.getDetailedDeliveryPeriodTo() != null))
+            if ((trans.GetDetailedDeliveryPeriodFrom() != null) || (trans.GetDetailedDeliveryPeriodTo() != null))
             {
                 xml = xml + "<ram:BillingSpecifiedPeriod>";
-                if (trans.getDetailedDeliveryPeriodFrom() != null)
+                if (trans.GetDetailedDeliveryPeriodFrom() != null)
                 {
-                    xml = xml + "<ram:StartDateTime><udt:DateTimeString format='102'>" + ((DateTime)trans.getDetailedDeliveryPeriodFrom()).ToString(zugferdDateFormatting) + "</udt:DateTimeString></ram:StartDateTime>";
+                    xml = xml + "<ram:StartDateTime><udt:DateTimeString format='102'>" + ((DateTime)trans.GetDetailedDeliveryPeriodFrom()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:StartDateTime>";
                 }
-                if (trans.getDetailedDeliveryPeriodTo() != null)
+                if (trans.GetDetailedDeliveryPeriodTo() != null)
                 {
-                    xml = xml + "<ram:EndDateTime><udt:DateTimeString format='102'>" + ((DateTime)trans.getDetailedDeliveryPeriodTo()).ToString(zugferdDateFormatting) + "</udt:DateTimeString></ram:EndDateTime>";
+                    xml = xml + "<ram:EndDateTime><udt:DateTimeString format='102'>" + ((DateTime)trans.GetDetailedDeliveryPeriodTo()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:EndDateTime>";
                 }
                 xml = xml + "</ram:BillingSpecifiedPeriod>";
 
@@ -420,9 +420,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                     }
             */
 
-            if (trans.getPaymentTerms() == null)
+            if (trans.GetPaymentTerms() == null)
             {
-                xml = xml + "			<ram:SpecifiedTradePaymentTerms>\n" + "				<ram:Description>" + paymentTermsDescription + "</ram:Description>\n";
+                xml = xml + "			<ram:SpecifiedTradePaymentTerms>\n" + "				<ram:Description>" + _paymentTermsDescription + "</ram:Description>\n";
 
                 /*			if (trans.getTradeSettlement() != null)
                             {
@@ -435,16 +435,16 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                                 }
                             }
                 */
-                if (hasDueDate && (trans.getDueDate() != null))
+                if (hasDueDate && (trans.GetDueDate() != null))
                 {
-                    xml = xml + "				<ram:DueDateDateTime><udt:DateTimeString format=\"102\">" + ((DateTime)trans.getDueDate()).ToString(zugferdDateFormatting) + "</udt:DateTimeString></ram:DueDateDateTime>\n"; // 20130704
+                    xml = xml + "				<ram:DueDateDateTime><udt:DateTimeString format=\"102\">" + ((DateTime)trans.GetDueDate()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:DueDateDateTime>\n"; // 20130704
 
                 }
                 xml = xml + "			</ram:SpecifiedTradePaymentTerms>\n";
             }
             else
             {
-                xml = xml + buildPaymentTermsXml();
+                xml = xml + BuildPaymentTermsXml();
             }
 
 
@@ -453,7 +453,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             //string chargesTotalLine = "<ram:ChargeTotalAmount>" + currencyFormat(calc.getChargesForPercent(null)) + "</ram:ChargeTotalAmount>";
             string chargesTotalLine = "";
             string allowanceTotalLine = "";
-            xml = xml + "<ram:SpecifiedTradeSettlementHeaderMonetarySummation>\n" + "<ram:LineTotalAmount>" + currencyFormat(calc.getTotal()) + "</ram:LineTotalAmount>\n" + chargesTotalLine + allowanceTotalLine + "<ram:TaxBasisTotalAmount>" + currencyFormat(calc.getTaxBasis()) + "</ram:TaxBasisTotalAmount>\n" + "				<ram:TaxTotalAmount currencyID=\"" + trans.getCurrency() + "\">" + currencyFormat(calc.getGrandTotal() - calc.getTaxBasis()) + "</ram:TaxTotalAmount>\n" + "				<ram:GrandTotalAmount>" + currencyFormat(calc.getGrandTotal()) + "</ram:GrandTotalAmount>\n" + "             <ram:TotalPrepaidAmount>" + currencyFormat(calc.getTotalPrepaid()) + "</ram:TotalPrepaidAmount>\n" + "				<ram:DuePayableAmount>" + currencyFormat(calc.getGrandTotal() - calc.getTotalPrepaid()) + "</ram:DuePayableAmount>\n" + "			</ram:SpecifiedTradeSettlementHeaderMonetarySummation>\n" + "		</ram:ApplicableHeaderTradeSettlement>\n";
+            xml = xml + "<ram:SpecifiedTradeSettlementHeaderMonetarySummation>\n" + "<ram:LineTotalAmount>" + CurrencyFormat(Calc.GetTotal()) + "</ram:LineTotalAmount>\n" + chargesTotalLine + allowanceTotalLine + "<ram:TaxBasisTotalAmount>" + CurrencyFormat(Calc.GetTaxBasis()) + "</ram:TaxBasisTotalAmount>\n" + "				<ram:TaxTotalAmount currencyID=\"" + trans.GetCurrency() + "\">" + CurrencyFormat(Calc.GetGrandTotal() - Calc.GetTaxBasis()) + "</ram:TaxTotalAmount>\n" + "				<ram:GrandTotalAmount>" + CurrencyFormat(Calc.GetGrandTotal()) + "</ram:GrandTotalAmount>\n" + "             <ram:TotalPrepaidAmount>" + CurrencyFormat(Calc.GetTotalPrepaid()) + "</ram:TotalPrepaidAmount>\n" + "				<ram:DuePayableAmount>" + CurrencyFormat(Calc.GetGrandTotal() - Calc.GetTotalPrepaid()) + "</ram:DuePayableAmount>\n" + "			</ram:SpecifiedTradeSettlementHeaderMonetarySummation>\n" + "		</ram:ApplicableHeaderTradeSettlement>\n";
             // + " <IncludedSupplyChainTradeLineItem>\n"
             // + " <AssociatedDocumentLineDocument>\n"
             // + " <IncludedNote>\n"
@@ -471,29 +471,29 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             byte[] zugferdRaw;
             zugferdRaw = encoding.GetBytes(xml); ;
 
-            zugferdData = XMLTools.removeBOM(zugferdRaw);
+            ZugferdData = XmlTools.RemoveBom(zugferdRaw);
         }
 
-        public void setProfile(Profile p)
+        public void SetProfile(Profile p)
         {
-            profile = p;
+            Profile = p;
         }
-        private string buildPaymentTermsXml()
+        private string BuildPaymentTermsXml()
         {
             string paymentTermsXml = "<ram:SpecifiedTradePaymentTerms>";
 
-            IZUGFeRDPaymentTerms paymentTerms = trans.getPaymentTerms();
+            IZugFeRdPaymentTerms paymentTerms = Trans.GetPaymentTerms();
             //IZUGFeRDPaymentDiscountTerms discountTerms = paymentTerms.getDiscountTerms();
-            DateTime dueDate = paymentTerms.getDueDate();
+            DateTime dueDate = paymentTerms.GetDueDate();
             if (dueDate != null /*&& discountTerms != null && discountTerms.getBaseDate() != null*/)
             {
                 throw new System.InvalidOperationException("if paymentTerms.dueDate is specified, paymentTerms.discountTerms.baseDate has not to be specified");
             }
-            paymentTermsXml += "<ram:Description>" + paymentTerms.getDescription() + "</ram:Description>";
+            paymentTermsXml += "<ram:Description>" + paymentTerms.GetDescription() + "</ram:Description>";
             if (dueDate != null)
             {
                 paymentTermsXml += "<ram:DueDateDateTime>";
-                paymentTermsXml += "<udt:DateTimeString format=\"102\">" + dueDate.ToString(zugferdDateFormatting) + "</udt:DateTimeString>";
+                paymentTermsXml += "<udt:DateTimeString format=\"102\">" + dueDate.ToString(ZugferdDateFormatting) + "</udt:DateTimeString>";
                 paymentTermsXml += "</ram:DueDateDateTime>";
             }
             /*

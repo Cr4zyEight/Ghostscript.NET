@@ -35,7 +35,7 @@ namespace Ghostscript.NET.Processor
     {
         #region Private constants
 
-        private readonly char[] EMPTY_SPACE_SPLIT = new char[] { ' ' };
+        private readonly char[] _emptySpaceSplit = new char[] { ' ' };
 
         #endregion
 
@@ -44,9 +44,9 @@ namespace Ghostscript.NET.Processor
         private bool _disposed = false;
         private bool _processorOwnsLibrary = true;
         private GhostscriptLibrary _gs;
-        private GhostscriptStdIO _stdIO_Callback;
-        private GhostscriptProcessorInternalStdIOHandler _internalStdIO_Callback;
-        private gsapi_pool_callback _poolCallBack;
+        private GhostscriptStdIo _stdIoCallback;
+        private GhostscriptProcessorInternalStdIoHandler _internalStdIoCallback;
+        private GsapiPoolCallback _poolCallBack;
         private StringBuilder _outputMessages = new StringBuilder();
         private StringBuilder _errorMessages = new StringBuilder();
         private int _totalPages;
@@ -115,7 +115,7 @@ namespace Ghostscript.NET.Processor
         #region Constructor
 
         public GhostscriptProcessor()
-            : this(GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL), false)
+            : this(GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl), false)
         { }
 
         #endregion
@@ -228,32 +228,32 @@ namespace Ghostscript.NET.Processor
 
         #region Process - device, stdIO_callback
 
-        public void Process(GhostscriptDevice device, GhostscriptStdIO stdIO_callback)
+        public void Process(GhostscriptDevice device, GhostscriptStdIo stdIoCallback)
         {
-            this.StartProcessing(device, stdIO_callback);
+            this.StartProcessing(device, stdIoCallback);
         }
 
         #endregion
 
         #region Process - args, stdIO_callback
 
-        public void Process(string[] args, GhostscriptStdIO stdIO_callback)
+        public void Process(string[] args, GhostscriptStdIo stdIoCallback)
         {
-            this.StartProcessing(args, stdIO_callback);
+            this.StartProcessing(args, stdIoCallback);
         }
 
         #endregion
 
         #region StartProcessing - device, stdIO_callback
 
-        public void StartProcessing(GhostscriptDevice device, GhostscriptStdIO stdIO_callback)
+        public void StartProcessing(GhostscriptDevice device, GhostscriptStdIo stdIoCallback)
         {
             if (device == null)
             {
                 throw new ArgumentNullException("device");
             }
 
-            this.StartProcessing(device.GetSwitches(), stdIO_callback);
+            this.StartProcessing(device.GetSwitches(), stdIoCallback);
         }
 
         #endregion
@@ -265,7 +265,7 @@ namespace Ghostscript.NET.Processor
         /// </summary>
         /// <param name="args">Command arguments</param>
         /// <param name="stdIO_callback">StdIO callback, can be set to null if you dont want to handle it.</param>
-        public void StartProcessing(string[] args, GhostscriptStdIO stdIO_callback)
+        public void StartProcessing(string[] args, GhostscriptStdIo stdIoCallback)
         {
             if (args == null)
             {
@@ -286,71 +286,71 @@ namespace Ghostscript.NET.Processor
 
             IntPtr instance = IntPtr.Zero;
 
-            int rc_ins = _gs.gsapi_new_instance(out instance, IntPtr.Zero);
+            int rcIns = _gs.GsapiNewInstance(out instance, IntPtr.Zero);
 
-            if (ierrors.IsError(rc_ins))
+            if (Ierrors.IsError(rcIns))
             {
-                throw new GhostscriptAPICallException("gsapi_new_instance", rc_ins);
+                throw new GhostscriptApiCallException("gsapi_new_instance", rcIns);
             }
 
             try
             {
-                _stdIO_Callback = stdIO_callback;
+                _stdIoCallback = stdIoCallback;
 
-                _internalStdIO_Callback = new GhostscriptProcessorInternalStdIOHandler(
+                _internalStdIoCallback = new GhostscriptProcessorInternalStdIoHandler(
                                                 new StdInputEventHandler(OnStdIoInput), 
                                                 new StdOutputEventHandler(OnStdIoOutput), 
                                                 new StdErrorEventHandler(OnStdIoError));
 
-                int rc_stdio = _gs.gsapi_set_stdio(instance,
-                                        _internalStdIO_Callback._std_in,
-                                        _internalStdIO_Callback._std_out,
-                                        _internalStdIO_Callback._std_err);
+                int rcStdio = _gs.GsapiSetStdio(instance,
+                                        _internalStdIoCallback._std_in,
+                                        _internalStdIoCallback._std_out,
+                                        _internalStdIoCallback.StdErr);
 
-                _poolCallBack = new gsapi_pool_callback(Pool);
+                _poolCallBack = new GsapiPoolCallback(Pool);
 
-                int rc_pool = _gs.gsapi_set_poll(instance, _poolCallBack);
+                int rcPool = _gs.GsapiSetPoll(instance, _poolCallBack);
 
-                if (ierrors.IsError(rc_pool))
+                if (Ierrors.IsError(rcPool))
                 {
-                    throw new GhostscriptAPICallException("gsapi_set_poll", rc_pool);
+                    throw new GhostscriptApiCallException("gsapi_set_poll", rcPool);
 
                 }
 
-                if (ierrors.IsError(rc_stdio))
+                if (Ierrors.IsError(rcStdio))
                 {
-                    throw new GhostscriptAPICallException("gsapi_set_stdio", rc_stdio);
+                    throw new GhostscriptApiCallException("gsapi_set_stdio", rcStdio);
                 }
 
                 this.OnStarted(new GhostscriptProcessorEventArgs());
 
                 _stopProcessing = false;
 
-                if (_gs.is_gsapi_set_arg_encoding_supported)
+                if (_gs.IsGsapiSetArgEncodingSupported)
                 {
-                    int rc_enc = _gs.gsapi_set_arg_encoding(instance, GS_ARG_ENCODING.UTF8);
+                    int rcEnc = _gs.GsapiSetArgEncoding(instance, GsArgEncoding.Utf8);
                 }
 
-                int rc_init = _gs.gsapi_init_with_args(instance, args.Length, args);
+                int rcInit = _gs.GsapiInitWithArgs(instance, args.Length, args);
 
-                if (ierrors.IsErrorIgnoreQuit(rc_init))
+                if (Ierrors.IsErrorIgnoreQuit(rcInit))
                 {
-                    if (!ierrors.IsInterrupt(rc_init))
+                    if (!Ierrors.IsInterrupt(rcInit))
                     {
-                        throw new GhostscriptAPICallException("gsapi_init_with_args", rc_init);
+                        throw new GhostscriptApiCallException("gsapi_init_with_args", rcInit);
                     }
                 }
 
-                int rc_exit = _gs.gsapi_exit(instance);
+                int rcExit = _gs.GsapiExit(instance);
 
-                if (ierrors.IsErrorIgnoreQuit(rc_exit))
+                if (Ierrors.IsErrorIgnoreQuit(rcExit))
                 {
-                    throw new GhostscriptAPICallException("gsapi_exit", rc_exit);
+                    throw new GhostscriptApiCallException("gsapi_exit", rcExit);
                 }
             }
             finally
             {
-                _gs.gsapi_delete_instance(instance);
+                _gs.GsapiDeleteInstance(instance);
 
                 GC.Collect();
 
@@ -391,9 +391,9 @@ namespace Ghostscript.NET.Processor
 
         private void OnStdIoInput(out string input, int count)
         {
-            if (_stdIO_Callback != null)
+            if (_stdIoCallback != null)
             {
-                _stdIO_Callback.StdIn(out input, count);
+                _stdIoCallback.StdIn(out input, count);
             }
             else
             {
@@ -423,9 +423,9 @@ namespace Ghostscript.NET.Processor
                     rIndex = _outputMessages.ToString().IndexOf("\r\n");
                 }
 
-                if (_stdIO_Callback != null)
+                if (_stdIoCallback != null)
                 {
-                    _stdIO_Callback.StdOut(output);
+                    _stdIoCallback.StdOut(output);
                 }
             }
         }
@@ -452,9 +452,9 @@ namespace Ghostscript.NET.Processor
                     rIndex = _errorMessages.ToString().IndexOf("\r\n");
                 }
 
-                if (_stdIO_Callback != null)
+                if (_stdIoCallback != null)
                 {
-                    _stdIO_Callback.StdError(error);
+                    _stdIoCallback.StdError(error);
                 }
             }
         }
@@ -467,12 +467,12 @@ namespace Ghostscript.NET.Processor
         {
             if (line.StartsWith("Processing pages"))
             {
-                string[] chunks = line.Split(EMPTY_SPACE_SPLIT);
+                string[] chunks = line.Split(_emptySpaceSplit);
                 _totalPages = int.Parse(chunks[chunks.Length - 1].TrimEnd('.'));
             }
             else if (line.StartsWith("Page"))
             {
-                string[] chunks = line.Split(EMPTY_SPACE_SPLIT);
+                string[] chunks = line.Split(_emptySpaceSplit);
                 int currentPage = int.Parse(chunks[1]);
 
                 this.OnProcessing(new GhostscriptProcessorProcessingEventArgs(currentPage, _totalPages));

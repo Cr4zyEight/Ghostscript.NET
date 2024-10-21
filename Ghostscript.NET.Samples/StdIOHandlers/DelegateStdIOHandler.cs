@@ -2,13 +2,13 @@
 
 namespace Ghostscript.NET.Samples.StdIOHandlers
 {
-    public class DelegateStdIOHandler : GhostscriptStdIO
+    public class DelegateStdIoHandler : GhostscriptStdIo
     {
         readonly Func<int, string> _stdIn;
         readonly Action<string> _stdOut;
         readonly Action<string> _stdErr;
 
-        public DelegateStdIOHandler(
+        public DelegateStdIoHandler(
             Func<int, string> stdIn = null,
             Action<string> stdOut = null,
             Action<string> stdErr = null) :

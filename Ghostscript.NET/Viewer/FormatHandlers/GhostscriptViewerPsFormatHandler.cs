@@ -39,20 +39,20 @@ namespace Ghostscript.NET.Viewer
     {
         #region Private constants
 
-        private const string DSC_PAGES = "%%Pages:";
-        private const string DSC_PAGE = "%%Page:";
-        private const string DSC_BOUNDINGBOX = "%%BoundingBox:";
-        private const string DSC_PAGEBOUNDINGBOX = "%%PageBoundingBox:";
-        private const string DSC_TRAILER = "%%Trailer";
-        private const string DSC_EOF = "%%EOF";
+        private const string DscPages = "%%Pages:";
+        private const string DscPage = "%%Page:";
+        private const string DscBoundingbox = "%%BoundingBox:";
+        private const string DscPageboundingbox = "%%PageBoundingBox:";
+        private const string DscTrailer = "%%Trailer";
+        private const string DscEof = "%%EOF";
 
         #endregion
 
         #region Private variables
 
-        private DSCTokenizer _tokenizer;
-        private Dictionary<int, DSCToken> _pageTokens = new Dictionary<int, DSCToken>();
-        private DSCToken _lastPageEnding;
+        private DscTokenizer _tokenizer;
+        private Dictionary<int, DscToken> _pageTokens = new Dictionary<int, DscToken>();
+        private DscToken _lastPageEnding;
 
         #endregion
 
@@ -140,8 +140,8 @@ namespace Ghostscript.NET.Viewer
         {
             this.CurrentPageNumber = pageNumber;
 
-            DSCToken pageToken = _pageTokens[pageNumber];
-            DSCToken pageEndToken;
+            DscToken pageToken = _pageTokens[pageNumber];
+            DscToken pageEndToken;
             
             if (pageNumber == _pageTokens.Count)
             {
@@ -164,20 +164,20 @@ namespace Ghostscript.NET.Viewer
 
         private void OpenPsFile(string path)
         {
-            _tokenizer = new DSCTokenizer(path);
+            _tokenizer = new DscTokenizer(path);
 
             this.FirstPageNumber = 1;
 
-            DSCToken token = null;
+            DscToken token = null;
 
             // loop through all DSC comments based on keyword
-            while ((token = _tokenizer.GetNextDSCKeywordToken()) != null)
+            while ((token = _tokenizer.GetNextDscKeywordToken()) != null)
             {
                 switch (token.Text)
                 {
-                    case DSC_PAGES:        // %%Pages: <numpages> | (atend)
+                    case DscPages:        // %%Pages: <numpages> | (atend)
                         {
-                            token = _tokenizer.GetNextDSCValueToken(DSCTokenEnding.Whitespace | DSCTokenEnding.LineEnd);
+                            token = _tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
                             
                             // check if we need to ignore this comment because it's set at the end of the file
                             if (!string.IsNullOrWhiteSpace(token.Text) && token.Text != "(atend)" && !token.Text.StartsWith("%"))
@@ -188,17 +188,17 @@ namespace Ghostscript.NET.Viewer
 
                             break;
                         }
-                    case DSC_BOUNDINGBOX:  // { %%BoundingBox: <llx> <lly> <urx> <ury> } | (atend)
+                    case DscBoundingbox:  // { %%BoundingBox: <llx> <lly> <urx> <ury> } | (atend)
                         {
                             try
                             {
-                                DSCToken llx = _tokenizer.GetNextDSCValueToken(DSCTokenEnding.Whitespace | DSCTokenEnding.LineEnd);
+                                DscToken llx = _tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
 
                                 if (!string.IsNullOrWhiteSpace(llx.Text) && llx.Text != "(atend)" && !llx.Text.StartsWith("%"))
                                 {
-                                    DSCToken lly = _tokenizer.GetNextDSCValueToken(DSCTokenEnding.Whitespace);
-                                    DSCToken urx = _tokenizer.GetNextDSCValueToken(DSCTokenEnding.Whitespace);
-                                    DSCToken ury = _tokenizer.GetNextDSCValueToken(DSCTokenEnding.Whitespace | DSCTokenEnding.LineEnd);
+                                    DscToken lly = _tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace);
+                                    DscToken urx = _tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace);
+                                    DscToken ury = _tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
 
                                     this.BoundingBox = new GhostscriptRectangle(
                                         float.Parse(llx.Text, System.Globalization.CultureInfo.InvariantCulture),
@@ -211,18 +211,18 @@ namespace Ghostscript.NET.Viewer
 
                             break;
                         }
-                    case DSC_PAGE:         // %%Page: <label> <ordinal>
+                    case DscPage:         // %%Page: <label> <ordinal>
                         {
                             // label can be anything, we need to get oridinal which is the last
                             // value of the line
 
-                            DSCToken pageNumberToken;
+                            DscToken pageNumberToken;
                             
                             // loop through each comment value
-                            while ((pageNumberToken = _tokenizer.GetNextDSCValueToken(DSCTokenEnding.Whitespace | DSCTokenEnding.LineEnd)) != null)
+                            while ((pageNumberToken = _tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd)) != null)
                             {
                                 // check if this is the last comment value in this line
-                                if (pageNumberToken.Ending == DSCTokenEnding.LineEnd)
+                                if (pageNumberToken.Ending == DscTokenEnding.LineEnd)
                                 {
                                     // we got it, add this comment keyword to the page list
                                     _pageTokens.Add(int.Parse(pageNumberToken.Text), token);
@@ -232,7 +232,7 @@ namespace Ghostscript.NET.Viewer
 
                             break;
                         }
-                    case DSC_TRAILER:       // %%Trailer (no keywords)
+                    case DscTrailer:       // %%Trailer (no keywords)
                         {
                             // if the postscript is well formatted, we should get this one
                             // save this comment so we can know the position when the last page is ending
@@ -240,7 +240,7 @@ namespace Ghostscript.NET.Viewer
 
                             break;
                         }
-                    case DSC_EOF:           // %%EOF (no keywords)
+                    case DscEof:           // %%EOF (no keywords)
                         {
                             // check if we already know where the last page is ending
                             if (_lastPageEnding == null)
@@ -259,7 +259,7 @@ namespace Ghostscript.NET.Viewer
             {
                 // it seems that the last page goes to the end of the file, set the last page ending
                 // position to the complete file size value
-                _lastPageEnding = new DSCToken();
+                _lastPageEnding = new DscToken();
                 _lastPageEnding.StartPosition = _tokenizer.FileSize;
             }
 
@@ -273,7 +273,7 @@ namespace Ghostscript.NET.Viewer
             if (_pageTokens.Count == 0)
             {
                 // create dummy one that will point to the first byte in the file
-                _pageTokens.Add(1, new DSCToken() { StartPosition = 0 });
+                _pageTokens.Add(1, new DscToken() { StartPosition = 0 });
             }
 
             // hpd = Header, Procedure definitions, Document setup

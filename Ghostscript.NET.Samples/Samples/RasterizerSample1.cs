@@ -48,7 +48,7 @@ namespace Ghostscript.NET.Samples
 
         public void Sample1()
         {
-            int desired_dpi = 96;
+            int desiredDpi = 96;
 
             string inputPdfPath = @"E:\gss_test\test.pdf";
             string outputPath = @"E:\gss_test\output\";
@@ -63,7 +63,7 @@ namespace Ghostscript.NET.Samples
                 {
                     var pageFilePath = Path.Combine(outputPath, string.Format("Page-{0}.png", pageNumber));
 
-                    var img = rasterizer.GetPage(desired_dpi, pageNumber);
+                    var img = rasterizer.GetPage(desiredDpi, pageNumber);
                     img.Save(pageFilePath, ImageFormat.Png);
 
                     Console.WriteLine(pageFilePath);
@@ -73,12 +73,12 @@ namespace Ghostscript.NET.Samples
 
         public void Sample2()
         {
-            int desired_dpi = 96;
+            int desiredDpi = 96;
 
             string inputPdfPath = @"E:\gss_test\test.pdf";
             string outputPath = @"E:\gss_test\output\";
 
-            var output = new DelegateStdIOHandler(
+            var output = new DelegateStdIoHandler(
                 stdOut: Console.WriteLine,
                 stdErr: Console.WriteLine
                 );
@@ -91,7 +91,7 @@ namespace Ghostscript.NET.Samples
                 {
                     var pageFilePath = Path.Combine(outputPath, string.Format("Page-{0}.png", pageNumber));
 
-                    var img = rasterizer.GetPage(desired_dpi, pageNumber);
+                    var img = rasterizer.GetPage(desiredDpi, pageNumber);
                     img.Save(pageFilePath, ImageFormat.Png);
 
                     Console.WriteLine(pageFilePath);

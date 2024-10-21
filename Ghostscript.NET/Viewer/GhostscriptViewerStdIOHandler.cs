@@ -29,7 +29,7 @@ using System.Text;
 
 namespace Ghostscript.NET.Viewer
 {
-    internal class GhostscriptViewerStdIOHandler : GhostscriptStdIO
+    internal class GhostscriptViewerStdIoHandler : GhostscriptStdIo
     {
 
         #region Private variables
@@ -43,7 +43,7 @@ namespace Ghostscript.NET.Viewer
 
         #region Constructor
 
-        public GhostscriptViewerStdIOHandler(GhostscriptViewer viewer, GhostscriptViewerFormatHandler formatHandler) : base(true, true, true)
+        public GhostscriptViewerStdIoHandler(GhostscriptViewer viewer, GhostscriptViewerFormatHandler formatHandler) : base(true, true, true)
         {
             _viewer = viewer;
             _formatHandler = formatHandler;

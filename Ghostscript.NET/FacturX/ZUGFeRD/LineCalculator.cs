@@ -5,16 +5,16 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 	public class LineCalculator
 	{
-		private decimal price;
-		private decimal priceGross;
-		private decimal itemTotalNetAmount;
-		private decimal itemTotalVATAmount;
-		private decimal allowance = decimal.Zero;
-		private decimal charge = decimal.Zero;
+		private decimal _price;
+		private decimal _priceGross;
+		private decimal _itemTotalNetAmount;
+		private decimal _itemTotalVatAmount;
+		private decimal _allowance = decimal.Zero;
+		private decimal _charge = decimal.Zero;
 
 		//JAVA TO C# CONVERTER WARNING: The following constructor is declared outside of its associated class:
-		//ORIGINAL LINE: public LineCalculator(IZUGFeRDExportableItem currentItem)
-		public LineCalculator(IZUGFeRDExportableItem currentItem)
+		//ORIGINAL LINE: public LineCalculator(ZUGFeRDExportableItem currentItem)
+		public LineCalculator(ZUGFeRDExportableItem currentItem)
 		{
 			/*
 					if (currentItem.getItemAllowances() != null && currentItem.getItemAllowances().length > 0)
@@ -39,51 +39,51 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			//ORIGINAL LINE: @decimal multiplicator = currentItem.getProduct().getVATPercent().divide(100);
 			*/
 			decimal multiplicator = currentItem.getProduct().getVATPercent() / 100;
-			priceGross = currentItem.getPrice(); // see https://github.com/ZUGFeRD/mustangproject/issues/159
-			price = priceGross - allowance + charge;
-			itemTotalNetAmount = Math.Round(currentItem.getQuantity() * price / currentItem.getBasisQuantity(), 2, MidpointRounding.AwayFromZero);
-			itemTotalVATAmount = itemTotalNetAmount * multiplicator;
+			_priceGross = currentItem.getPrice(); // see https://github.com/ZUGFeRD/mustangproject/issues/159
+			_price = _priceGross - _allowance + _charge;
+			_itemTotalNetAmount = Math.Round(currentItem.getQuantity() * _price / currentItem.getBasisQuantity(), 2, MidpointRounding.AwayFromZero);
+			_itemTotalVatAmount = _itemTotalNetAmount * multiplicator;
 
 		}
 
 
-		public virtual decimal getPrice()
+		public virtual decimal GetPrice()
 		{
 
-			return price;
+			return _price;
 
 		}
 
-		public virtual decimal getItemTotalNetAmount()
+		public virtual decimal GetItemTotalNetAmount()
 		{
 
-			return itemTotalNetAmount;
+			return _itemTotalNetAmount;
 
 		}
 
-		public virtual decimal getItemTotalVATAmount()
+		public virtual decimal GetItemTotalVatAmount()
 		{
-			return itemTotalVATAmount;
+			return _itemTotalVatAmount;
 		}
 
-		public virtual decimal getItemTotalGrossAmount()
+		public virtual decimal GetItemTotalGrossAmount()
 		{
-			return itemTotalNetAmount;
+			return _itemTotalNetAmount;
 		}
 
-		public virtual decimal getPriceGross()
+		public virtual decimal GetPriceGross()
 		{
-			return priceGross;
+			return _priceGross;
 		}
 
-		public virtual void addAllowance(decimal b)
+		public virtual void AddAllowance(decimal b)
 		{
-			allowance += b;
+			_allowance += b;
 		}
 
-		public virtual void addCharge(decimal b)
+		public virtual void AddCharge(decimal b)
 		{
-			charge += b;
+			_charge += b;
 		}
 
 

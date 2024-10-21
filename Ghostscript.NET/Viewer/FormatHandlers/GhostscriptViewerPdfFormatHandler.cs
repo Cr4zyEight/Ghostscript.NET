@@ -36,14 +36,14 @@ namespace Ghostscript.NET.Viewer
     {
         #region Private constants
 
-        private const string PDF_TAG = "%GSNET";
-        private const string PDF_PAGES_TAG = "%GSNET_VIEWER_PDF_PAGES: ";
-        private const string PDF_PAGE_TAG = "%GSNET_VIEWER_PDF_PAGE: ";
-        private const string PDF_MEDIA_TAG = "%GSNET_VIEWER_PDF_MEDIA: ";
-        private const string PDF_CROP_TAG = "%GSNET_VIEWER_PDF_CROP: ";
-        private const string PDF_ROTATE_TAG = "%GSNET_VIEWER_PDF_ROTATE: ";
-        private const string PDF_DONE_TAG = "%GSNET_VIEWER_PDF_DONE: ";
-        private const string PDF_MARK_TAG = "%GSNET_VIEWER_PDF_MARK: ";
+        private const string PdfTag = "%GSNET";
+        private const string PdfPagesTag = "%GSNET_VIEWER_PDF_PAGES: ";
+        private const string PdfPageTag = "%GSNET_VIEWER_PDF_PAGE: ";
+        private const string PdfMediaTag = "%GSNET_VIEWER_PDF_MEDIA: ";
+        private const string PdfCropTag = "%GSNET_VIEWER_PDF_CROP: ";
+        private const string PdfRotateTag = "%GSNET_VIEWER_PDF_ROTATE: ";
+        private const string PdfDoneTag = "%GSNET_VIEWER_PDF_DONE: ";
+        private const string PdfMarkTag = "%GSNET_VIEWER_PDF_MARK: ";
 
         #endregion
 
@@ -72,7 +72,7 @@ namespace Ghostscript.NET.Viewer
         	        if 
                     Page /Rotate pget not {{ 0 }} if 
         	        ({3}) print == flush 
-                }} def", PDF_PAGE_TAG, PDF_MEDIA_TAG, PDF_CROP_TAG, PDF_ROTATE_TAG));
+                }} def", PdfPageTag, PdfMediaTag, PdfCropTag, PdfRotateTag));
 
             // put these in userdict so we can write to them later
             this.Execute(@"
@@ -101,7 +101,7 @@ namespace Ghostscript.NET.Viewer
         {
             int res = 0;
 
-            if (StringHelper.HasNonASCIIChars(filePath))
+            if (StringHelper.HasNonAsciiChars(filePath))
             {
                 IntPtr ptrStr = StringHelper.NativeUtf8FromString(string.Format("({0}) (r) file runpdfbegin", filePath.Replace("\\", "/")));
 
@@ -116,20 +116,20 @@ namespace Ghostscript.NET.Viewer
                 res = this.Execute(string.Format("({0}) (r) file runpdfbegin", filePath.Replace("\\", "/")));
             }
 
-            if (res == ierrors.e_ioerror)
+            if (res == Ierrors.EIoerror)
             {
-                throw new GhostscriptException("IO error for file: '" + filePath + "'", ierrors.e_ioerror);
+                throw new GhostscriptException("IO error for file: '" + filePath + "'", Ierrors.EIoerror);
             }
-            else if (res == ierrors.e_invalidfileaccess)
+            else if (res == Ierrors.EInvalidfileaccess)
             {
-                throw new GhostscriptException("IO security problem (access control failure) for file: '" + filePath + "'", ierrors.e_ioerror);
+                throw new GhostscriptException("IO security problem (access control failure) for file: '" + filePath + "'", Ierrors.EIoerror);
             }
 
             this.Execute("/FirstPage where { pop FirstPage } { 1 } ifelse");
             this.Execute("/LastPage where { pop LastPage } { pdfpagecount } ifelse");
 
             // flush stdout and then send PDF page marker to stdout where we capture the page numbers via callback
-            this.Execute(string.Format("flush ({0}) print exch =only ( ) print =only (\n) print flush", PDF_PAGES_TAG));
+            this.Execute(string.Format("flush ({0}) print exch =only ( ) print =only (\n) print flush", PdfPagesTag));
 
             // fixes problem with the invisible layers
             // if we don't run that code, then optional content groups will be left unmarked and always processed
@@ -151,9 +151,9 @@ namespace Ghostscript.NET.Viewer
 
         public override void StdOutput(string message)
         {
-            if (message.Contains(PDF_TAG))
+            if (message.Contains(PdfTag))
             {
-                int startPos = message.IndexOf(PDF_TAG);
+                int startPos = message.IndexOf(PdfTag);
                 int endPos = message.IndexOf(": ");
 
                 string tag = message.Substring(startPos, endPos - startPos + 2);
@@ -161,7 +161,7 @@ namespace Ghostscript.NET.Viewer
 
                 switch (tag)
                 {
-                    case PDF_PAGES_TAG:
+                    case PdfPagesTag:
                         {
                             string[] pages = rest.Split(new char[] { ' ' });
 
@@ -175,7 +175,7 @@ namespace Ghostscript.NET.Viewer
 
                             break;
                         }
-                    case PDF_PAGE_TAG:
+                    case PdfPageTag:
                         {
                             int number;
 
@@ -186,7 +186,7 @@ namespace Ghostscript.NET.Viewer
 
                             break;
                         }
-                    case PDF_MEDIA_TAG:
+                    case PdfMediaTag:
                         {
                             string[] mb = rest.Split(new char[] { ' ' });
 
@@ -203,7 +203,7 @@ namespace Ghostscript.NET.Viewer
 
                             break;
                         }
-                    case PDF_CROP_TAG:
+                    case PdfCropTag:
                         {
                             string[] cb = rest.Split(new char[] { ' ' });
 
@@ -220,7 +220,7 @@ namespace Ghostscript.NET.Viewer
 
                             break;
                         }
-                    case PDF_ROTATE_TAG:
+                    case PdfRotateTag:
                         {
                             int rotate;
 

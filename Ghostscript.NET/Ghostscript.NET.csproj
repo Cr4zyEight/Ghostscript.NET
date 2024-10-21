@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
-	<Nullable>enable</Nullable> 
-	  <ImplicitUsings>enable</ImplicitUsings>
+	<ImplicitUsings>enable</ImplicitUsings>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <BuildPackage>true</BuildPackage>
@@ -49,6 +48,7 @@
     <Copyright>Copyright © 2013-2021 by Josip Habjan %28habjan%40gmail.com%29. All Rights Reserved.</Copyright>
     <AssemblyVersion>1.2.3</AssemblyVersion>
     <FileVersion>1.2.3</FileVersion>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="itext7" Version="8.0.3" />

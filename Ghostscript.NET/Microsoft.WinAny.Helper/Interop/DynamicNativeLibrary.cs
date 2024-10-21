@@ -54,8 +54,8 @@ namespace Microsoft.WinAny.Interop
 
         private uint[,,] _protectionFlags = new uint[2, 2, 2]
                     {
-                        { /* not executable */ {WinNT.PAGE_NOACCESS, WinNT.PAGE_WRITECOPY}, {WinNT.PAGE_READONLY, WinNT.PAGE_READWRITE}, }, 
-                        { /* executable */ {WinNT.PAGE_EXECUTE, WinNT.PAGE_EXECUTE_WRITECOPY}, {WinNT.PAGE_EXECUTE_READ, WinNT.PAGE_EXECUTE_READWRITE}, },
+                        { /* not executable */ {WinNt.PageNoaccess, WinNt.PageWritecopy}, {WinNt.PageReadonly, WinNt.PageReadwrite}, }, 
+                        { /* executable */ {WinNt.PageExecute, WinNt.PageExecuteWritecopy}, {WinNt.PageExecuteRead, WinNt.PageExecuteReadwrite}, },
                     };
 
         #endregion
@@ -159,117 +159,117 @@ namespace Microsoft.WinAny.Interop
         /// <returns>If the function succeeds, the return value is a handle to the module.</returns>
         private IntPtr MemoryLoadLibrary(byte[] data)
         {
-            fixed (byte* ptr_data = data)
+            fixed (byte* ptrData = data)
             {
-                WinNT.IMAGE_DOS_HEADER* dos_header = (WinNT.IMAGE_DOS_HEADER*)ptr_data;
+                WinNt.ImageDosHeader* dosHeader = (WinNt.ImageDosHeader*)ptrData;
 
-                if (dos_header->e_magic != WinNT.IMAGE_DOS_SIGNATURE)
+                if (dosHeader->e_magic != WinNt.ImageDosSignature)
                 {
                     throw new NotSupportedException();
                 }
 
-                byte* ptr_old_header;
-                uint old_header_oh_sizeOfImage;
-                uint old_header_oh_sizeOfHeaders;
-                int image_nt_headers_Size;
-                IntPtr old_header_oh_imageBase;
+                byte* ptrOldHeader;
+                uint oldHeaderOhSizeOfImage;
+                uint oldHeaderOhSizeOfHeaders;
+                int imageNtHeadersSize;
+                IntPtr oldHeaderOhImageBase;
 
                 if (Environment.Is64BitProcess)
                 {
-                    WinNT.IMAGE_NT_HEADERS64* old_header = (WinNT.IMAGE_NT_HEADERS64*)(ptr_data + dos_header->e_lfanew);
-                    if (old_header->Signature != WinNT.IMAGE_NT_SIGNATURE)
+                    WinNt.ImageNtHeaders64* oldHeader = (WinNt.ImageNtHeaders64*)(ptrData + dosHeader->e_lfanew);
+                    if (oldHeader->Signature != WinNt.ImageNtSignature)
                     {
                         throw new NotSupportedException();
                     }
 
-                    old_header_oh_sizeOfImage = old_header->OptionalHeader.SizeOfImage;
-                    old_header_oh_sizeOfHeaders = old_header->OptionalHeader.SizeOfHeaders;
-                    old_header_oh_imageBase = old_header->OptionalHeader.ImageBase;
-                    ptr_old_header = (byte*)old_header;
+                    oldHeaderOhSizeOfImage = oldHeader->OptionalHeader.SizeOfImage;
+                    oldHeaderOhSizeOfHeaders = oldHeader->OptionalHeader.SizeOfHeaders;
+                    oldHeaderOhImageBase = oldHeader->OptionalHeader.ImageBase;
+                    ptrOldHeader = (byte*)oldHeader;
 
-                    image_nt_headers_Size = sizeof(WinNT.IMAGE_NT_HEADERS64);
+                    imageNtHeadersSize = sizeof(WinNt.ImageNtHeaders64);
                 }
                 else
                 {
-                    WinNT.IMAGE_NT_HEADERS32* old_header = (WinNT.IMAGE_NT_HEADERS32*)(ptr_data + dos_header->e_lfanew);
-                    if (old_header->Signature != WinNT.IMAGE_NT_SIGNATURE)
+                    WinNt.ImageNtHeaders32* oldHeader = (WinNt.ImageNtHeaders32*)(ptrData + dosHeader->e_lfanew);
+                    if (oldHeader->Signature != WinNt.ImageNtSignature)
                     {
                         throw new NotSupportedException();
                     }
 
-                    old_header_oh_sizeOfImage = old_header->OptionalHeader.SizeOfImage;
-                    old_header_oh_sizeOfHeaders = old_header->OptionalHeader.SizeOfHeaders;
-                    old_header_oh_imageBase = old_header->OptionalHeader.ImageBase;
-                    ptr_old_header = (byte*)old_header;
+                    oldHeaderOhSizeOfImage = oldHeader->OptionalHeader.SizeOfImage;
+                    oldHeaderOhSizeOfHeaders = oldHeader->OptionalHeader.SizeOfHeaders;
+                    oldHeaderOhImageBase = oldHeader->OptionalHeader.ImageBase;
+                    ptrOldHeader = (byte*)oldHeader;
 
-                    image_nt_headers_Size = sizeof(WinNT.IMAGE_NT_HEADERS32);
+                    imageNtHeadersSize = sizeof(WinNt.ImageNtHeaders32);
                 }
 
                 IntPtr codeBase = IntPtr.Zero;
 
                 if (!Environment.Is64BitProcess)
                 {
-                    codeBase = WinBase.VirtualAlloc(old_header_oh_imageBase, old_header_oh_sizeOfImage, WinNT.MEM_RESERVE, WinNT.PAGE_READWRITE);
+                    codeBase = WinBase.VirtualAlloc(oldHeaderOhImageBase, oldHeaderOhSizeOfImage, WinNt.MemReserve, WinNt.PageReadwrite);
                 }
 
                 if (codeBase == IntPtr.Zero)
-                    codeBase = WinBase.VirtualAlloc(IntPtr.Zero, old_header_oh_sizeOfImage, WinNT.MEM_RESERVE, WinNT.PAGE_READWRITE);
+                    codeBase = WinBase.VirtualAlloc(IntPtr.Zero, oldHeaderOhSizeOfImage, WinNt.MemReserve, WinNt.PageReadwrite);
 
                 if (codeBase == IntPtr.Zero)
                     return IntPtr.Zero;
 
-                MEMORY_MODULE* memory_module = (MEMORY_MODULE*)Marshal.AllocHGlobal(sizeof(MEMORY_MODULE));
-                memory_module->codeBase = (byte*)codeBase;
-                memory_module->numModules = 0;
-                memory_module->modules = null;
-                memory_module->initialized = 0;
+                MemoryModule* memoryModule = (MemoryModule*)Marshal.AllocHGlobal(sizeof(MemoryModule));
+                memoryModule->codeBase = (byte*)codeBase;
+                memoryModule->numModules = 0;
+                memoryModule->modules = null;
+                memoryModule->initialized = 0;
 
-                WinBase.VirtualAlloc(codeBase, old_header_oh_sizeOfImage, WinNT.MEM_COMMIT, WinNT.PAGE_READWRITE);
+                WinBase.VirtualAlloc(codeBase, oldHeaderOhSizeOfImage, WinNt.MemCommit, WinNt.PageReadwrite);
 
-                IntPtr headers = WinBase.VirtualAlloc(codeBase, old_header_oh_sizeOfHeaders, WinNT.MEM_COMMIT, WinNT.PAGE_READWRITE);
+                IntPtr headers = WinBase.VirtualAlloc(codeBase, oldHeaderOhSizeOfHeaders, WinNt.MemCommit, WinNt.PageReadwrite);
 
 
                 // copy PE header to code
-                memory.memcpy((byte*)headers, (byte*)dos_header, dos_header->e_lfanew + old_header_oh_sizeOfHeaders);
+                Memory.Memcpy((byte*)headers, (byte*)dosHeader, dosHeader->e_lfanew + oldHeaderOhSizeOfHeaders);
                
-                memory_module->headers = &((byte*)(headers))[dos_header->e_lfanew];
+                memoryModule->headers = &((byte*)(headers))[dosHeader->e_lfanew];
 
                 if (Environment.Is64BitProcess)
                 {
-                    WinNT.IMAGE_NT_HEADERS64* mm_headers_64 = (WinNT.IMAGE_NT_HEADERS64*)(memory_module->headers);
-                    mm_headers_64->OptionalHeader.ImageBase = codeBase;
+                    WinNt.ImageNtHeaders64* mmHeaders64 = (WinNt.ImageNtHeaders64*)(memoryModule->headers);
+                    mmHeaders64->OptionalHeader.ImageBase = codeBase;
                 }
                 else
                 {
-                    WinNT.IMAGE_NT_HEADERS32* mm_headers_32 = (WinNT.IMAGE_NT_HEADERS32*)(memory_module->headers);
-                    mm_headers_32->OptionalHeader.ImageBase = codeBase;
+                    WinNt.ImageNtHeaders32* mmHeaders32 = (WinNt.ImageNtHeaders32*)(memoryModule->headers);
+                    mmHeaders32->OptionalHeader.ImageBase = codeBase;
                 }
 
-                this.CopySections(ptr_data, ptr_old_header, memory_module);
+                this.CopySections(ptrData, ptrOldHeader, memoryModule);
 
-                ulong locationDelta = (ulong)((ulong)codeBase - (ulong)old_header_oh_imageBase);
+                ulong locationDelta = (ulong)((ulong)codeBase - (ulong)oldHeaderOhImageBase);
 
                 if (locationDelta != 0)
                 {
-                    this.PerformBaseRelocation(memory_module, locationDelta);
+                    this.PerformBaseRelocation(memoryModule, locationDelta);
                 }
 
-                if (!this.BuildImportTable(memory_module))
+                if (!this.BuildImportTable(memoryModule))
                 {
                     goto error;
                 }
 
-                this.FinalizeSections(memory_module);
+                this.FinalizeSections(memoryModule);
 
-                if (!this.CallDllEntryPoint(memory_module, WinNT.DLL_PROCESS_ATTACH))
+                if (!this.CallDllEntryPoint(memoryModule, WinNt.DllProcessAttach))
                 {
                     goto error;
                 }
 
-                return (IntPtr)memory_module;
+                return (IntPtr)memoryModule;
 
             error:
-                MemoryFreeLibrary((IntPtr)memory_module);
+                MemoryFreeLibrary((IntPtr)memoryModule);
                 return IntPtr.Zero;
             }
         }
@@ -284,29 +284,29 @@ namespace Microsoft.WinAny.Interop
         /// <param name="ptr_data">Pointer to a native module byte array.</param>
         /// <param name="ptr_old_headers">Pointer to a source native module headers.</param>
         /// <param name="memory_module">Pointer to a memory module.</param>
-        private void CopySections(byte* ptr_data, byte* ptr_old_headers, MEMORY_MODULE* memory_module)
+        private void CopySections(byte* ptrData, byte* ptrOldHeaders, MemoryModule* memoryModule)
         {
-            byte* codeBase = memory_module->codeBase;
-            WinNT.IMAGE_SECTION_HEADER* section = WinNT.IMAGE_FIRST_SECTION(memory_module->headers);
+            byte* codeBase = memoryModule->codeBase;
+            WinNt.ImageSectionHeader* section = WinNt.IMAGE_FIRST_SECTION(memoryModule->headers);
 
             ushort numberOfSections;
             uint sectionAlignment;
 
             if (Environment.Is64BitProcess)
             {
-                WinNT.IMAGE_NT_HEADERS64* new_headers = (WinNT.IMAGE_NT_HEADERS64*)memory_module->headers;
-                numberOfSections = new_headers->FileHeader.NumberOfSections;
+                WinNt.ImageNtHeaders64* newHeaders = (WinNt.ImageNtHeaders64*)memoryModule->headers;
+                numberOfSections = newHeaders->FileHeader.NumberOfSections;
 
-                WinNT.IMAGE_NT_HEADERS64* old_headers = (WinNT.IMAGE_NT_HEADERS64*)ptr_old_headers;
-                sectionAlignment = old_headers->OptionalHeader.SectionAlignment;
+                WinNt.ImageNtHeaders64* oldHeaders = (WinNt.ImageNtHeaders64*)ptrOldHeaders;
+                sectionAlignment = oldHeaders->OptionalHeader.SectionAlignment;
             }
             else
             {
-                WinNT.IMAGE_NT_HEADERS32* new_headers = (WinNT.IMAGE_NT_HEADERS32*)memory_module->headers;
-                numberOfSections = new_headers->FileHeader.NumberOfSections;
+                WinNt.ImageNtHeaders32* newHeaders = (WinNt.ImageNtHeaders32*)memoryModule->headers;
+                numberOfSections = newHeaders->FileHeader.NumberOfSections;
 
-                WinNT.IMAGE_NT_HEADERS32* old_headers = (WinNT.IMAGE_NT_HEADERS32*)ptr_old_headers;
-                sectionAlignment = old_headers->OptionalHeader.SectionAlignment;
+                WinNt.ImageNtHeaders32* oldHeaders = (WinNt.ImageNtHeaders32*)ptrOldHeaders;
+                sectionAlignment = oldHeaders->OptionalHeader.SectionAlignment;
             }
 
             uint index;
@@ -318,17 +318,17 @@ namespace Microsoft.WinAny.Interop
                 {
                     if (sectionAlignment > 0)
                     {
-                        dest = (byte*)WinBase.VirtualAlloc((IntPtr)(codeBase + section->VirtualAddress), sectionAlignment, WinNT.MEM_COMMIT, WinNT.PAGE_READWRITE);
+                        dest = (byte*)WinBase.VirtualAlloc((IntPtr)(codeBase + section->VirtualAddress), sectionAlignment, WinNt.MemCommit, WinNt.PageReadwrite);
                         section->PhysicalAddress = (uint)dest;
-                        memory.memset(dest, 0, sectionAlignment);
+                        Memory.Memset(dest, 0, sectionAlignment);
                     }
 
                     continue;
                 }
 
                 // commit memory block and copy data from dll
-                dest = (byte*)WinBase.VirtualAlloc((IntPtr)(codeBase + section->VirtualAddress), section->SizeOfRawData, WinNT.MEM_COMMIT, WinNT.PAGE_READWRITE);
-                memory.memcpy(dest, ptr_data + section->PointerToRawData, section->SizeOfRawData);
+                dest = (byte*)WinBase.VirtualAlloc((IntPtr)(codeBase + section->VirtualAddress), section->SizeOfRawData, WinNt.MemCommit, WinNt.PageReadwrite);
+                Memory.Memcpy(dest, ptrData + section->PointerToRawData, section->SizeOfRawData);
 
                 section->PhysicalAddress = (uint)dest;
             }
@@ -343,27 +343,27 @@ namespace Microsoft.WinAny.Interop
         /// </summary>
         /// <param name="memory_module">Pointer to a memory module.</param>
         /// <param name="delta">Adjustment delta value.</param>
-        private void PerformBaseRelocation(MEMORY_MODULE* memory_module, ulong delta)
+        private void PerformBaseRelocation(MemoryModule* memoryModule, ulong delta)
         {
-            WinNT.IMAGE_DATA_DIRECTORY* directory = this.GET_HEADER_DIRECTORY(memory_module, WinNT.IMAGE_DIRECTORY_ENTRY_BASERELOC);
+            WinNt.ImageDataDirectory* directory = this.GET_HEADER_DIRECTORY(memoryModule, WinNt.ImageDirectoryEntryBasereloc);
 
             if (directory->Size > 0)
             {
-                WinNT.IMAGE_BASE_RELOCATION* relocation = (WinNT.IMAGE_BASE_RELOCATION*)(memory_module->codeBase + directory->VirtualAddress);
+                WinNt.ImageBaseRelocation* relocation = (WinNt.ImageBaseRelocation*)(memoryModule->codeBase + directory->VirtualAddress);
 
-                int sizeOfBaseRelocation = sizeof(WinNT.IMAGE_BASE_RELOCATION);
+                int sizeOfBaseRelocation = sizeof(WinNt.ImageBaseRelocation);
 
                 int index;
 
                 for (; relocation->VirtualAddress > 0; )
                 {
-                    byte* dest = (byte*)(memory_module->codeBase + relocation->VirtualAddress);
+                    byte* dest = (byte*)(memoryModule->codeBase + relocation->VirtualAddress);
                     ushort* relInfo = (ushort*)((byte*)relocation + sizeOfBaseRelocation);
 
                     for (index = 0; index < ((relocation->SizeOfBlock - sizeOfBaseRelocation) / 2); index++, relInfo++)
                     {
-                        uint* patchAddrHL32;
-                        ulong* patchAddrHL64;
+                        uint* patchAddrHl32;
+                        ulong* patchAddrHl64;
 
                         uint type, offset;
 
@@ -375,18 +375,18 @@ namespace Microsoft.WinAny.Interop
 
                         switch (type)
                         {
-                            case WinNT.IMAGE_REL_BASED_ABSOLUTE:
+                            case WinNt.ImageRelBasedAbsolute:
                                 break;
 
-                            case WinNT.IMAGE_REL_BASED_HIGHLOW:
-                                patchAddrHL32 = (uint*)((uint)dest + offset);
-                                *patchAddrHL32 += (uint)delta;
+                            case WinNt.ImageRelBasedHighlow:
+                                patchAddrHl32 = (uint*)((uint)dest + offset);
+                                *patchAddrHl32 += (uint)delta;
                                 break;
 
 
-                            case WinNT.IMAGE_REL_BASED_DIR64:
-                                patchAddrHL64 = (ulong*)((ulong)dest + offset);
-                                *patchAddrHL64 += delta;
+                            case WinNt.ImageRelBasedDir64:
+                                patchAddrHl64 = (ulong*)((ulong)dest + offset);
+                                *patchAddrHl64 += delta;
                                 break;
 
                             default:
@@ -394,7 +394,7 @@ namespace Microsoft.WinAny.Interop
                         }
                     }
 
-                    relocation = (WinNT.IMAGE_BASE_RELOCATION*)((byte*)relocation + relocation->SizeOfBlock);
+                    relocation = (WinNt.ImageBaseRelocation*)((byte*)relocation + relocation->SizeOfBlock);
                 }
             }
         }
@@ -408,22 +408,22 @@ namespace Microsoft.WinAny.Interop
         /// </summary>
         /// <param name="memory_module">Pointer to a memory module.</param>
         /// <returns>If the function succeeds, the return value is true.</returns>
-        private bool BuildImportTable(MEMORY_MODULE* memory_module)
+        private bool BuildImportTable(MemoryModule* memoryModule)
         {
             bool result = true;
 
-            WinNT.IMAGE_DATA_DIRECTORY* directory = this.GET_HEADER_DIRECTORY(memory_module, WinNT.IMAGE_DIRECTORY_ENTRY_IMPORT);
+            WinNt.ImageDataDirectory* directory = this.GET_HEADER_DIRECTORY(memoryModule, WinNt.ImageDirectoryEntryImport);
 
             if (directory->Size > 0)
             {
-                WinNT.IMAGE_IMPORT_DESCRIPTOR* importDesc = (WinNT.IMAGE_IMPORT_DESCRIPTOR*)(memory_module->codeBase + directory->VirtualAddress);
+                WinNt.ImageImportDescriptor* importDesc = (WinNt.ImageImportDescriptor*)(memoryModule->codeBase + directory->VirtualAddress);
 
                 for (; importDesc->Name != 0; importDesc++)
                 {
                     IntPtr* thunkRef;
                     IntPtr* funcRef;
 
-                    string moduleName = Marshal.PtrToStringAnsi((IntPtr)(memory_module->codeBase + importDesc->Name));
+                    string moduleName = Marshal.PtrToStringAnsi((IntPtr)(memoryModule->codeBase + importDesc->Name));
                     IntPtr handle = WinBase.LoadLibrary(moduleName);
 
                     if (handle == IntPtr.Zero)
@@ -432,41 +432,41 @@ namespace Microsoft.WinAny.Interop
                         break;
                     }
 
-                    int size_of_pointer = sizeof(IntPtr);
+                    int sizeOfPointer = sizeof(IntPtr);
 
-                    memory_module->modules = (IntPtr*)memory.realloc((byte*)memory_module->modules,
-                                                                     (uint)((memory_module->numModules) * size_of_pointer),
-                                                                     (uint)((memory_module->numModules + 1) * size_of_pointer));
+                    memoryModule->modules = (IntPtr*)Memory.Realloc((byte*)memoryModule->modules,
+                                                                     (uint)((memoryModule->numModules) * sizeOfPointer),
+                                                                     (uint)((memoryModule->numModules + 1) * sizeOfPointer));
 
 
-                    if (memory_module->modules == null)
+                    if (memoryModule->modules == null)
                     {
                         result = false;
                         break;
                     }
 
-                    memory_module->modules[memory_module->numModules++] = handle;
+                    memoryModule->modules[memoryModule->numModules++] = handle;
 
                     if (importDesc->Characteristics != 0)
                     {
-                        thunkRef = (IntPtr*)(memory_module->codeBase + importDesc->Characteristics);
-                        funcRef = (IntPtr*)(memory_module->codeBase + importDesc->FirstThunk);
+                        thunkRef = (IntPtr*)(memoryModule->codeBase + importDesc->Characteristics);
+                        funcRef = (IntPtr*)(memoryModule->codeBase + importDesc->FirstThunk);
                     }
                     else
                     {
-                        thunkRef = (IntPtr*)(memory_module->codeBase + importDesc->FirstThunk);
-                        funcRef = (IntPtr*)(memory_module->codeBase + importDesc->FirstThunk);
+                        thunkRef = (IntPtr*)(memoryModule->codeBase + importDesc->FirstThunk);
+                        funcRef = (IntPtr*)(memoryModule->codeBase + importDesc->FirstThunk);
                     }
 
                     for (; *thunkRef != IntPtr.Zero; thunkRef++, funcRef++)
                     {
-                        if (WinNT.IMAGE_SNAP_BY_ORDINAL(thunkRef))
+                        if (WinNt.IMAGE_SNAP_BY_ORDINAL(thunkRef))
                         {
-                            *funcRef = WinBase.GetProcAddress(handle, (byte*)WinNT.IMAGE_ORDINAL(thunkRef));
+                            *funcRef = WinBase.GetProcAddress(handle, (byte*)WinNt.IMAGE_ORDINAL(thunkRef));
                         }
                         else
                         {
-                            WinNT.IMAGE_IMPORT_BY_NAME* thunkData = (WinNT.IMAGE_IMPORT_BY_NAME*)(memory_module->codeBase + (ulong)*thunkRef);
+                            WinNt.ImageImportByName* thunkData = (WinNt.ImageImportByName*)(memoryModule->codeBase + (ulong)*thunkRef);
                             //string procName = Marshal.PtrToStringAnsi((IntPtr)(byte*)(thunkData) + 2);
                             IntPtr a = (IntPtr)(byte*)(thunkData);
                             string procName = Marshal.PtrToStringAnsi(new IntPtr(a.ToInt64() + 2));
@@ -496,68 +496,68 @@ namespace Microsoft.WinAny.Interop
         /// Marks memory pages depending on section headers and release sections that are marked as "discardable".
         /// </summary>
         /// <param name="memory_module">Pointer to a memory module.</param>
-        private void FinalizeSections(MEMORY_MODULE* memory_module)
+        private void FinalizeSections(MemoryModule* memoryModule)
         {
-            WinNT.IMAGE_SECTION_HEADER* section = WinNT.IMAGE_FIRST_SECTION(memory_module->headers); ;
+            WinNt.ImageSectionHeader* section = WinNt.IMAGE_FIRST_SECTION(memoryModule->headers); ;
 
-            ushort number_of_sections;
-            uint size_of_initialized_data;
-            uint size_of_uninitialized_data;
+            ushort numberOfSections;
+            uint sizeOfInitializedData;
+            uint sizeOfUninitializedData;
 
-            long image_offset = 0;
+            long imageOffset = 0;
 
             if (Environment.Is64BitProcess)
             {
-                WinNT.IMAGE_NT_HEADERS64* headers = (WinNT.IMAGE_NT_HEADERS64*)memory_module->headers;
-                number_of_sections = headers->FileHeader.NumberOfSections;
-                size_of_initialized_data = headers->OptionalHeader.SizeOfInitializedData;
-                size_of_uninitialized_data = headers->OptionalHeader.SizeOfUninitializedData;
+                WinNt.ImageNtHeaders64* headers = (WinNt.ImageNtHeaders64*)memoryModule->headers;
+                numberOfSections = headers->FileHeader.NumberOfSections;
+                sizeOfInitializedData = headers->OptionalHeader.SizeOfInitializedData;
+                sizeOfUninitializedData = headers->OptionalHeader.SizeOfUninitializedData;
 
-                image_offset = (long)((ulong)headers->OptionalHeader.ImageBase & 0xffffffff00000000);
+                imageOffset = (long)((ulong)headers->OptionalHeader.ImageBase & 0xffffffff00000000);
             }
             else
             {
-                WinNT.IMAGE_NT_HEADERS32* headers = (WinNT.IMAGE_NT_HEADERS32*)memory_module->headers;
-                number_of_sections = headers->FileHeader.NumberOfSections;
-                size_of_initialized_data = headers->OptionalHeader.SizeOfInitializedData;
-                size_of_uninitialized_data = headers->OptionalHeader.SizeOfUninitializedData;
+                WinNt.ImageNtHeaders32* headers = (WinNt.ImageNtHeaders32*)memoryModule->headers;
+                numberOfSections = headers->FileHeader.NumberOfSections;
+                sizeOfInitializedData = headers->OptionalHeader.SizeOfInitializedData;
+                sizeOfUninitializedData = headers->OptionalHeader.SizeOfUninitializedData;
             }
 
-            for (int i = 0; i < number_of_sections; i++, section++)
+            for (int i = 0; i < numberOfSections; i++, section++)
             {
                 uint protect, oldProtect, rawDataSize;
-                uint executable = Convert.ToUInt32((section->Characteristics & WinNT.IMAGE_SCN_MEM_EXECUTE) != 0);
-                uint readable = Convert.ToUInt32((section->Characteristics & WinNT.IMAGE_SCN_MEM_READ) != 0);
-                uint writeable = Convert.ToUInt32((section->Characteristics & WinNT.IMAGE_SCN_MEM_WRITE) != 0);
+                uint executable = Convert.ToUInt32((section->Characteristics & WinNt.ImageScnMemExecute) != 0);
+                uint readable = Convert.ToUInt32((section->Characteristics & WinNt.ImageScnMemRead) != 0);
+                uint writeable = Convert.ToUInt32((section->Characteristics & WinNt.ImageScnMemWrite) != 0);
 
-                if ((section->Characteristics & WinNT.IMAGE_SCN_MEM_DISCARDABLE) != 0)
+                if ((section->Characteristics & WinNt.ImageScnMemDiscardable) != 0)
                 {
                     // section is not needed any more and can safely be freed
-                    WinBase.VirtualFree((IntPtr)(void*)((long)section->PhysicalAddress | (long)image_offset), section->SizeOfRawData, WinNT.MEM_DECOMMIT);
+                    WinBase.VirtualFree((IntPtr)(void*)((long)section->PhysicalAddress | (long)imageOffset), section->SizeOfRawData, WinNt.MemDecommit);
                     continue;
                 }
 
                 protect = _protectionFlags[executable, readable, writeable];
 
-                if ((section->Characteristics & WinNT.IMAGE_SCN_MEM_NOT_CACHED) != 0)
-                    protect |= WinNT.PAGE_NOCACHE;
+                if ((section->Characteristics & WinNt.ImageScnMemNotCached) != 0)
+                    protect |= WinNt.PageNocache;
 
                 // determine size of region
                 rawDataSize = section->SizeOfRawData;
 
                 if (rawDataSize == 0)
                 {
-                    if ((section->Characteristics & WinNT.IMAGE_SCN_CNT_INITIALIZED_DATA) != 0)
-                        rawDataSize = size_of_initialized_data;
+                    if ((section->Characteristics & WinNt.ImageScnCntInitializedData) != 0)
+                        rawDataSize = sizeOfInitializedData;
 
-                    else if ((section->Characteristics & WinNT.IMAGE_SCN_CNT_UNINITIALIZED_DATA) != 0)
-                        rawDataSize = size_of_uninitialized_data;
+                    else if ((section->Characteristics & WinNt.ImageScnCntUninitializedData) != 0)
+                        rawDataSize = sizeOfUninitializedData;
                 }
 
                 if (rawDataSize > 0)
                 {
                     // change memory access flags
-                    WinBase.VirtualProtect((IntPtr)(void*)((long)section->PhysicalAddress | (long)image_offset), rawDataSize, protect, &oldProtect);
+                    WinBase.VirtualProtect((IntPtr)(void*)((long)section->PhysicalAddress | (long)imageOffset), rawDataSize, protect, &oldProtect);
                 }
             }
         }
@@ -572,24 +572,24 @@ namespace Microsoft.WinAny.Interop
         /// <param name="memory_module">Pointer to a memory module.</param>
         /// <param name="fdwReason"></param>
         /// <returns>If the function succeeds or if there is no entry point, the return value is true.</returns>
-        private bool CallDllEntryPoint(MEMORY_MODULE* memory_module, uint fdwReason)
+        private bool CallDllEntryPoint(MemoryModule* memoryModule, uint fdwReason)
         {
             uint addressOfEntryPoint;
 
             if (Environment.Is64BitProcess)
             {
-                WinNT.IMAGE_NT_HEADERS64* headers = (WinNT.IMAGE_NT_HEADERS64*)memory_module->headers;
+                WinNt.ImageNtHeaders64* headers = (WinNt.ImageNtHeaders64*)memoryModule->headers;
                 addressOfEntryPoint = headers->OptionalHeader.AddressOfEntryPoint;
             }
             else
             {
-                WinNT.IMAGE_NT_HEADERS32* headers = (WinNT.IMAGE_NT_HEADERS32*)memory_module->headers;
+                WinNt.ImageNtHeaders32* headers = (WinNt.ImageNtHeaders32*)memoryModule->headers;
                 addressOfEntryPoint = headers->OptionalHeader.AddressOfEntryPoint;
             }
 
             if (addressOfEntryPoint != 0)
             {
-                IntPtr dllEntry = (IntPtr)(memory_module->codeBase + addressOfEntryPoint);
+                IntPtr dllEntry = (IntPtr)(memoryModule->codeBase + addressOfEntryPoint);
 
                 if (dllEntry == IntPtr.Zero)
                 {
@@ -598,15 +598,15 @@ namespace Microsoft.WinAny.Interop
 
                 DllEntryProc dllEntryProc = (DllEntryProc)Marshal.GetDelegateForFunctionPointer(dllEntry, typeof(DllEntryProc));
 
-                if (dllEntryProc((IntPtr)memory_module->codeBase, fdwReason, 0))
+                if (dllEntryProc((IntPtr)memoryModule->codeBase, fdwReason, 0))
                 {
-                    if (fdwReason == WinNT.DLL_PROCESS_ATTACH)
+                    if (fdwReason == WinNt.DllProcessAttach)
                     {
-                        memory_module->initialized = 1;
+                        memoryModule->initialized = 1;
                     }
-                    else if (fdwReason == WinNT.DLL_PROCESS_DETACH)
+                    else if (fdwReason == WinNt.DllProcessDetach)
                     {
-                        memory_module->initialized = 0;
+                        memoryModule->initialized = 0;
                     }
 
                     return true;
@@ -633,36 +633,36 @@ namespace Microsoft.WinAny.Interop
             if (hModule == IntPtr.Zero)
                 return;
 
-            MEMORY_MODULE* memory_module = (MEMORY_MODULE*)hModule;
+            MemoryModule* memoryModule = (MemoryModule*)hModule;
 
-            if (memory_module != null)
+            if (memoryModule != null)
             {
-                if (memory_module->initialized != 0)
+                if (memoryModule->initialized != 0)
                 {
-                    this.CallDllEntryPoint(memory_module, WinNT.DLL_PROCESS_DETACH);
+                    this.CallDllEntryPoint(memoryModule, WinNt.DllProcessDetach);
                 }
 
-                if (memory_module->modules != null)
+                if (memoryModule->modules != null)
                 {
                     // free previously opened libraries
-                    for (int index = 0; index < memory_module->numModules; index++)
+                    for (int index = 0; index < memoryModule->numModules; index++)
                     {
-                        if (memory_module->modules[index] != IntPtr.Zero)
+                        if (memoryModule->modules[index] != IntPtr.Zero)
                         {
-                            WinBase.FreeLibrary(memory_module->modules[index]);
+                            WinBase.FreeLibrary(memoryModule->modules[index]);
                         }
                     }
 
-                    Marshal.FreeHGlobal((IntPtr)memory_module->modules);
+                    Marshal.FreeHGlobal((IntPtr)memoryModule->modules);
                 }
 
-                if ((IntPtr)memory_module->codeBase != IntPtr.Zero)
+                if ((IntPtr)memoryModule->codeBase != IntPtr.Zero)
                 {
                     // release memory of library
-                    WinBase.VirtualFree((IntPtr)memory_module->codeBase, 0, WinNT.MEM_RELEASE);
+                    WinBase.VirtualFree((IntPtr)memoryModule->codeBase, 0, WinNt.MemRelease);
                 }
 
-                Marshal.FreeHGlobal((IntPtr)memory_module);
+                Marshal.FreeHGlobal((IntPtr)memoryModule);
             }
         }
 
@@ -726,9 +726,9 @@ namespace Microsoft.WinAny.Interop
                 return WinBase.GetProcAddress(_loadedModuleHandle, procName);
             }
 
-            MEMORY_MODULE* memory_module = (MEMORY_MODULE*)_loadedModuleHandle;
+            MemoryModule* memoryModule = (MemoryModule*)_loadedModuleHandle;
 
-            byte* codeBase = memory_module->codeBase;
+            byte* codeBase = memoryModule->codeBase;
 
             int idx = -1;
             uint i;
@@ -737,13 +737,13 @@ namespace Microsoft.WinAny.Interop
             ushort* ordinal;
 
             
-            WinNT.IMAGE_DATA_DIRECTORY* directory = this.GET_HEADER_DIRECTORY(memory_module, WinNT.IMAGE_DIRECTORY_ENTRY_EXPORT);
+            WinNt.ImageDataDirectory* directory = this.GET_HEADER_DIRECTORY(memoryModule, WinNt.ImageDirectoryEntryExport);
 
             if (directory->Size == 0)
                 // no export table found
                 return IntPtr.Zero;
 
-            WinNT.IMAGE_EXPORT_DIRECTORY* exports = (WinNT.IMAGE_EXPORT_DIRECTORY*)(codeBase + directory->VirtualAddress);
+            WinNt.ImageExportDirectory* exports = (WinNt.ImageExportDirectory*)(codeBase + directory->VirtualAddress);
 
             if (exports->NumberOfNames == 0 || exports->NumberOfFunctions == 0)
                 // DLL doesn't export anything
@@ -782,17 +782,17 @@ namespace Microsoft.WinAny.Interop
 
         #region GET_HEADER_DIRECTORY
 
-        private WinNT.IMAGE_DATA_DIRECTORY* GET_HEADER_DIRECTORY(MEMORY_MODULE* memory_module, uint index)
+        private WinNt.ImageDataDirectory* GET_HEADER_DIRECTORY(MemoryModule* memoryModule, uint index)
         {
             if (Environment.Is64BitProcess)
             {
-                WinNT.IMAGE_NT_HEADERS64* headers = (WinNT.IMAGE_NT_HEADERS64*)memory_module->headers;
-                return (WinNT.IMAGE_DATA_DIRECTORY*)(&headers->OptionalHeader.DataDirectory[index]);
+                WinNt.ImageNtHeaders64* headers = (WinNt.ImageNtHeaders64*)memoryModule->headers;
+                return (WinNt.ImageDataDirectory*)(&headers->OptionalHeader.DataDirectory[index]);
             }
             else
             {
-                WinNT.IMAGE_NT_HEADERS32* headers = (WinNT.IMAGE_NT_HEADERS32*)memory_module->headers;
-                return (WinNT.IMAGE_DATA_DIRECTORY*)(&headers->OptionalHeader.DataDirectory[index]);
+                WinNt.ImageNtHeaders32* headers = (WinNt.ImageNtHeaders32*)memoryModule->headers;
+                return (WinNt.ImageDataDirectory*)(&headers->OptionalHeader.DataDirectory[index]);
             }
         }
 
@@ -801,7 +801,7 @@ namespace Microsoft.WinAny.Interop
         #region MEMORY_MODULE
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        private struct MEMORY_MODULE
+        private struct MemoryModule
         {
             public byte* headers;
             public byte* codeBase;

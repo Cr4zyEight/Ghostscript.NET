@@ -2,14 +2,14 @@
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
 
-	public interface IZUGFeRDExportableTradeParty
+	public interface IZugFeRdExportableTradeParty
 	{
 
 		/// <summary>
 		/// customer identification assigned by the seller
 		/// </summary>
 		/// <returns> customer identification </returns>
-		string getID()
+		string GetId()
 		{
 			return null;
 		}
@@ -18,7 +18,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// customer global identification assigned by the seller
 		/// </summary>
 		/// <returns> customer identification </returns>
-		string getGlobalID()
+		string GetGlobalId()
 		{
 			return null;
 		}
@@ -36,13 +36,13 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// customer global identification scheme
 		/// </summary>
 		/// <returns> customer identification </returns>
-		string getGlobalIDScheme()
+		string GetGlobalIdScheme()
 		{
 			return null;
 		}
 
 
-		IZUGFeRDExportableContact getContact()
+		IZugFeRdExportableContact GetContact()
 		{
 			return null;
 		}
@@ -51,17 +51,17 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// First and last name of the recipient
 		/// </summary>
 		/// <returns> First and last name of the recipient </returns>
-		string getName();
+		string GetName();
 		/// <summary>
 		/// Postal code of the recipient
 		/// </summary>
 		/// <returns> Postal code of the recipient </returns>
-		string getZIP();
+		string GetZip();
 		/// <summary>
 		/// VAT ID (Umsatzsteueridentifikationsnummer) of the contact
 		/// </summary>
 		/// <returns> VAT ID (Umsatzsteueridentifikationsnummer) of the contact </returns>
-		string getVATID()
+		string GetVatid()
 		{
 			return null;
 		}
@@ -69,22 +69,22 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// two-letter country code of the contact
 		/// </summary>
 		/// <returns> two-letter iso country code of the contact </returns>
-		string getCountry();
+		string GetCountry();
 		/// <summary>
 		/// Returns the city of the contact
 		/// </summary>
 		/// <returns> Returns the city of the recipient </returns>
-		string getLocation();
+		string GetLocation();
 		/// <summary>
 		/// Returns the street address (street+number) of the contact
 		/// </summary>
 		/// <returns> street address (street+number) of the contact </returns>
-		string getStreet();
+		string GetStreet();
 		/// <summary>
 		/// returns additional address information which is display in xml tag "LineTwo"
 		/// </summary>
 		/// <returns> additional address information </returns>
-		string getAdditionalAddress()
+		string GetAdditionalAddress()
 		{
 			return null;
 		}
@@ -92,7 +92,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		///*
 		/// obligatory for sender but not for recipient </summary>
 		/// <returns> the tax id as string </returns>
-		string getTaxID()
+		string GetTaxId()
 		{
 			return null;
 		}

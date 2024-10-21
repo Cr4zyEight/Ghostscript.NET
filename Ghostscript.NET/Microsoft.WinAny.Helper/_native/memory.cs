@@ -29,7 +29,7 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.WinAny
 {
-    internal static unsafe class memory
+    internal static unsafe class Memory
     {
         /// <summary>
         /// Copies bytes between buffers.
@@ -37,7 +37,7 @@ namespace Microsoft.WinAny
         /// <param name="dest">New buffer.</param>
         /// <param name="src">Buffer to copy from.</param>
         /// <param name="size">Number of characters to copy.</param>
-        public static void memcpy(byte* dest, byte* src, uint count)
+        public static void Memcpy(byte* dest, byte* src, uint count)
         {
             for (uint i = 0; i < count; i++)
             {
@@ -51,7 +51,7 @@ namespace Microsoft.WinAny
         /// <param name="dest">Pointer to destination.</param>
         /// <param name="c">Character to set.</param>
         /// <param name="count">Number of characters.</param>
-        public static void memset(byte* dest, byte c, uint count)
+        public static void Memset(byte* dest, byte c, uint count)
         {
             for (uint i = 0; i < count; i++)
             {
@@ -66,11 +66,11 @@ namespace Microsoft.WinAny
         /// <param name="size">Previously allocated memory block size.</param>
         /// <param name="newsize">New size in bytes.</param>
         /// <returns></returns>
-        public static byte* realloc(byte* memblock, uint size, uint newsize)
+        public static byte* Realloc(byte* memblock, uint size, uint newsize)
         {
             byte* newMemBlock = (byte*)Marshal.AllocHGlobal((int)newsize).ToPointer();
 
-            memcpy(newMemBlock, memblock, size);
+            Memcpy(newMemBlock, memblock, size);
 
             Marshal.FreeHGlobal(new IntPtr(memblock));
 

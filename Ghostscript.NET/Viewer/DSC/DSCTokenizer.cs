@@ -32,7 +32,7 @@ using System.Text;
 
 namespace Ghostscript.NET.Viewer.DSC
 {
-    internal class DSCTokenizer : IDisposable
+    internal class DscTokenizer : IDisposable
     {
 
         #region Private variables
@@ -48,7 +48,7 @@ namespace Ghostscript.NET.Viewer.DSC
 
         #region Constructor - path
 
-        public DSCTokenizer(string path)
+        public DscTokenizer(string path)
         {
             _stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             _initiallyOwned = true;
@@ -59,7 +59,7 @@ namespace Ghostscript.NET.Viewer.DSC
 
         #region Constructor - stream
 
-        public DSCTokenizer(Stream stream, bool isUnicode, bool isLittleEndian)
+        public DscTokenizer(Stream stream, bool isUnicode, bool isLittleEndian)
         {
             _stream = stream;
             _bufferedStream = new BufferedStream(_stream);
@@ -71,7 +71,7 @@ namespace Ghostscript.NET.Viewer.DSC
 
         #region Destructor
 
-        ~DSCTokenizer()
+        ~DscTokenizer()
         {
             this.Dispose(false);
         }
@@ -121,7 +121,7 @@ namespace Ghostscript.NET.Viewer.DSC
 
         #region GetNextDSCKeywordToken
 
-        public DSCToken GetNextDSCKeywordToken()
+        public DscToken GetNextDscKeywordToken()
         {
             int c;
 
@@ -131,7 +131,7 @@ namespace Ghostscript.NET.Viewer.DSC
                 {
                     if (this.ReadChar() == '%')
                     {
-                        return this.ReadUntil("%%", DSCTokenEnding.Whitespace | DSCTokenEnding.LineEnd);
+                        return this.ReadUntil("%%", DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
                     }
                 }
             }
@@ -143,7 +143,7 @@ namespace Ghostscript.NET.Viewer.DSC
 
         #region GetNextDSCValueToken
 
-        public DSCToken GetNextDSCValueToken(DSCTokenEnding end)
+        public DscToken GetNextDscValueToken(DscTokenEnding end)
         {
             return this.ReadUntil(string.Empty, end);
         }
@@ -152,10 +152,10 @@ namespace Ghostscript.NET.Viewer.DSC
 
         #region ReadUntil
 
-        private DSCToken ReadUntil(string prefix, DSCTokenEnding end)
+        private DscToken ReadUntil(string prefix, DscTokenEnding end)
         {
             int c;
-            DSCToken token = new DSCToken();
+            DscToken token = new DscToken();
             token.StartPosition = _bufferedStream.Position - prefix.Length;
 
             StringBuilder text = new StringBuilder(prefix, 64);
@@ -165,36 +165,36 @@ namespace Ghostscript.NET.Viewer.DSC
             while ((c = this.ReadChar()) > -1)
             {
                 // unix new line
-                if (c == '\n' && (end & DSCTokenEnding.LineEnd) == DSCTokenEnding.LineEnd)
+                if (c == '\n' && (end & DscTokenEnding.LineEnd) == DscTokenEnding.LineEnd)
                 {
                     token.Length = _bufferedStream.Position - 1 - token.StartPosition;
                     token.Text = text.ToString().Trim();
-                    token.Ending = DSCTokenEnding.LineEnd;
+                    token.Ending = DscTokenEnding.LineEnd;
                     return token;
                 }
                 // windows new line
-                else if (c == '\r' && this.PeekChar() == '\n' && (end & DSCTokenEnding.LineEnd) == DSCTokenEnding.LineEnd)
+                else if (c == '\r' && this.PeekChar() == '\n' && (end & DscTokenEnding.LineEnd) == DscTokenEnding.LineEnd)
                 {
                     this.ReadChar();
 
                     token.Length = _bufferedStream.Position - 2 - token.StartPosition;
                     token.Text = text.ToString().Trim();
-                    token.Ending = DSCTokenEnding.LineEnd;
+                    token.Ending = DscTokenEnding.LineEnd;
                     return token;
                 }
                 // mac new line
-                else if (c == '\r' && (end & DSCTokenEnding.LineEnd) == DSCTokenEnding.LineEnd)
+                else if (c == '\r' && (end & DscTokenEnding.LineEnd) == DscTokenEnding.LineEnd)
                 {
                     token.Length = _bufferedStream.Position - 1 - token.StartPosition;
                     token.Text = text.ToString().Trim();
-                    token.Ending = DSCTokenEnding.LineEnd;
+                    token.Ending = DscTokenEnding.LineEnd;
                     return token;
                 }
-                else if (c == ' ' && text.Length > 0 && lastAppendedChar != ' ' && (end & DSCTokenEnding.Whitespace) == DSCTokenEnding.Whitespace)
+                else if (c == ' ' && text.Length > 0 && lastAppendedChar != ' ' && (end & DscTokenEnding.Whitespace) == DscTokenEnding.Whitespace)
                 {
                     token.Length = _bufferedStream.Position - 1 - token.StartPosition;
                     token.Text = text.ToString().Trim();
-                    token.Ending = DSCTokenEnding.Whitespace;
+                    token.Ending = DscTokenEnding.Whitespace;
                     return token;
                 }
                 else

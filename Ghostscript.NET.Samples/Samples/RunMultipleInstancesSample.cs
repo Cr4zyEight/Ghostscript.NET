@@ -32,7 +32,7 @@ namespace Ghostscript.NET.Samples
 {
     public class RunMultipleInstancesSample : ISample
     {
-        private GhostscriptVersionInfo _gs_verssion_info = GhostscriptVersionInfo.GetLastInstalledVersion();
+        private GhostscriptVersionInfo _gsVerssionInfo = GhostscriptVersionInfo.GetLastInstalledVersion();
 
         public void Start()
         {
@@ -44,8 +44,8 @@ namespace Ghostscript.NET.Samples
         {
             // make sure that constructor 'fromMemory' option is set to true if 
             // you want to run multiple instances of the Ghostscript
-            Ghostscript.NET.Processor.GhostscriptProcessor processor = new Processor.GhostscriptProcessor(_gs_verssion_info, true);
-            processor.StartProcessing(CreateTestArgs(input, output, startPage, endPage), new ConsoleStdIO(true, true, true));
+            Ghostscript.NET.Processor.GhostscriptProcessor processor = new Processor.GhostscriptProcessor(_gsVerssionInfo, true);
+            processor.StartProcessing(CreateTestArgs(input, output, startPage, endPage), new ConsoleStdIo(true, true, true));
         }
 
         private void Instance1(object target)

@@ -38,7 +38,7 @@ namespace Ghostscript.NET
         /// 24bit RGB color.
         /// </summary>
         [GhostscriptSwitchValue("png16m")]
-        Png16m,
+        Png16M,
         /// <summary>
         /// Transparency support.
         /// </summary>
@@ -78,15 +78,15 @@ namespace Ghostscript.NET
     public enum GhostscriptPngDeviceMinFeatureSize
     {
         [GhostscriptSwitchValue("0")]
-        V_0,
+        V0,
         [GhostscriptSwitchValue("1")]
-        V_1,
+        V1,
         [GhostscriptSwitchValue("2")]
-        V_2,
+        V2,
         [GhostscriptSwitchValue("3")]
-        V_3,
+        V3,
         [GhostscriptSwitchValue("4")]
-        V_4
+        V4
     }
 
     #endregion
@@ -96,7 +96,7 @@ namespace Ghostscript.NET
 
         #region Constructor
 
-        public GhostscriptPngDevice() : this(GhostscriptPngDeviceType.Png16m) { }
+        public GhostscriptPngDevice() : this(GhostscriptPngDeviceType.Png16M) { }
 
         #endregion
 
@@ -148,12 +148,12 @@ namespace Ghostscript.NET
 
         #region Process
 
-        public static void Process(GhostscriptPngDeviceType pngDeviceType, string[] inputFiles, string outputPath, GhostscriptStdIO stdIO_callback)
+        public static void Process(GhostscriptPngDeviceType pngDeviceType, string[] inputFiles, string outputPath, GhostscriptStdIo stdIoCallback)
         {
             GhostscriptPngDevice dev = new GhostscriptPngDevice(pngDeviceType);
             dev.InputFiles.AddRange(inputFiles);
             dev.OutputPath = outputPath;
-            dev.Process(stdIO_callback);
+            dev.Process(stdIoCallback);
         }
 
         #endregion

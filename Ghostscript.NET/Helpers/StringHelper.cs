@@ -57,7 +57,7 @@ namespace Ghostscript.NET
 
         #region HasNonASCIIChars
 
-        public static bool HasNonASCIIChars(string str)
+        public static bool HasNonAsciiChars(string str)
         {
             return (Encoding.UTF8.GetByteCount(str) != str.Length);
         }

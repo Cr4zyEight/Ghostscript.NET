@@ -28,7 +28,7 @@
 
 namespace Ghostscript.NET.Viewer.DSC
 {
-    internal enum DSCTokenEnding
+    internal enum DscTokenEnding
     {
         LineEnd = 1,
         Whitespace = 2

@@ -35,12 +35,12 @@ namespace Ghostscript.NET
     /// <param name="pointer"></param>
     /// <param name="count"></param>
     /// <returns></returns>
-    public delegate int gsapi_stdio_callback(IntPtr handle, IntPtr pointer, int count);
+    public delegate int GsapiStdioCallback(IntPtr handle, IntPtr pointer, int count);
 
     /// <summary>
     /// Callback function for gsapi_set_poll function.
     /// </summary>
     /// <param name="handle"></param>
     /// <returns></returns>
-    public delegate int gsapi_pool_callback(IntPtr handle);
+    public delegate int GsapiPoolCallback(IntPtr handle);
 }

@@ -13,14 +13,14 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
     //JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
     //ORIGINAL LINE: @JsonIgnoreProperties(ignoreUnknown = true) public class Item implements org.mustangproject.ZUGFeRD.IZUGFeRDExportableItem
-    public class Item : IZUGFeRDExportableItem
+    public class Item : IZugFeRdExportableItem
 	{
-		protected internal decimal price, quantity, tax, grossPrice, lineTotalAmount;
-		protected internal DateTime? detailedDeliveryPeriodFrom = null, detailedDeliveryPeriodTo = null;
-		protected internal string id;
-		protected internal string referencedLineID = null;
-		protected internal Product product;
-		protected internal List<string> notes = null;
+		protected internal decimal Price, Quantity, Tax, GrossPrice, LineTotalAmount;
+		protected internal DateTime? DetailedDeliveryPeriodFrom = null, DetailedDeliveryPeriodTo = null;
+		protected internal string Id;
+		protected internal string ReferencedLineId = null;
+		protected internal Product Product;
+		protected internal List<string> Notes = null;
 		//protected internal List<ReferencedDocument> referencedDocuments = null;
 //		protected internal List<IZUGFeRDAllowanceCharge> Allowances = new List<IZUGFeRDAllowanceCharge>(), Charges = new List<IZUGFeRDAllowanceCharge>();
 
@@ -32,9 +32,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// <param name="quantity"> the number, dimensions or the weight of the delivered product or good in this context </param>
 		public Item(Product product, decimal price, decimal quantity)
 		{
-			this.price = price;
-			this.quantity = quantity;
-			this.product = product;
+			this.Price = price;
+			this.Quantity = quantity;
+			this.Product = product;
 		}
 
 
@@ -48,9 +48,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		{
 		}
 
-		public virtual Item addReferencedLineID(string s)
+		public virtual Item AddReferencedLineId(string s)
 		{
-			referencedLineID = s;
+			ReferencedLineId = s;
 			return this;
 		}
 
@@ -59,29 +59,29 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// BT 132 (issue https://github.com/ZUGFeRD/mustangproject/issues/247)
 		/// @return
 		/// </summary>
-		public string getBuyerOrderReferencedDocumentLineID()
+		public string GetBuyerOrderReferencedDocumentLineId()
 		{
-			return referencedLineID;
+			return ReferencedLineId;
 		}
 
-		public virtual decimal getLineTotalAmount()
+		public virtual decimal GetLineTotalAmount()
 		{
-			return lineTotalAmount;
+			return LineTotalAmount;
 		}
 
 		/// <summary>
 		/// should only be set by calculator classes or maybe when reading from XML </summary>
 		/// <param name="lineTotalAmount"> price*quantity of this line </param>
 		/// <returns> fluent setter </returns>
-		public virtual Item setLineTotalAmount(decimal lineTotalAmount)
+		public virtual Item SetLineTotalAmount(decimal lineTotalAmount)
 		{
-			this.lineTotalAmount = lineTotalAmount;
+			this.LineTotalAmount = lineTotalAmount;
 			return this;
 		}
 
-		public virtual decimal getGrossPrice()
+		public virtual decimal GetGrossPrice()
 		{
-			return grossPrice;
+			return GrossPrice;
 		}
 
 
@@ -90,62 +90,73 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// the list price without VAT (sic!), refer to EN16931-1 for definition </summary>
 		/// <param name="grossPrice"> the list price without VAT </param>
 		/// <returns> fluent setter </returns>
-		public virtual Item setGrossPrice(decimal grossPrice)
+		public virtual Item SetGrossPrice(decimal grossPrice)
 		{
-			this.grossPrice = grossPrice;
+			this.GrossPrice = grossPrice;
 			return this;
 		}
 
 
-		public virtual decimal getTax()
+		public virtual decimal GetTax()
 		{
-			return tax;
+			return Tax;
 		}
 
-		public virtual Item setTax(decimal tax)
+		public virtual Item SetTax(decimal tax)
 		{
-			this.tax = tax;
+			this.Tax = tax;
 			return this;
 		}
 
-		public virtual Item setId(string id)
+		public virtual Item SetId(string id)
 		{
-			this.id = id;
+			this.Id = id;
 			return this;
 		}
 
-		public virtual string getId()
+		public virtual string GetId()
 		{
-			return id;
+			return Id;
 		}
 
-		public decimal getPrice()
+		public decimal GetPrice()
 		{
-			return price;
+			return Price;
 		}
 
-		public virtual Item setPrice(decimal price)
+		public virtual Item SetPrice(decimal price)
 		{
-			this.price = price;
+			this.Price = price;
 			return this;
 		}
 
 
 
-		public decimal getQuantity()
+		public decimal GetQuantity()
 		{
-			return quantity;
+			return Quantity;
 		}
 
-		public virtual Item setQuantity(decimal quantity)
+        public decimal GetBasisQuantity()
+        {
+            const int scale = 4;
+            return Math.Round(decimal.One, scale, MidpointRounding.AwayFromZero);
+        }
+
+        public string GetAdditionalReferencedDocumentId()
+        {
+            throw null;
+        }
+
+        public virtual Item SetQuantity(decimal quantity)
 		{
-			this.quantity = quantity;
+			this.Quantity = quantity;
 			return this;
 		}
 
-		public IZUGFeRDExportableProduct getProduct()
+		public IZugFeRdExportableProduct GetProduct()
 		{
-			return product;
+			return Product;
 		}
 
 /*		public override IZUGFeRDAllowanceCharge[] getItemAllowances()
@@ -174,18 +185,18 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 */
 
-		public string[] getNotes()
+		public string[] GetNotes()
 		{
-			if (notes == null)
+			if (Notes == null)
 			{
 				return null;
 			}
-			return notes.ToArray();
+			return Notes.ToArray();
 		}
 
-		public virtual Item setProduct(Product product)
+		public virtual Item SetProduct(Product product)
 		{
-			this.product = product;
+			this.Product = product;
 			return this;
 		}
 
@@ -219,13 +230,13 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// adds item level freetext fields (includednote) </summary>
 		/// <param name="text"> UTF8 plain text </param>
 		/// <returns> fluent setter </returns>
-		public virtual Item addNote(string text)
+		public virtual Item AddNote(string text)
 		{
-			if (notes == null)
+			if (Notes == null)
 			{
-				notes = new List<string>();
+				Notes = new List<string>();
 			}
-			notes.Add(text);
+			Notes.Add(text);
 			return this;
 		}
 
@@ -262,10 +273,10 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// <param name="from"> start date </param>
 		/// <param name="to"> end date </param>
 		/// <returns> fluent setter </returns>
-		public virtual Item setDetailedDeliveryPeriod(DateTime from, DateTime to)
+		public virtual Item SetDetailedDeliveryPeriod(DateTime from, DateTime to)
 		{
-			detailedDeliveryPeriodFrom = from;
-			detailedDeliveryPeriodTo = to;
+			DetailedDeliveryPeriodFrom = from;
+			DetailedDeliveryPeriodTo = to;
 			return this;
 		}
 
@@ -274,9 +285,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// specifies the item level delivery period (there is also one on document level),
 		/// this will be included in a BillingSpecifiedPeriod element </summary>
 		/// <returns> the beginning of the delivery period </returns>
-		public virtual DateTime? getDetailedDeliveryPeriodFrom()
+		public virtual DateTime? GetDetailedDeliveryPeriodFrom()
 		{
-			return detailedDeliveryPeriodFrom;
+			return DetailedDeliveryPeriodFrom;
 		}
 
 		/// <summary>
@@ -284,9 +295,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// specifies the item level delivery period (there is also one on document level),
 		/// this will be included in a BillingSpecifiedPeriod element </summary>
 		/// <returns> the end of the delivery period </returns>
-		public virtual DateTime? getDetailedDeliveryPeriodTo()
+		public virtual DateTime? GetDetailedDeliveryPeriodTo()
 		{
-			return detailedDeliveryPeriodTo;
+			return DetailedDeliveryPeriodTo;
 		}
 
 	}

@@ -58,7 +58,7 @@ namespace Ghostscript.NET.Samples
         private void Sample_2()
         {
             List<GhostscriptVersionInfo> gsVersions =
-                GhostscriptVersionInfo.GetInstalledVersions(GhostscriptLicense.GPL | GhostscriptLicense.AFPL | GhostscriptLicense.Artifex);
+                GhostscriptVersionInfo.GetInstalledVersions(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl | GhostscriptLicense.Artifex);
 
             foreach (GhostscriptVersionInfo gsv in gsVersions)
             {
@@ -66,7 +66,7 @@ namespace Ghostscript.NET.Samples
             }
 
             GhostscriptVersionInfo lastVersion =
-                GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL | GhostscriptLicense.Artifex, GhostscriptLicense.GPL);
+                GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl | GhostscriptLicense.Artifex, GhostscriptLicense.Gpl);
 
             Console.WriteLine("Ghostscript version used in this sample: " +
                 lastVersion.LicenseType.ToString() + " Ghostscript " + lastVersion.Version.ToString());

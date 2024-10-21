@@ -69,7 +69,7 @@ namespace Ghostscript.NET
             _version = new Version();
             _dllPath = customDllPath;
             _libPath = string.Empty;
-            _licenseType = GhostscriptLicense.GPL;
+            _licenseType = GhostscriptLicense.Gpl;
         }
 
         #region Version
@@ -139,7 +139,7 @@ namespace Ghostscript.NET
         /// </summary>
         public static List<GhostscriptVersionInfo> GetInstalledVersions()
         {
-            return GetInstalledVersions(GhostscriptLicense.GPL | GhostscriptLicense.AFPL | GhostscriptLicense.Artifex);
+            return GetInstalledVersions(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl | GhostscriptLicense.Artifex);
         }
 
         #endregion
@@ -156,17 +156,17 @@ namespace Ghostscript.NET
             List<GhostscriptLicense> licenses = new List<GhostscriptLicense>();
 
             // check if we need to search for AFPL installations
-            if ((licenseType & GhostscriptLicense.AFPL) == GhostscriptLicense.AFPL)
+            if ((licenseType & GhostscriptLicense.Afpl) == GhostscriptLicense.Afpl)
             {
                 // yep, add this license in the search list
-                licenses.Add(GhostscriptLicense.AFPL);
+                licenses.Add(GhostscriptLicense.Afpl);
             }
 
             // check if we need to search for GPL installations
-            if ((licenseType & GhostscriptLicense.GPL) == GhostscriptLicense.GPL)
+            if ((licenseType & GhostscriptLicense.Gpl) == GhostscriptLicense.Gpl)
             {
                 // yep, add this license in the search list
-                licenses.Add(GhostscriptLicense.GPL);
+                licenses.Add(GhostscriptLicense.Gpl);
             }
 
             // check if we need to search for GPL installations
@@ -198,12 +198,12 @@ namespace Ghostscript.NET
                 }
 
                 // check the license type
-                if (license == GhostscriptLicense.AFPL)
+                if (license == GhostscriptLicense.Afpl)
                 {
                     // get the AFPL registry key
                     rkGs = hklm.OpenSubKey("SOFTWARE\\AFPL Ghostscript\\");
                 }
-                else if (license == GhostscriptLicense.GPL)
+                else if (license == GhostscriptLicense.Gpl)
                 {
                     // get the GPL registry key
                     rkGs = hklm.OpenSubKey("SOFTWARE\\GPL Ghostscript\\");
@@ -272,7 +272,7 @@ namespace Ghostscript.NET
         /// </summary>
         public static GhostscriptVersionInfo GetLastInstalledVersion()
         {
-            return GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL | GhostscriptLicense.Artifex, GhostscriptLicense.GPL);
+            return GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl | GhostscriptLicense.Artifex, GhostscriptLicense.Gpl);
         }
 
         #endregion
@@ -343,7 +343,7 @@ namespace Ghostscript.NET
             get
             {
                 // check for any, GPL or AFPL version
-                return GetInstalledVersions(GhostscriptLicense.GPL | GhostscriptLicense.AFPL | GhostscriptLicense.Artifex).Count > 0;
+                return GetInstalledVersions(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl | GhostscriptLicense.Artifex).Count > 0;
             }
         }
 

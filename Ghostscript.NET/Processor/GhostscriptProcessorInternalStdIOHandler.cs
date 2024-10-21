@@ -28,13 +28,13 @@ using System;
 
 namespace Ghostscript.NET.Processor
 {
-    internal class GhostscriptProcessorInternalStdIOHandler : GhostscriptStdIO
+    internal class GhostscriptProcessorInternalStdIoHandler : GhostscriptStdIo
     {
         private StdInputEventHandler _input;
         private StdOutputEventHandler _output;
         private StdErrorEventHandler _error;
 
-        public GhostscriptProcessorInternalStdIOHandler(StdInputEventHandler input, StdOutputEventHandler output, StdErrorEventHandler error) : base(true, true, true) 
+        public GhostscriptProcessorInternalStdIoHandler(StdInputEventHandler input, StdOutputEventHandler output, StdErrorEventHandler error) : base(true, true, true) 
         {
             _input = input;
             _output = output;

@@ -6,7 +6,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
     public class TransactionCalculator
     {
-        protected internal IExportableTransaction trans;
+        protected internal IExportableTransaction Trans;
 
         /// <summary>
         ///*
@@ -14,22 +14,22 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// <param name="trans"> the invoice (or IExportableTransaction) to be calculated </param>
         public TransactionCalculator(IExportableTransaction trans)
         {
-            this.trans = trans;
+            this.Trans = trans;
         }
 
         /// <summary>
         ///*
         /// if something had already been paid in advance, this will get it from the transaction </summary>
         /// <returns> prepaid amount </returns>
-        protected internal virtual decimal getTotalPrepaid()
+        protected internal virtual decimal GetTotalPrepaid()
         {
-            if (trans.getTotalPrepaidAmount() == null)
+            if (Trans.GetTotalPrepaidAmount() == null)
             {
                 return decimal.Zero;
             }
             else
             {
-                return Math.Round(trans.getTotalPrepaidAmount(), 2, MidpointRounding.AwayFromZero);
+                return Math.Round(Trans.GetTotalPrepaidAmount(), 2, MidpointRounding.AwayFromZero);
             }
         }
 
@@ -37,16 +37,16 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         ///*
         /// the invoice total with VAT, corrected by prepaid amount, allowances and charges </summary>
         /// <returns> the invoice total including taxes </returns>
-        public virtual decimal getGrandTotal()
+        public virtual decimal GetGrandTotal()
         {
 
             //JAVA TO C# CONVERTER WARNING: The original Java variable was marked 'final':
-            decimal res = getTaxBasis();
-            Dictionary<decimal, VATAmount> VATPercentAmountMap = getVATPercentAmountMap();
-            foreach (decimal currentTaxPercent in VATPercentAmountMap.Keys)
+            decimal res = GetTaxBasis();
+            Dictionary<decimal, VatAmount> vatPercentAmountMap = GetVatPercentAmountMap();
+            foreach (decimal currentTaxPercent in vatPercentAmountMap.Keys)
             {
-                VATAmount amount = VATPercentAmountMap[currentTaxPercent];
-                res += amount.getCalculated();
+                VatAmount amount = vatPercentAmountMap[currentTaxPercent];
+                res += amount.GetCalculated();
             }
             return Math.Round(res, 2, MidpointRounding.AwayFromZero);
         }
@@ -146,15 +146,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         ///*
         /// returns the total net value of all items, without document level charges/allowances </summary>
         /// <returns> item sum </returns>
-        protected internal virtual decimal getTotal()
+        protected internal virtual decimal GetTotal()
         {
             //JAVA TO C# CONVERTER TODO TASK: Method reference constructor syntax is not converted by Java to C# Converter:
 
             decimal res = decimal.Zero;
-            foreach (IZUGFeRDExportableItem currentItem in trans.getZFItems())
+            foreach (IZugFeRdExportableItem currentItem in Trans.GetZfItems())
             {
                 LineCalculator lc = new LineCalculator(currentItem);
-                res += lc.getItemTotalGrossAmount();
+                res += lc.GetItemTotalGrossAmount();
             }
             return res;
 
@@ -167,9 +167,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// returns the total net value of the invoice, including charges/allowances on document
         /// level </summary>
         /// <returns> item sum +- charges/allowances </returns>
-        protected internal virtual decimal getTaxBasis()
+        protected internal virtual decimal GetTaxBasis()
         {
-            return getTotal() /*+ (getChargesForPercent(null).setScale(2, RoundingMode.HALF_UP)).subtract(getAllowancesForPercent(null).setScale(2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP)*/;
+            return GetTotal() /*+ (getChargesForPercent(null).setScale(2, RoundingMode.HALF_UP)).subtract(getAllowancesForPercent(null).setScale(2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP)*/;
         }
 
         /// <summary>
@@ -178,16 +178,16 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// (=190 EUR VAT) and 200 EUR were applicable to 7% (=14 EUR VAT) 190 Eur
         /// </summary>
         /// <returns> which taxes have been used with which amounts in this invoice </returns>
-        protected internal virtual Dictionary<decimal, VATAmount> getVATPercentAmountMap()
+        protected internal virtual Dictionary<decimal, VatAmount> GetVatPercentAmountMap()
         {
-            Dictionary<decimal, VATAmount> hm = new Dictionary<decimal, VATAmount>();
+            Dictionary<decimal, VatAmount> hm = new Dictionary<decimal, VatAmount>();
 
-            foreach (IZUGFeRDExportableItem currentItem in trans.getZFItems())
+            foreach (IZugFeRdExportableItem currentItem in Trans.GetZfItems())
             {
-                decimal percent = currentItem.getProduct().getVATPercent();
+                decimal percent = currentItem.GetProduct().GetVatPercent();
 
                 LineCalculator lc = new LineCalculator(currentItem);
-                VATAmount itemVATAmount = new VATAmount(lc.getItemTotalNetAmount(), lc.getItemTotalVATAmount(), currentItem.getProduct().getTaxCategoryCode());
+                VatAmount itemVatAmount = new VatAmount(lc.GetItemTotalNetAmount(), lc.GetItemTotalVatAmount(), currentItem.GetProduct().GetTaxCategoryCode());
 
                 decimal test1 = 1.45m;
                 decimal test2 = 1.45000000m;
@@ -195,12 +195,12 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
                 if (!hm.ContainsKey(percent))
                 {
-                    hm[percent] = itemVATAmount;
+                    hm[percent] = itemVatAmount;
                 }
                 else
                 {
-                    VATAmount current = hm[percent];
-                    hm[percent] = current.add(itemVATAmount);
+                    VatAmount current = hm[percent];
+                    hm[percent] = current.Add(itemVatAmount);
                 }
             }
 
@@ -244,9 +244,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
 
-        public decimal getValue()
+        public decimal GetValue()
         {
-            return getTotal();
+            return GetTotal();
         }
 
     }

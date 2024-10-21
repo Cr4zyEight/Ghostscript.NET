@@ -43,9 +43,9 @@ namespace Ghostscript.NET.Viewer
         private GhostscriptViewerFormatHandler _formatHandler = null;
         private bool _progressiveUpdate = true;
         private int _progressiveUpdateInterval = 100;
-        private GhostscriptStdIO _stdIoCallback = null;
-        private int _zoom_xDpi = 96;
-        private int _zoom_yDpi = 96;
+        private GhostscriptStdIo _stdIoCallback = null;
+        private int _zoomXDpi = 96;
+        private int _zoomYDpi = 96;
         private bool _showPageAfterOpen = true;
         private FileCleanupHelper _fileCleanupHelper = new FileCleanupHelper();
         private int _graphicsAlphaBits = 4;
@@ -187,7 +187,7 @@ namespace Ghostscript.NET.Viewer
                 throw new FileNotFoundException("Could not find input file.", path);
             }
 
-            this.Open(path, GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL), false);
+            this.Open(path, GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl), false);
         }
 
         #endregion
@@ -361,7 +361,7 @@ namespace Ghostscript.NET.Viewer
                     }
             }
 
-            _interpreter.Setup(new GhostscriptViewerStdIOHandler(this, _formatHandler), new GhostscriptViewerDisplayHandler(this));
+            _interpreter.Setup(new GhostscriptViewerStdIoHandler(this, _formatHandler), new GhostscriptViewerDisplayHandler(this));
 
             List<string> args = new List<string>();
             args.Add("-gsnet");
@@ -377,11 +377,11 @@ namespace Ghostscript.NET.Viewer
             }
 
             args.Add("-dDisplayFormat=" +
-                        ((int)DISPLAY_FORMAT_COLOR.DISPLAY_COLORS_RGB |
-                        (int)DISPLAY_FORMAT_ALPHA.DISPLAY_ALPHA_NONE |
-                        (int)DISPLAY_FORMAT_DEPTH.DISPLAY_DEPTH_8 |
-                        (int)DISPLAY_FORMAT_ENDIAN.DISPLAY_LITTLEENDIAN |
-                        (int)DISPLAY_FORMAT_FIRSTROW.DISPLAY_BOTTOMFIRST).ToString());
+                        ((int)DisplayFormatColor.DisplayColorsRgb |
+                        (int)DisplayFormatAlpha.DisplayAlphaNone |
+                        (int)DisplayFormatDepth.DisplayDepth8 |
+                        (int)DisplayFormatEndian.DisplayLittleendian |
+                        (int)DisplayFormatFirstrow.DisplayBottomfirst).ToString());
 
 
             if (_interpreter.LibraryRevision > 950)
@@ -437,7 +437,7 @@ namespace Ghostscript.NET.Viewer
 
         #region AttachStdIO
 
-        public void AttachStdIO(GhostscriptStdIO stdIoCallback)
+        public void AttachStdIo(GhostscriptStdIo stdIoCallback)
         {
             _stdIoCallback = stdIoCallback;
         }
@@ -470,7 +470,7 @@ namespace Ghostscript.NET.Viewer
                             "%%BeginPageSetup\n" +
                             "<<\n");
 
-            this.Interpreter.Run(string.Format("/HWResolution [{0} {1}]\n", _zoom_xDpi, _zoom_yDpi));
+            this.Interpreter.Run(string.Format("/HWResolution [{0} {1}]\n", _zoomXDpi, _zoomYDpi));
 
             GhostscriptRectangle mediaBox = _formatHandler.MediaBox;
             GhostscriptRectangle boundingBox = _formatHandler.BoundingBox;
@@ -479,22 +479,22 @@ namespace Ghostscript.NET.Viewer
             float pageWidth = 0;
             float pageHeight = 0;
 
-            if ((_formatHandler.GetType() == typeof(GhostscriptViewerEpsFormatHandler) && this.EPSClip && boundingBox != GhostscriptRectangle.Empty))
+            if ((_formatHandler.GetType() == typeof(GhostscriptViewerEpsFormatHandler) && this.EpsClip && boundingBox != GhostscriptRectangle.Empty))
             {
-                pageWidth = boundingBox.urx - boundingBox.llx;
-                pageHeight = boundingBox.ury - boundingBox.lly;
+                pageWidth = boundingBox.Urx - boundingBox.Llx;
+                pageHeight = boundingBox.Ury - boundingBox.Lly;
             }
             else
             {
                 if (cropBox != GhostscriptRectangle.Empty)
                 {
-                    pageWidth = cropBox.urx - cropBox.llx;
-                    pageHeight = cropBox.ury - cropBox.lly;
+                    pageWidth = cropBox.Urx - cropBox.Llx;
+                    pageHeight = cropBox.Ury - cropBox.Lly;
                 }
                 else
                 {
-                    pageWidth = mediaBox.urx - mediaBox.llx;
-                    pageHeight = mediaBox.ury - mediaBox.lly;
+                    pageWidth = mediaBox.Urx - mediaBox.Llx;
+                    pageHeight = mediaBox.Ury - mediaBox.Lly;
                 }
             }
 
@@ -523,26 +523,26 @@ namespace Ghostscript.NET.Viewer
                 if (_formatHandler.PageOrientation == GhostscriptPageOrientation.Portrait)
                 {
                     this.Interpreter.Run(string.Format("/PageOffset  [{0} {1}]\n",
-                                            (-mediaBox.llx).ToString("0.00", CultureInfo.InvariantCulture),
-                                            (-mediaBox.lly).ToString("0.00", CultureInfo.InvariantCulture)));
+                                            (-mediaBox.Llx).ToString("0.00", CultureInfo.InvariantCulture),
+                                            (-mediaBox.Lly).ToString("0.00", CultureInfo.InvariantCulture)));
                 }
                 else if (_formatHandler.PageOrientation == GhostscriptPageOrientation.Landscape)
                 {
                     this.Interpreter.Run(string.Format("/PageOffset  [{0} {1}]\n",
-                                            (-mediaBox.lly).ToString("0.00", CultureInfo.InvariantCulture),
-                                            (mediaBox.llx).ToString("0.00", CultureInfo.InvariantCulture)));
+                                            (-mediaBox.Lly).ToString("0.00", CultureInfo.InvariantCulture),
+                                            (mediaBox.Llx).ToString("0.00", CultureInfo.InvariantCulture)));
                 }
                 else if (_formatHandler.PageOrientation == GhostscriptPageOrientation.UpsideDown)
                 {
                     this.Interpreter.Run(string.Format("/PageOffset  [{0} {1}]\n",
-                                            (mediaBox.llx).ToString("0.00", CultureInfo.InvariantCulture),
-                                            (mediaBox.lly).ToString("0.00", CultureInfo.InvariantCulture)));
+                                            (mediaBox.Llx).ToString("0.00", CultureInfo.InvariantCulture),
+                                            (mediaBox.Lly).ToString("0.00", CultureInfo.InvariantCulture)));
                 }
                 else if (_formatHandler.PageOrientation == GhostscriptPageOrientation.Seascape)
                 {
                     this.Interpreter.Run(string.Format("/PageOffset  [{0} {1}]\n",
-                                            (mediaBox.lly).ToString("0.00", CultureInfo.InvariantCulture),
-                                            (-mediaBox.llx).ToString("0.00", CultureInfo.InvariantCulture)));
+                                            (mediaBox.Lly).ToString("0.00", CultureInfo.InvariantCulture),
+                                            (-mediaBox.Llx).ToString("0.00", CultureInfo.InvariantCulture)));
                 }
             }
 
@@ -639,8 +639,8 @@ namespace Ghostscript.NET.Viewer
 
         public bool Zoom(float scale, bool test = false)
         {
-            int tmpZoopX = (int)(_zoom_xDpi * scale + 0.5);
-            int tmpZoomY = (int)(_zoom_yDpi * scale + 0.5);
+            int tmpZoopX = (int)(_zoomXDpi * scale + 0.5);
+            int tmpZoomY = (int)(_zoomYDpi * scale + 0.5);
 
             if (tmpZoopX < 39)
                 return false;
@@ -650,8 +650,8 @@ namespace Ghostscript.NET.Viewer
 
             if (!test)
             {
-                _zoom_xDpi = tmpZoopX;
-                _zoom_yDpi = tmpZoomY;
+                _zoomXDpi = tmpZoopX;
+                _zoomYDpi = tmpZoomY;
             }
 
             return true;
@@ -690,8 +690,8 @@ namespace Ghostscript.NET.Viewer
         public GhostscriptViewerState SaveState()
         {
             GhostscriptViewerState state = new GhostscriptViewerState();
-            state.XDpi = _zoom_xDpi;
-            state.YDpi = _zoom_yDpi;
+            state.XDpi = _zoomXDpi;
+            state.YDpi = _zoomYDpi;
             state.CurrentPage = _formatHandler.CurrentPageNumber;
             state.ProgressiveUpdate = _progressiveUpdate;
             return state;
@@ -703,8 +703,8 @@ namespace Ghostscript.NET.Viewer
 
         public void RestoreState(GhostscriptViewerState state)
         {
-            _zoom_xDpi = state.XDpi;
-            _zoom_yDpi = state.YDpi;
+            _zoomXDpi = state.XDpi;
+            _zoomYDpi = state.YDpi;
             _formatHandler.CurrentPageNumber = state.CurrentPage;
             _progressiveUpdate = state.ProgressiveUpdate;
         }
@@ -782,8 +782,8 @@ namespace Ghostscript.NET.Viewer
 
         internal int ZoomXDpi
         {
-            get { return _zoom_xDpi; }
-            set { _zoom_xDpi = value; }
+            get { return _zoomXDpi; }
+            set { _zoomXDpi = value; }
         }
 
         #endregion
@@ -792,8 +792,8 @@ namespace Ghostscript.NET.Viewer
 
         internal int ZoomYDpi
         {
-            get { return _zoom_yDpi; }
-            set { _zoom_yDpi = value; }
+            get { return _zoomYDpi; }
+            set { _zoomYDpi = value; }
         }
 
         #endregion
@@ -1016,7 +1016,7 @@ namespace Ghostscript.NET.Viewer
 
         #region EPSClip
 
-        public bool EPSClip
+        public bool EpsClip
         {
             get
             {

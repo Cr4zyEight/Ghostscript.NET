@@ -193,22 +193,22 @@ namespace Ghostscript.NET
 
         #region Ghostscript functions
 
-        public gsapi_revision @gsapi_revision = null;
-        public gsapi_new_instance @gsapi_new_instance = null;
-        public gsapi_delete_instance @gsapi_delete_instance = null;
-        public gsapi_set_stdio @gsapi_set_stdio = null;
-        public gsapi_set_poll @gsapi_set_poll = null;
-        public gsapi_set_display_callback @gsapi_set_display_callback = null;
-        public gsapi_set_arg_encoding @gsapi_set_arg_encoding = null;
-        public gsapi_init_with_args @gsapi_init_with_args = null;
-        public gsapi_run_string_begin @gsapi_run_string_begin = null;
-        public gsapi_run_string_continue @gsapi_run_string_continue = null;
-        public gsapi_run_string_end @gsapi_run_string_end = null;
-        public gsapi_run_string_with_length @gsapi_run_string_with_length = null;
-        public gsapi_run_string @gsapi_run_string = null;
-        public gsapi_run_ptr_string @gsapi_run_ptr_string = null;
-        public gsapi_run_file @gsapi_run_file = null;
-        public gsapi_exit @gsapi_exit = null;
+        public GsapiRevision GsapiRevision = null;
+        public GsapiNewInstance GsapiNewInstance = null;
+        public GsapiDeleteInstance GsapiDeleteInstance = null;
+        public GsapiSetStdio GsapiSetStdio = null;
+        public GsapiSetPoll GsapiSetPoll = null;
+        public GsapiSetDisplayCallback GsapiSetDisplayCallback = null;
+        public GsapiSetArgEncoding GsapiSetArgEncoding = null;
+        public GsapiInitWithArgs GsapiInitWithArgs = null;
+        public GsapiRunStringBegin GsapiRunStringBegin = null;
+        public GsapiRunStringContinue GsapiRunStringContinue = null;
+        public GsapiRunStringEnd GsapiRunStringEnd = null;
+        public GsapiRunStringWithLength GsapiRunStringWithLength = null;
+        public GsapiRunString GsapiRunString = null;
+        public GsapiRunPtrString GsapiRunPtrString = null;
+        public GsapiRunFile GsapiRunFile = null;
+        public GsapiExit GsapiExit = null;
 
         #endregion 
 
@@ -221,93 +221,93 @@ namespace Ghostscript.NET
         {
             string symbolMappingError = "Delegate of an exported function couldn't be created for symbol '{0}'";
 
-            this.gsapi_revision = _library.GetDelegateForFunction<gsapi_revision>("gsapi_revision");
+            this.GsapiRevision = _library.GetDelegateForFunction<GsapiRevision>("gsapi_revision");
             
-            if (this.gsapi_revision == null)
+            if (this.GsapiRevision == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_revision"));
 
-            gsapi_revision_s rev = new gsapi_revision_s();
-            if (this.gsapi_revision(ref rev, System.Runtime.InteropServices.Marshal.SizeOf(rev)) == 0)
+            GsapiRevisionS rev = new GsapiRevisionS();
+            if (this.GsapiRevision(ref rev, System.Runtime.InteropServices.Marshal.SizeOf(rev)) == 0)
             {
                 _revision = rev.revision;
             }
 
-            this.gsapi_new_instance = _library.GetDelegateForFunction<gsapi_new_instance>("gsapi_new_instance");
+            this.GsapiNewInstance = _library.GetDelegateForFunction<GsapiNewInstance>("gsapi_new_instance");
 
-            if (this.gsapi_new_instance == null)
+            if (this.GsapiNewInstance == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_new_instance"));
 
-            this.gsapi_delete_instance = _library.GetDelegateForFunction<gsapi_delete_instance>("gsapi_delete_instance");
+            this.GsapiDeleteInstance = _library.GetDelegateForFunction<GsapiDeleteInstance>("gsapi_delete_instance");
 
-            if (this.gsapi_delete_instance == null)
+            if (this.GsapiDeleteInstance == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_delete_instance"));
 
-            this.gsapi_set_stdio = _library.GetDelegateForFunction<gsapi_set_stdio>("gsapi_set_stdio");
+            this.GsapiSetStdio = _library.GetDelegateForFunction<GsapiSetStdio>("gsapi_set_stdio");
 
-            if (this.gsapi_set_stdio == null)
+            if (this.GsapiSetStdio == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_set_stdio"));
 
-            this.gsapi_set_poll = _library.GetDelegateForFunction<gsapi_set_poll>("gsapi_set_poll");
+            this.GsapiSetPoll = _library.GetDelegateForFunction<GsapiSetPoll>("gsapi_set_poll");
 
-            if (this.gsapi_set_poll == null)
+            if (this.GsapiSetPoll == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_set_poll"));
 
-            this.gsapi_set_display_callback = _library.GetDelegateForFunction<gsapi_set_display_callback>("gsapi_set_display_callback");
+            this.GsapiSetDisplayCallback = _library.GetDelegateForFunction<GsapiSetDisplayCallback>("gsapi_set_display_callback");
 
-            if (this.gsapi_set_display_callback == null)
+            if (this.GsapiSetDisplayCallback == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_set_display_callback"));
 
-            if (is_gsapi_set_arg_encoding_supported)
+            if (IsGsapiSetArgEncodingSupported)
             {
-                this.gsapi_set_arg_encoding = _library.GetDelegateForFunction<gsapi_set_arg_encoding>("gsapi_set_arg_encoding");
+                this.GsapiSetArgEncoding = _library.GetDelegateForFunction<GsapiSetArgEncoding>("gsapi_set_arg_encoding");
 
-                if (this.gsapi_set_arg_encoding == null)
+                if (this.GsapiSetArgEncoding == null)
                     throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_set_arg_encoding"));
             }
 
-            this.gsapi_init_with_args = _library.GetDelegateForFunction<gsapi_init_with_args>("gsapi_init_with_args");
+            this.GsapiInitWithArgs = _library.GetDelegateForFunction<GsapiInitWithArgs>("gsapi_init_with_args");
 
-            if (this.gsapi_init_with_args == null)
+            if (this.GsapiInitWithArgs == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_init_with_args"));
 
-            this.gsapi_run_string_begin = _library.GetDelegateForFunction<gsapi_run_string_begin>("gsapi_run_string_begin");
+            this.GsapiRunStringBegin = _library.GetDelegateForFunction<GsapiRunStringBegin>("gsapi_run_string_begin");
 
-            if (this.gsapi_run_string_begin == null)
+            if (this.GsapiRunStringBegin == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_run_string_begin"));
 
-            this.gsapi_run_string_continue = _library.GetDelegateForFunction<gsapi_run_string_continue>("gsapi_run_string_continue");
+            this.GsapiRunStringContinue = _library.GetDelegateForFunction<GsapiRunStringContinue>("gsapi_run_string_continue");
 
-            if (this.gsapi_run_string_continue == null)
+            if (this.GsapiRunStringContinue == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_run_string_continue"));
 
-            this.gsapi_run_string_end = _library.GetDelegateForFunction< gsapi_run_string_end>("gsapi_run_string_end");
+            this.GsapiRunStringEnd = _library.GetDelegateForFunction< GsapiRunStringEnd>("gsapi_run_string_end");
 
-            if (this.gsapi_run_string_end == null)
+            if (this.GsapiRunStringEnd == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_run_string_end"));
 
-            this.gsapi_run_string_with_length = _library.GetDelegateForFunction<gsapi_run_string_with_length>("gsapi_run_string_with_length");
+            this.GsapiRunStringWithLength = _library.GetDelegateForFunction<GsapiRunStringWithLength>("gsapi_run_string_with_length");
 
-            if (this.gsapi_run_string_with_length == null)
+            if (this.GsapiRunStringWithLength == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_run_string_with_length"));
 
-            this.gsapi_run_string = _library.GetDelegateForFunction<gsapi_run_string>("gsapi_run_string");
+            this.GsapiRunString = _library.GetDelegateForFunction<GsapiRunString>("gsapi_run_string");
 
-            if (this.gsapi_run_string == null)
+            if (this.GsapiRunString == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_run_string"));
 
-            this.gsapi_run_ptr_string = _library.GetDelegateForFunction<gsapi_run_ptr_string>("gsapi_run_string");
+            this.GsapiRunPtrString = _library.GetDelegateForFunction<GsapiRunPtrString>("gsapi_run_string");
 
-            if (this.gsapi_run_ptr_string == null)
+            if (this.GsapiRunPtrString == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_run_string"));
 
-            this.gsapi_run_file = _library.GetDelegateForFunction<gsapi_run_file>("gsapi_run_file");
+            this.GsapiRunFile = _library.GetDelegateForFunction<GsapiRunFile>("gsapi_run_file");
 
-            if (this.gsapi_run_file == null)
+            if (this.GsapiRunFile == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_run_file"));
 
-            this.gsapi_exit = _library.GetDelegateForFunction<gsapi_exit>("gsapi_exit");
+            this.GsapiExit = _library.GetDelegateForFunction<GsapiExit>("gsapi_exit");
 
-            if (this.gsapi_exit == null)
+            if (this.GsapiExit == null)
                 throw new GhostscriptException(string.Format(symbolMappingError, "gsapi_exit"));
 
         }
@@ -341,7 +341,7 @@ namespace Ghostscript.NET
 
         #region is_gsapi_set_arg_encoding
 
-        public bool is_gsapi_set_arg_encoding_supported
+        public bool IsGsapiSetArgEncodingSupported
         {
             get
             {

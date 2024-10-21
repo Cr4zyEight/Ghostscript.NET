@@ -37,9 +37,9 @@ namespace Ghostscript.NET
 
         #region Internal variables
 
-        internal display_callback _callback;
+        internal DisplayCallback Callback;
 
-        internal GhostscriptLibrary _gs;
+        internal GhostscriptLibrary Gs;
 
         #endregion
 
@@ -50,31 +50,31 @@ namespace Ghostscript.NET
         /// </summary>
         public GhostscriptDisplayDeviceHandler(GhostscriptLibrary gs)
         {
-            _gs = gs;
+            Gs = gs;
 
             if (gs.Revision > 951)
             {
-                _callback = new display_callback_v3();
-                _callback.version_minor = gdevdsp.DISPLAY_VERSION_MINOR_V3;
-                _callback.version_major = gdevdsp.DISPLAY_VERSION_MAJOR_V3;
-                _callback.size = Marshal.SizeOf(typeof(display_callback_v3));
+                Callback = new DisplayCallbackV3();
+                Callback.version_minor = Gdevdsp.DisplayVersionMinorV3;
+                Callback.version_major = Gdevdsp.DisplayVersionMajorV3;
+                Callback.size = Marshal.SizeOf(typeof(DisplayCallbackV3));
             }
             else
             {
-                _callback = new display_callback();
-                _callback.version_minor = gdevdsp.DISPLAY_VERSION_MINOR_V2;
-                _callback.version_major = gdevdsp.DISPLAY_VERSION_MAJOR_V2;
-                _callback.size = Marshal.SizeOf(typeof(display_callback));
+                Callback = new DisplayCallback();
+                Callback.version_minor = Gdevdsp.DisplayVersionMinorV2;
+                Callback.version_major = Gdevdsp.DisplayVersionMajorV2;
+                Callback.size = Marshal.SizeOf(typeof(DisplayCallback));
             }
 
-            _callback.display_open = new display_open_callback(display_open);
-            _callback.display_preclose = new display_preclose_callback(display_preclose);
-            _callback.display_close = new display_close_callback(display_close);
-            _callback.display_presize = new display_presize_callback(display_presize);
-            _callback.display_size = new display_size_callback(display_size);
-            _callback.display_sync = new display_sync_callback(display_sync);
-            _callback.display_page = new display_page_callback(display_page);
-            _callback.display_update = new display_update_callback(display_update);
+            Callback.display_open = new DisplayOpenCallback(display_open);
+            Callback.display_preclose = new DisplayPrecloseCallback(display_preclose);
+            Callback.display_close = new DisplayCloseCallback(display_close);
+            Callback.display_presize = new DisplayPresizeCallback(display_presize);
+            Callback.display_size = new DisplaySizeCallback(display_size);
+            Callback.display_sync = new DisplaySyncCallback(display_sync);
+            Callback.display_page = new DisplayPageCallback(display_page);
+            Callback.display_update = new DisplayUpdateCallback(display_update);
 
             //_callback.display_memalloc = new display_memalloc_callback(display_memalloc);
             //_callback.display_memfree = new display_memfree_callback(display_memfree);
@@ -175,7 +175,7 @@ namespace Ghostscript.NET
 
         #region display_separation
 
-        private int display_separation(IntPtr handle, IntPtr device, Int32 component, string component_name, UInt16 c, UInt16 m, UInt16 y, UInt16 k)
+        private int display_separation(IntPtr handle, IntPtr device, Int32 component, string componentName, UInt16 c, UInt16 m, UInt16 y, UInt16 k)
         {
             return 0;
         }

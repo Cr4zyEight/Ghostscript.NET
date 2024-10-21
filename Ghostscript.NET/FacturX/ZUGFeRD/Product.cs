@@ -8,14 +8,14 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 	/// </summary>
 //JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
 //ORIGINAL LINE: @JsonIgnoreProperties(ignoreUnknown = true) public class Product implements org.mustangproject.ZUGFeRD.IZUGFeRDExportableProduct
-	public class Product : IZUGFeRDExportableProduct
+	public class Product : IZugFeRdExportableProduct
 	{
-		protected internal string unit, name, description, sellerAssignedID, buyerAssignedID;
-		protected internal decimal VATPercent;
+		protected internal string Unit, Name, Description, SellerAssignedId, BuyerAssignedId;
+		protected internal decimal VatPercent;
 //JAVA TO C# CONVERTER NOTE: Fields cannot have the same name as methods of the current type:
-		protected internal bool isReverseCharge_Conflict = false;
+		protected internal bool IsReverseChargeConflict = false;
 //JAVA TO C# CONVERTER NOTE: Fields cannot have the same name as methods of the current type:
-		protected internal bool isIntraCommunitySupply_Conflict = false;
+		protected internal bool IsIntraCommunitySupplyConflict = false;
 
 		/// <summary>
 		///*
@@ -23,13 +23,13 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// <param name="name"> product short name </param>
 		/// <param name="description"> product long name </param>
 		/// <param name="unit"> a two/three letter UN/ECE rec 20 unit code, e.g. "C62" for piece </param>
-		/// <param name="VATPercent"> product vat rate </param>
-		public Product(string name, string description, string unit, decimal VATPercent)
+		/// <param name="vatPercent"> product vat rate </param>
+		public Product(string name, string description, string unit, decimal vatPercent)
 		{
-			this.unit = unit;
-			this.name = name;
-			this.description = description;
-			this.VATPercent = VATPercent;
+			this.Unit = unit;
+			this.Name = name;
+			this.Description = description;
+			this.VatPercent = vatPercent;
 		}
 
 
@@ -44,56 +44,56 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		}
 
 
-		public virtual string getSellerAssignedID()
+		public virtual string GetSellerAssignedId()
 		{
-			return sellerAssignedID;
+			return SellerAssignedId;
 		}
 
 		/// <summary>
 		///*
 		/// how the seller identifies this type of product </summary>
-		/// <param name="sellerAssignedID"> a unique string </param>
+		/// <param name="sellerAssignedId"> a unique string </param>
 		/// <returns> fluent setter </returns>
-		public virtual Product setSellerAssignedID(string sellerAssignedID)
+		public virtual Product SetSellerAssignedId(string sellerAssignedId)
 		{
-			this.sellerAssignedID = sellerAssignedID;
+			this.SellerAssignedId = sellerAssignedId;
 			return this;
 		}
 
-		public virtual string getBuyerAssignedID()
+		public virtual string GetBuyerAssignedId()
 		{
-			return buyerAssignedID;
+			return BuyerAssignedId;
 		}
 
 		/// <summary>
 		///*
 		/// if the buyer provided an ID how he refers to this product </summary>
-		/// <param name="buyerAssignedID"> a string the buyer provided </param>
+		/// <param name="buyerAssignedId"> a string the buyer provided </param>
 		/// <returns> fluent setter </returns>
-		public virtual Product setBuyerAssignedID(string buyerAssignedID)
+		public virtual Product SetBuyerAssignedId(string buyerAssignedId)
 		{
-			this.buyerAssignedID = buyerAssignedID;
+			this.BuyerAssignedId = buyerAssignedId;
 			return this;
 		}
 
-		public  bool isReverseCharge()
+		public  bool IsReverseCharge()
 		{
-			return isReverseCharge_Conflict;
+			return IsReverseChargeConflict;
 		}
 
-		public  bool isIntraCommunitySupply()
+		public  bool IsIntraCommunitySupply()
 		{
-			return isIntraCommunitySupply_Conflict;
+			return IsIntraCommunitySupplyConflict;
 		}
 
 		/// <summary>
 		///*
 		/// sets reverse charge(=delivery to outside EU) </summary>
 		/// <returns> fluent setter </returns>
-		public virtual Product setReverseCharge()
+		public virtual Product SetReverseCharge()
 		{
-			isReverseCharge_Conflict = true;
-			setVATPercent(decimal.Zero);
+			IsReverseChargeConflict = true;
+			SetVatPercent(decimal.Zero);
 			return this;
 		}
 
@@ -102,16 +102,16 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		///*
 		/// sets intra community supply(=delivery outside the country inside the EU) </summary>
 		/// <returns> fluent setter </returns>
-		public virtual Product setIntraCommunitySupply()
+		public virtual Product SetIntraCommunitySupply()
 		{
-			isIntraCommunitySupply_Conflict = true;
-			setVATPercent(decimal.Zero);
+			IsIntraCommunitySupplyConflict = true;
+			SetVatPercent(decimal.Zero);
 			return this;
 		}
 
-		public  string getUnit()
+		public  string GetUnit()
 		{
-			return unit;
+			return Unit;
 		}
 
 		/// <summary>
@@ -119,55 +119,55 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// sets a UN/ECE rec 20 or 21 code which unit the product ships in, e.g. C62=piece </summary>
 		/// <param name="unit"> 2-3 letter UN/ECE rec 20 or 21 </param>
 		/// <returns> fluent setter </returns>
-		public virtual Product setUnit(string unit)
+		public virtual Product SetUnit(string unit)
 		{
-			this.unit = unit;
+			this.Unit = unit;
 			return this;
 		}
 
-		public  string getName()
+		public  string GetName()
 		{
-			return name;
+			return Name;
 		}
 
 		/// <summary>
 		/// name of the product </summary>
 		/// <param name="name"> short name </param>
 		/// <returns> fluent setter </returns>
-		public virtual Product setName(string name)
+		public virtual Product SetName(string name)
 		{
-			this.name = name;
+			this.Name = name;
 			return this;
 		}
 
-		public  string getDescription()
+		public  string GetDescription()
 		{
-			return description;
+			return Description;
 		}
 
 		/// <summary>
 		/// description of the product (required) </summary>
 		/// <param name="description"> long name </param>
 		/// <returns> fluent setter </returns>
-		public virtual Product setDescription(string description)
+		public virtual Product SetDescription(string description)
 		{
-			this.description = description;
+			this.Description = description;
 			return this;
 		}
 
-		public  decimal getVATPercent()
+		public  decimal GetVatPercent()
 		{
-			return VATPercent;
+			return VatPercent;
 		}
 
 		/// <summary>
 		///**
 		/// VAT rate of the product </summary>
-		/// <param name="VATPercent"> vat rate of the product </param>
+		/// <param name="vatPercent"> vat rate of the product </param>
 		/// <returns> fluent setter </returns>
-		public virtual Product setVATPercent(decimal VATPercent)
+		public virtual Product SetVatPercent(decimal vatPercent)
 		{
-			this.VATPercent = VATPercent;
+			this.VatPercent = vatPercent;
 			return this;
 		}
 	}

@@ -36,11 +36,11 @@ namespace Ghostscript.NET
         /// <summary>
         /// Open source releases.
         /// </summary>
-        GPL = 0,
+        Gpl = 0,
         /// <summary>
         /// Old open source releases.
         /// </summary>
-        AFPL = 1,
+        Afpl = 1,
         /// <summary>
         /// Commercially licensed release.
         /// </summary>

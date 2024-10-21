@@ -5,7 +5,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 	public class Profiles
 	{
-		private static readonly Dictionary<string, Profile> zf2Map = new Dictionary<string, Profile>
+		private static readonly Dictionary<string, Profile> Zf2Map = new Dictionary<string, Profile>
 	{
 		{"MINIMUM", new Profile("MINIMUM", "urn:factur-x.eu:1p0:minimum")},
 		 {"BASICWL", new Profile("BASICWL", "urn:factur-x.eu:1p0:basicwl")},
@@ -15,7 +15,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		 {"XRECHNUNG", new Profile("XRECHNUNG", "urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.1")}
 	};
 
-		private static readonly Dictionary<string, Profile> zf1Map = new Dictionary<string, Profile>
+		private static readonly Dictionary<string, Profile> Zf1Map = new Dictionary<string, Profile>
 	{
 
 		{"BASIC", new Profile("BASIC", "urn:ferd:CrossIndustryDocument:invoice:1p0:basic")},
@@ -24,16 +24,16 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 	};
 
 
-		public static Profile getByName(string name, int version)
+		public static Profile GetByName(string name, int version)
 		{
 			Profile result = null;
 			if (version == 1)
 			{
-				result = zf1Map[name.ToUpper()];
+				result = Zf1Map[name.ToUpper()];
 			}
 			else
 			{
-				result = zf2Map[name.ToUpper()];
+				result = Zf2Map[name.ToUpper()];
 			}
 			if (result == null)
 			{
@@ -41,9 +41,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 			}
 			return result;
 		}
-		public static Profile getByName(string name)
+		public static Profile GetByName(string name)
 		{
-			return getByName(name, 2);
+			return GetByName(name, 2);
 		}
 
 	}

@@ -74,7 +74,7 @@ namespace Ghostscript.NET.Samples
             Console.WriteLine(e.CurrentPage.ToString() + " / " + e.TotalPages.ToString());
         }
 
-        public class LogStdio : GhostscriptStdIO
+        public class LogStdio : GhostscriptStdIo
         {
             public LogStdio() : base(true, true, true) { }
 

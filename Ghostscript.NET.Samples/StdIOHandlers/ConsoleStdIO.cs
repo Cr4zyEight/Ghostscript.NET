@@ -31,9 +31,9 @@ using System.Text;
 
 namespace Ghostscript.NET.Samples
 {
-    public class ConsoleStdIO : Ghostscript.NET.GhostscriptStdIO
+    public class ConsoleStdIo : Ghostscript.NET.GhostscriptStdIo
     {
-        public ConsoleStdIO(bool handleStdIn, bool handleStdOut, bool handleStdErr) : base(handleStdIn, handleStdOut, handleStdErr) { }
+        public ConsoleStdIo(bool handleStdIn, bool handleStdOut, bool handleStdErr) : base(handleStdIn, handleStdOut, handleStdErr) { }
 
         public override void StdIn(out string input, int count)
         {

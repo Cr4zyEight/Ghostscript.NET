@@ -45,7 +45,7 @@ namespace Ghostscript.NET.Samples
     {
         public void Start()
         {
-            int desired_dpi = 96;
+            int desiredDpi = 96;
 
             string inputPdfPath = @"E:\gss_test\test.pdf";
             string outputPath = @"E:\gss_test\output\";
@@ -67,7 +67,7 @@ namespace Ghostscript.NET.Samples
                 {
                     string pageFilePath = Path.Combine(outputPath, "Page-" + pageNumber.ToString() + ".png");
 
-                    Image img = rasterizer.GetPage(desired_dpi, pageNumber);
+                    Image img = rasterizer.GetPage(desiredDpi, pageNumber);
                     img.Save(pageFilePath, ImageFormat.Png);
 
                     Console.WriteLine(pageFilePath);

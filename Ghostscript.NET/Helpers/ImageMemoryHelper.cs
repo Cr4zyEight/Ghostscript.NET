@@ -33,7 +33,7 @@ namespace Ghostscript.NET
     {
         #region Set24bppRgbImageColor
 
-        public unsafe static void Set24bppRgbImageColor(IntPtr image, int width, int height, byte r, byte g, byte b)
+        public unsafe static void Set24BppRgbImageColor(IntPtr image, int width, int height, byte r, byte g, byte b)
         {
             byte* ptr = (byte*)image;
             int stride = (((width * 3) + 3) & ~3);
@@ -72,7 +72,7 @@ namespace Ghostscript.NET
                 posSrcTop = (srcTop * (stride)) + (x * bytesPerPixel);
                 posDestTop = (destTop * (destStride));
 
-                wdm.MoveMemory(new IntPtr((long)dest + posDestTop), new IntPtr((long)src + posSrcTop), (uint)(width * bytesPerPixel));
+                Wdm.MoveMemory(new IntPtr((long)dest + posDestTop), new IntPtr((long)src + posSrcTop), (uint)(width * bytesPerPixel));
 
                 srcTop++;
                 destTop++;
@@ -98,7 +98,7 @@ namespace Ghostscript.NET
                 posDestTop = (destTop * stride) + (x * bytesPerPixel);
                 posSrcTop = (srcTop * partStride);
 
-                wdm.MoveMemory(new IntPtr((long)dest + posDestTop), new IntPtr((long)src + posSrcTop), (uint)(width * bytesPerPixel));
+                Wdm.MoveMemory(new IntPtr((long)dest + posDestTop), new IntPtr((long)src + posSrcTop), (uint)(width * bytesPerPixel));
 
                 destTop++;
                 srcTop++;

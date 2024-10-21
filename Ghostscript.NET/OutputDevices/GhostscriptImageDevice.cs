@@ -37,17 +37,17 @@ namespace Ghostscript.NET
         /// 1.
         /// </summary>
         [GhostscriptSwitchValue("1")]
-        V_1,
+        V1,
         /// <summary>
         /// 2.
         /// </summary>
         [GhostscriptSwitchValue("2")]
-        V_2,
+        V2,
         /// <summary>
         /// 4.
         /// </summary>
         [GhostscriptSwitchValue("4")]
-        V_4
+        V4
     }
 
     #endregion
@@ -112,7 +112,7 @@ namespace Ghostscript.NET
         /// This option sets the resolution of the output file in dots per inch. The default value if you don't specify this options is usually 72 dpi.
         /// </summary>
         [GhostscriptSwitch("-r{0}x{1}")]
-        public GhostscriptImageDeviceResolution ResolutionXY { get; set; }
+        public GhostscriptImageDeviceResolution ResolutionXy { get; set; }
 
         #endregion
 

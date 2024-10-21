@@ -34,7 +34,7 @@ namespace Ghostscript.NET.Viewer
 {
     static class Program
     {
-        public static string NAME = "Ghostscript.NET.Viewer " + Assembly.GetEntryAssembly().GetName().Version.ToString(3);
+        public static string Name = "Ghostscript.NET.Viewer " + Assembly.GetEntryAssembly().GetName().Version.ToString(3);
 
         /// <summary>
         /// The main entry point for the application.
@@ -47,7 +47,7 @@ namespace Ghostscript.NET.Viewer
 
             if (!GhostscriptVersionInfo.IsGhostscriptInstalled)
             {
-                MessageBox.Show("Ghostscript not installed on this machine. This application requires Ghostscript library in order to run!", NAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Ghostscript not installed on this machine. This application requires Ghostscript library in order to run!", Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

@@ -7,69 +7,69 @@ using Microsoft.Extensions.Logging;
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
 
-    public class ZUGFeRDExporter
+    public class ZugFeRdExporter
     {
-        protected string? gsDLL = null;
-        protected string? sourcePDF = null;
-        protected bool noSourceCopy = false;
-        protected string profile = "EN16931";
-        protected int version = 2;
-        protected IExportableTransaction? trans = null;
+        protected string GsDll = null;
+        protected string SourcePdf = null;
+        protected bool NoSourceCopy = false;
+        protected string Profile = "EN16931";
+        protected int Version = 2;
+        protected IExportableTransaction? Trans = null;
 
-        public ZUGFeRDExporter(string gsDLL)
+        public ZugFeRdExporter(string gsDll)
         {
-            this.gsDLL = gsDLL;
+            this.GsDll = gsDll;
         }
-        public ZUGFeRDExporter load(string PDFfilename)
+        public ZugFeRdExporter Load(string pdFfilename)
         {
-            string basename=Path.GetFileName(PDFfilename);
-            this.sourcePDF = Path.GetTempPath() + basename;
-            string d1=Path.GetDirectoryName(PDFfilename)+Path.DirectorySeparatorChar;
+            string basename=Path.GetFileName(pdFfilename);
+            this.SourcePdf = Path.GetTempPath() + basename;
+            string d1=Path.GetDirectoryName(pdFfilename)+Path.DirectorySeparatorChar;
             string d2=Path.GetTempPath();
             if (d1.Equals(Path.GetTempPath())) {
-                noSourceCopy=true;
+                NoSourceCopy=true;
             } else {
-                File.Copy(PDFfilename, sourcePDF);
+                File.Copy(pdFfilename, SourcePdf);
             }
             return this;
         }
-        public ZUGFeRDExporter setTransaction(IExportableTransaction trans)
+        public ZugFeRdExporter SetTransaction(IExportableTransaction trans)
         {
-            this.trans = trans;
+            this.Trans = trans;
             return this;
         }
 
-        public ZUGFeRDExporter setZUGFeRDVersion(int version)
+        public ZugFeRdExporter SetZugFeRdVersion(int version)
         {
-            this.version = version;
+            this.Version = version;
             return this;
         }
 
-        public ZUGFeRDExporter setProfile(string profile)
+        public ZugFeRdExporter SetProfile(string profile)
         {
-            this.profile = profile;
+            this.Profile = profile;
             return this;
         }
 
 
-        public void export(string targetFilename)
+        public void Export(string targetFilename)
         {
 
-            PDFConverter pc = new PDFConverter(sourcePDF, targetFilename);
+            PdfConverter pc = new PdfConverter(SourcePdf, targetFilename);
 
-            ZUGFeRD2PullProvider zf2p = new ZUGFeRD2PullProvider();
-            zf2p.setProfile(Profiles.getByName(profile));
-            zf2p.generateXML(trans);
+            ZugFeRd2PullProvider zf2P = new ZugFeRd2PullProvider();
+            zf2P.SetProfile(Profiles.GetByName(Profile));
+            zf2P.GenerateXml(Trans);
             System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
 
             string tempfilename = Path.GetTempPath() + "\\factur-x.xml";
-            File.WriteAllBytes(tempfilename, zf2p.getXML());
+            File.WriteAllBytes(tempfilename, zf2P.GetXml());
 
-            pc.EmbedXMLForZF(tempfilename, Convert.ToString(version));
-            pc.ConvertToPDFA3(gsDLL);
+            pc.EmbedXmlForZf(tempfilename, Convert.ToString(Version));
+            pc.ConvertToPdfa3(GsDll);
             File.Delete(Path.GetTempPath() + "\\factur-x.xml");
-            if (!noSourceCopy) {
-                File.Delete(sourcePDF);
+            if (!NoSourceCopy) {
+                File.Delete(SourcePdf);
             }
 
         }

@@ -109,12 +109,12 @@ namespace Ghostscript.NET
 
         #region Process
 
-        public static void Process(GhostscriptJpegDeviceType deviceType, string[] inputFiles, string outputPath, GhostscriptStdIO stdIO_callback)
+        public static void Process(GhostscriptJpegDeviceType deviceType, string[] inputFiles, string outputPath, GhostscriptStdIo stdIoCallback)
         {
             GhostscriptJpegDevice dev = new GhostscriptJpegDevice(deviceType);
             dev.InputFiles.AddRange(inputFiles);
             dev.OutputPath = outputPath;
-            dev.Process(stdIO_callback);
+            dev.Process(stdIoCallback);
         }
 
         #endregion

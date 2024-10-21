@@ -16,13 +16,13 @@ namespace Ghostscript.NET.DisplayTest
     {
         private GhostscriptViewer _viewer;
         private FPreview _preview = new FPreview();
-        private StdIOHandler _stdioHandler;
+        private StdIoHandler _stdioHandler;
 
         public FMain()
         {
             InitializeComponent();
 
-            _stdioHandler = new StdIOHandler(txtOutput);
+            _stdioHandler = new StdIoHandler(txtOutput);
         }
 
         private void FMain_Load(object sender, EventArgs e)
@@ -37,7 +37,7 @@ namespace Ghostscript.NET.DisplayTest
 
             _viewer = new GhostscriptViewer();
 
-            _viewer.AttachStdIO(_stdioHandler);
+            _viewer.AttachStdIo(_stdioHandler);
             
             _viewer.DisplaySize += new GhostscriptViewerViewEventHandler(_viewer_DisplaySize);
             _viewer.DisplayUpdate += new GhostscriptViewerViewEventHandler(_viewer_DisplayUpdate);

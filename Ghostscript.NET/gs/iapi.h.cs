@@ -35,7 +35,7 @@ namespace Ghostscript.NET
     #region gsapi_revision_s
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct gsapi_revision_s
+    public struct GsapiRevisionS
     {
         public IntPtr product;
         public IntPtr copyright;
@@ -60,7 +60,7 @@ namespace Ghostscript.NET
     /// <param name="len"></param>
     /// <returns></returns>
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    public delegate int gsapi_revision(ref gsapi_revision_s pr, Int32 len);
+    public delegate int GsapiRevision(ref GsapiRevisionS pr, Int32 len);
 
     /// <summary>
     /// Create a new instance of Ghostscript.
@@ -71,7 +71,7 @@ namespace Ghostscript.NET
     /// <param name="caller_handle"></param>
     /// <returns></returns>
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    public delegate int gsapi_new_instance(out IntPtr pinstance, IntPtr caller_handle);
+    public delegate int GsapiNewInstance(out IntPtr pinstance, IntPtr callerHandle);
 
     /// <summary>
     /// Destroy an instance of Ghostscript
@@ -81,7 +81,7 @@ namespace Ghostscript.NET
     /// </summary>
     /// <param name="instance"></param>
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    public delegate void gsapi_delete_instance(IntPtr instance);
+    public delegate void GsapiDeleteInstance(IntPtr instance);
 
     /// <summary>
     /// Set the callback functions for stdio
@@ -97,7 +97,7 @@ namespace Ghostscript.NET
     /// <param name="stderr_fn"></param>
     /// <returns></returns>
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    public delegate int gsapi_set_stdio(IntPtr instance, gsapi_stdio_callback stdin_fn, gsapi_stdio_callback stdout_fn, gsapi_stdio_callback stderr_fn);
+    public delegate int GsapiSetStdio(IntPtr instance, GsapiStdioCallback stdinFn, GsapiStdioCallback stdoutFn, GsapiStdioCallback stderrFn);
 
     /// <summary>
     /// Set the callback function for polling.
@@ -110,7 +110,7 @@ namespace Ghostscript.NET
     /// <param name="poll_fn"></param>
     /// <returns></returns>
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    public delegate int gsapi_set_poll(IntPtr instance, gsapi_pool_callback poll_fn);
+    public delegate int GsapiSetPoll(IntPtr instance, GsapiPoolCallback pollFn);
 
     /// <summary>
     /// Set the display device callback structure.
@@ -122,7 +122,7 @@ namespace Ghostscript.NET
     /// <param name="callback"></param>
     /// <returns></returns>
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    public delegate int gsapi_set_display_callback(IntPtr instance, IntPtr callback);
+    public delegate int GsapiSetDisplayCallback(IntPtr instance, IntPtr callback);
 
     /// <summary>
     /// Set the encoding used for the args. By default we assume
@@ -133,13 +133,13 @@ namespace Ghostscript.NET
     /// this function) is now deprecated!
     /// </summary>
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    public delegate int gsapi_set_arg_encoding(IntPtr instance, GS_ARG_ENCODING encoding);
+    public delegate int GsapiSetArgEncoding(IntPtr instance, GsArgEncoding encoding);
 
-    public enum GS_ARG_ENCODING : int
+    public enum GsArgEncoding : int
     {
-        LOCAL = 0,
-        UTF8 = 1,
-        UTF16LE = 2
+        Local = 0,
+        Utf8 = 1,
+        Utf16Le = 2
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ namespace Ghostscript.NET
     /// <param name="argv"></param>
     /// <returns></returns>
     [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet=CharSet.Ansi)]
-    public delegate int gsapi_init_with_args(IntPtr instance, Int32 argc, string[] argv);
+    public delegate int GsapiInitWithArgs(IntPtr instance, Int32 argc, string[] argv);
 
     // The gsapi_run_* functions are like gs_main_run_* except
     // that the error_object is omitted.
@@ -170,25 +170,25 @@ namespace Ghostscript.NET
     // which will return e_NeedInput if all is well.
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    public delegate int gsapi_run_string_begin(IntPtr instance, Int32 user_errors, out Int32 pexit_code);
+    public delegate int GsapiRunStringBegin(IntPtr instance, Int32 userErrors, out Int32 pexitCode);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet=CharSet.Ansi)]
-    public delegate int gsapi_run_string_continue(IntPtr instance, string str, UInt32 length, Int32 user_errors, out Int32 pexit_code);
+    public delegate int GsapiRunStringContinue(IntPtr instance, string str, UInt32 length, Int32 userErrors, out Int32 pexitCode);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    public delegate int gsapi_run_string_end(IntPtr instance, Int32 user_errors, out Int32 pexit_code);
+    public delegate int GsapiRunStringEnd(IntPtr instance, Int32 userErrors, out Int32 pexitCode);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet=CharSet.Ansi)]
-    public delegate int gsapi_run_string_with_length(IntPtr instance, string str, UInt32 length, Int32 user_errors, out Int32 pexit_code);
+    public delegate int GsapiRunStringWithLength(IntPtr instance, string str, UInt32 length, Int32 userErrors, out Int32 pexitCode);
     
     [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet=CharSet.Ansi)]
-    public delegate int gsapi_run_string(IntPtr instance, string str, Int32 user_errors, out Int32 pexit_code);
+    public delegate int GsapiRunString(IntPtr instance, string str, Int32 userErrors, out Int32 pexitCode);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet = CharSet.Ansi)]
-    public delegate int gsapi_run_ptr_string(IntPtr instance, IntPtr str, Int32 user_errors, out Int32 pexit_code);
+    public delegate int GsapiRunPtrString(IntPtr instance, IntPtr str, Int32 userErrors, out Int32 pexitCode);
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet=CharSet.Ansi)]
-    public delegate int gsapi_run_file(IntPtr instance, string file_name, Int32 user_errors, out Int32 pexit_code);
+    public delegate int GsapiRunFile(IntPtr instance, string fileName, Int32 userErrors, out Int32 pexitCode);
 
     /// <summary>
     /// Exit the interpreter.
@@ -198,6 +198,6 @@ namespace Ghostscript.NET
     /// <param name="instance"></param>
     /// <returns></returns>
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
-    public delegate int gsapi_exit(IntPtr instance);
+    public delegate int GsapiExit(IntPtr instance);
 
 }

@@ -47,10 +47,10 @@ namespace Ghostscript.NET.Samples
 
         private void Export_Second_And_Third_Pdf_Page_As_24bit_Png()
         {
-            GhostscriptPngDevice dev = new GhostscriptPngDevice(GhostscriptPngDeviceType.Png16m);
-            dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V_4;
-            dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V_4;
-            dev.ResolutionXY = new GhostscriptImageDeviceResolution(96, 96);
+            GhostscriptPngDevice dev = new GhostscriptPngDevice(GhostscriptPngDeviceType.Png16M);
+            dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+            dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+            dev.ResolutionXy = new GhostscriptImageDeviceResolution(96, 96);
             dev.InputFiles.Add(@"E:\gss_test\indispensable.pdf");
             dev.Pdf.FirstPage = 2;
             dev.Pdf.LastPage = 4;
@@ -62,9 +62,9 @@ namespace Ghostscript.NET.Samples
         private void Export_Second_And_Third_Pdf_Page_As_Grayscale_Png()
         {
             GhostscriptPngDevice dev = new GhostscriptPngDevice(GhostscriptPngDeviceType.PngGray);
-            dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V_4;
-            dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V_4;
-            dev.ResolutionXY = new GhostscriptImageDeviceResolution(96, 96);
+            dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+            dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+            dev.ResolutionXy = new GhostscriptImageDeviceResolution(96, 96);
             dev.InputFiles.Add(@"E:\gss_test\indispensable.pdf");
             dev.Pdf.FirstPage = 2;
             dev.Pdf.LastPage = 4;
@@ -75,9 +75,9 @@ namespace Ghostscript.NET.Samples
         private void Export_First_And_Second_Pdf_Page_As_Color_Jpeg()
         {
             GhostscriptJpegDevice dev = new GhostscriptJpegDevice(GhostscriptJpegDeviceType.Jpeg);
-            dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V_4;
-            dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V_4;
-            dev.ResolutionXY = new GhostscriptImageDeviceResolution(96, 96);
+            dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+            dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+            dev.ResolutionXy = new GhostscriptImageDeviceResolution(96, 96);
             dev.JpegQuality = 80;
             dev.InputFiles.Add(@"E:\gss_test\indispensable.pdf");
             dev.Pdf.FirstPage = 2;
@@ -89,9 +89,9 @@ namespace Ghostscript.NET.Samples
         private void Export_First_And_Second_Pdf_Page_As_Grayscale_Jpeg()
         {
             GhostscriptJpegDevice dev = new GhostscriptJpegDevice(GhostscriptJpegDeviceType.JpegGray);
-            dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V_4;
-            dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V_4;
-            dev.ResolutionXY = new GhostscriptImageDeviceResolution(96, 96);
+            dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+            dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+            dev.ResolutionXy = new GhostscriptImageDeviceResolution(96, 96);
             dev.JpegQuality = 80;
             dev.InputFiles.Add(@"E:\gss_test\indispensable.pdf");
             dev.Pdf.FirstPage = 2;

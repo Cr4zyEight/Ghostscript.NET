@@ -33,14 +33,14 @@ namespace Ghostscript.NET
     /// <summary>
     /// Represents a base Ghostscript standard input output handler.
     /// </summary>
-    public abstract class GhostscriptStdIO
+    public abstract class GhostscriptStdIo
     {
 
         #region Internal variables
 
-        internal gsapi_stdio_callback _std_in = null;
-        internal gsapi_stdio_callback _std_out = null;
-        internal gsapi_stdio_callback _std_err = null;
+        internal GsapiStdioCallback StdInCallback = null;
+        internal GsapiStdioCallback StdOutCallback = null;
+        internal GsapiStdioCallback StdErrCallback = null;
 
         #endregion
 
@@ -58,27 +58,27 @@ namespace Ghostscript.NET
         /// <param name="handleStdIn">Whether or not to handle Ghostscript standard input.</param>
         /// <param name="handleStdOut">Whether or not to handle Ghostscript standard output.</param>
         /// <param name="handleStdErr">Whether or not to handle Ghostscript standard errors.</param>
-        public GhostscriptStdIO(bool handleStdIn, bool handleStdOut, bool handleStdErr)
+        public GhostscriptStdIo(bool handleStdIn, bool handleStdOut, bool handleStdErr)
         {
             // check if we need to handle standard input
             if (handleStdIn)
             {
                 // attach standard input handler
-                _std_in = new gsapi_stdio_callback(gs_std_in);
+                StdInCallback = new GsapiStdioCallback(gs_std_in);
             }
 
             // check if we need to handle standard output
             if (handleStdOut)
             {
                 // attach standard output handler
-                _std_out = new gsapi_stdio_callback(gs_std_out);
+                StdOutCallback = new GsapiStdioCallback(gs_std_out);
             }
 
             // check if we need to handle errors
             if (handleStdErr)
             {
                 // attach error handler
-                _std_err = new gsapi_stdio_callback(gs_std_err);
+                StdErrCallback = new GsapiStdioCallback(gs_std_err);
             }
         }
 

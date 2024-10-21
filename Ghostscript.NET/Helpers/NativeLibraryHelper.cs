@@ -76,15 +76,15 @@ namespace Ghostscript.NET
                 // seek to the IMAGE_DOS_HEADER->e_lfanew position
                 reader.BaseStream.Seek(0x3c, SeekOrigin.Begin);
                 // read out the value
-                uint e_lfanew = reader.ReadUInt32();
+                uint eLfanew = reader.ReadUInt32();
                 // seek the the file address of new exe header
-                reader.BaseStream.Seek(e_lfanew, SeekOrigin.Begin);
+                reader.BaseStream.Seek(eLfanew, SeekOrigin.Begin);
                 // read out the signature
                 uint signature = reader.ReadUInt32();
                 // check if it's a signature we can handle
-                if (signature != WinNT.IMAGE_NT_SIGNATURE)
+                if (signature != WinNt.ImageNtSignature)
                 {
-                    return WinNT.IMAGE_FILE_MACHINE_UNKNOWN;
+                    return WinNt.ImageFileMachineUnknown;
                 }
 
                 // read out and return IMAGE_FILE_HEADER->Machine value
@@ -122,10 +122,10 @@ namespace Ghostscript.NET
         {
             switch(machine)
             {
-                case WinNT.IMAGE_FILE_MACHINE_AMD64:
-                case WinNT.IMAGE_FILE_MACHINE_IA64:
+                case WinNt.ImageFileMachineAmd64:
+                case WinNt.ImageFileMachineIa64:
                     return true;
-                case WinNT.IMAGE_FILE_MACHINE_I386:
+                case WinNt.ImageFileMachineI386:
                     return false;
                 default:
                     return false;

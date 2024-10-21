@@ -43,16 +43,16 @@ namespace Ghostscript.NET.Samples
         public void Start()
         {
             
-            Invoice i = (new Invoice()).setDueDate(DateTime.Now).setIssueDate(DateTime.Now).setDeliveryDate(DateTime.Now).setSender((new TradeParty("Test company", "teststr", "55232", "teststadt", "DE")).addTaxID("DE4711").addVATID("DE0815").setContact(new Contact("Hans Test", "+49123456789", "test@example.org")).addBankDetails(new BankDetails("DE12500105170648489890", "COBADEFXXX"))).setRecipient(new TradeParty("Franz Müller", "teststr.12", "55232", "Entenhausen", "DE")).setReferenceNumber("991-01484-64").setNumber("123").
-                    addItem(new Item(new Product("Testprodukt", "", "C62", new decimal(19)), decimal.One, decimal.One));
+            Invoice i = (new Invoice()).SetDueDate(DateTime.Now).SetIssueDate(DateTime.Now).SetDeliveryDate(DateTime.Now).SetSender((new TradeParty("Test company", "teststr", "55232", "teststadt", "DE")).AddTaxId("DE4711").AddVatid("DE0815").SetContact(new Contact("Hans Test", "+49123456789", "test@example.org")).AddBankDetails(new BankDetails("DE12500105170648489890", "COBADEFXXX"))).SetRecipient(new TradeParty("Franz Müller", "teststr.12", "55232", "Entenhausen", "DE")).SetReferenceNumber("991-01484-64").SetNumber("123").
+                    AddItem(new Item(new Product("Testprodukt", "", "C62", new decimal(19)), decimal.One, decimal.One));
 
-            ZUGFeRD2PullProvider zf2p = new ZUGFeRD2PullProvider();
-            zf2p.setProfile(Profiles.getByName("XRechnung"));
-            zf2p.generateXML(i);
+            ZugFeRd2PullProvider zf2P = new ZugFeRd2PullProvider();
+            zf2P.SetProfile(Profiles.GetByName("XRechnung"));
+            zf2P.GenerateXml(i);
             System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
 
             string outfilename = "xrechnung.xml";
-            File.WriteAllBytes(outfilename, zf2p.getXML());
+            File.WriteAllBytes(outfilename, zf2P.GetXml());
         }
 
     }

@@ -75,27 +75,27 @@ namespace Ghostscript.NET.Viewer
                 _content = _content.Substring(0, i + 5);
             }
 
-            if (this.Viewer.EPSClip)
+            if (this.Viewer.EpsClip)
             {
                 unsafe
                 {
                     fixed (char* p = _content)
                     {
                         UnmanagedMemoryStream ums = new UnmanagedMemoryStream((byte*)p, _content.Length);
-                        DSCTokenizer tokenizer = new DSCTokenizer(ums, true, BitConverter.IsLittleEndian);
+                        DscTokenizer tokenizer = new DscTokenizer(ums, true, BitConverter.IsLittleEndian);
 
-                        DSCToken token = null;
+                        DscToken token = null;
 
-                        while ((token = tokenizer.GetNextDSCKeywordToken()) != null)
+                        while ((token = tokenizer.GetNextDscKeywordToken()) != null)
                         {
                             if (token.Text == "%%BoundingBox:")
                             {
                                 try
                                 {
-                                    DSCToken v1 = tokenizer.GetNextDSCValueToken(DSCTokenEnding.Whitespace | DSCTokenEnding.LineEnd);
-                                    DSCToken v2 = tokenizer.GetNextDSCValueToken(DSCTokenEnding.Whitespace | DSCTokenEnding.LineEnd);
-                                    DSCToken v3 = tokenizer.GetNextDSCValueToken(DSCTokenEnding.Whitespace | DSCTokenEnding.LineEnd);
-                                    DSCToken v4 = tokenizer.GetNextDSCValueToken(DSCTokenEnding.Whitespace | DSCTokenEnding.LineEnd);
+                                    DscToken v1 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
+                                    DscToken v2 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
+                                    DscToken v3 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
+                                    DscToken v4 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
 
                                     this.BoundingBox = new GhostscriptRectangle(
                                             float.Parse(v1.Text, System.Globalization.CultureInfo.InvariantCulture),

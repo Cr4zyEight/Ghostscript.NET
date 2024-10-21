@@ -23,14 +23,14 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
     /// </summary>
 
 
-    public interface IZUGFeRDTradeSettlementPayment : IZUGFeRDTradeSettlement
+    public interface IZugFeRdTradeSettlementPayment : IZugFeRdTradeSettlement
     {
 
         /// <summary>
         /// get payment information text. e.g. Bank transfer
         /// </summary>
         /// <returns> payment information text </returns>
-        string getOwnPaymentInfoText()
+        string GetOwnPaymentInfoText()
         {
             return null;
         }
@@ -39,7 +39,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// BIC of the sender
         /// </summary>
         /// <returns> the BIC code of the recipient sender's bank </returns>
-        string getOwnBIC()
+        string GetOwnBic()
         {
             return null;
         }
@@ -49,7 +49,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// IBAN of the sender
         /// </summary>
         /// <returns> the IBAN of the invoice sender's bank account </returns>
-        string getOwnIBAN()
+        string GetOwnIban()
         {
             return null;
         }
@@ -59,24 +59,24 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// Account name
         /// </summary>
         /// <returns> the name of the account holder (if not identical to sender) </returns>
-        string getAccountName()
+        string GetAccountName()
         {
             return null;
         }
 
 
-        public string getSettlementXML()
+        public string GetSettlementXml()
         {
             string accountNameStr = "";
-            if (getAccountName() != null)
+            if (GetAccountName() != null)
             {
-                accountNameStr = "<ram:AccountName>" + XMLTools.encodeXML(getAccountName()) + "</ram:AccountName>\n";
+                accountNameStr = "<ram:AccountName>" + XmlTools.EncodeXml(GetAccountName()) + "</ram:AccountName>\n";
 
             }
 
-            string xml = "			<ram:SpecifiedTradeSettlementPaymentMeans>\n" + "				<ram:TypeCode>58</ram:TypeCode>\n" + "				<ram:Information>SEPA credit transfer</ram:Information>\n" + "				<ram:PayeePartyCreditorFinancialAccount>\n" + "					<ram:IBANID>" + XMLTools.encodeXML(getOwnIBAN()) + "</ram:IBANID>\n";
+            string xml = "			<ram:SpecifiedTradeSettlementPaymentMeans>\n" + "				<ram:TypeCode>58</ram:TypeCode>\n" + "				<ram:Information>SEPA credit transfer</ram:Information>\n" + "				<ram:PayeePartyCreditorFinancialAccount>\n" + "					<ram:IBANID>" + XmlTools.EncodeXml(GetOwnIban()) + "</ram:IBANID>\n";
             xml += accountNameStr;
-            xml += "				</ram:PayeePartyCreditorFinancialAccount>\n" + "				<ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "					<ram:BICID>" + XMLTools.encodeXML(getOwnBIC()) + "</ram:BICID>\n" + "				</ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "			</ram:SpecifiedTradeSettlementPaymentMeans>\n";
+            xml += "				</ram:PayeePartyCreditorFinancialAccount>\n" + "				<ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "					<ram:BICID>" + XmlTools.EncodeXml(GetOwnBic()) + "</ram:BICID>\n" + "				</ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "			</ram:SpecifiedTradeSettlementPaymentMeans>\n";
             return xml;
         }
 

@@ -3,54 +3,54 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 	public class Profile
 	{
-		protected internal string name, id;
+		protected internal string Name, Id;
 
 		/// <summary>
 		///*
 		/// Contruct </summary>
 		/// <param name="name"> human readable name of the profile, also used as basis to detemine the XMP Name </param>
-		/// <param name="ID"> XML Guideline ID </param>
-		public Profile(string name, string ID)
+		/// <param name="id"> XML Guideline ID </param>
+		public Profile(string name, string id)
 		{
-			this.name = name;
-			this.id = ID;
+			this.Name = name;
+			this.Id = id;
 		}
 
 		/// <summary>
 		///*
 		/// gets the name </summary>
 		/// <returns> the name of the profile </returns>
-		public virtual string getName()
+		public virtual string GetName()
 		{
-			return name;
+			return Name;
 		}
 
 		/// <summary>
 		///*
 		/// get guideline id </summary>
 		/// <returns> the XML Guideline ID of the profile </returns>
-		public virtual string getID()
+		public virtual string GetId()
 		{
-			return id;
+			return Id;
 		}
 
 		/// <summary>
 		///*
 		/// if the profile is embedded in PDF we need RDF metadata </summary>
 		/// <returns> the XMP name string of the profile </returns>
-		public virtual string getXMPName()
+		public virtual string GetXmpName()
 		{
-			if (name.Equals("BASICWL"))
+			if (Name.Equals("BASICWL"))
 			{
 				return "BASIC WL";
 			}
-			else if (name.Equals("EN16931"))
+			else if (Name.Equals("EN16931"))
 			{
 				return "EN 16931";
 			}
 			else
 			{
-				return name;
+				return Name;
 			}
 		}
 	}

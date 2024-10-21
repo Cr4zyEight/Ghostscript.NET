@@ -10,11 +10,11 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 	/// <seealso cref="TradeParty"/>
 	//JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
 	//ORIGINAL LINE: @JsonIgnoreProperties(ignoreUnknown = true) public class Contact implements org.mustangproject.ZUGFeRD.IZUGFeRDExportableContact
-	public class Contact : IZUGFeRDExportableContact
+	public class Contact : IZugFeRdExportableContact
 	{
 
-		protected internal string name, phone, email, zip, street, location, country;
-		protected internal string fax = null;
+		protected internal string Name, Phone, Email, Zip, Street, Location, Country;
+		protected internal string Fax = null;
 
 		/// <summary>
 		///*
@@ -25,9 +25,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// <param name="email"> email address of the contact </param>
 		public Contact(string name, string phone, string email)
 		{
-			this.name = name;
-			this.phone = phone;
-			this.email = email;
+			this.Name = name;
+			this.Phone = phone;
+			this.Email = email;
 		}
 
 		/// <summary>
@@ -51,13 +51,13 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// <param name="country"> two-letter iso code </param>
 		public Contact(string name, string phone, string email, string street, string zip, string location, string country)
 		{
-			this.name = name;
-			this.phone = phone;
-			this.email = email;
-			this.street = street;
-			this.zip = zip;
-			this.location = location;
-			this.country = country;
+			this.Name = name;
+			this.Phone = phone;
+			this.Email = email;
+			this.Street = street;
+			this.Zip = zip;
+			this.Location = location;
+			this.Country = country;
 
 		}
 
@@ -88,7 +88,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                     {
                         if (currentItemNode.LocalName.Equals("PersonName"))
                         {
-                            name = currentItemNode.FirstChild.Value;
+                            Name = currentItemNode.FirstChild.Value;
                         }
                         if (currentItemNode.LocalName.Equals("TelephoneUniversalCommunication"))
                         {
@@ -98,7 +98,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                                 if (!string.IsNullOrEmpty(telNodeChildren[telChildIndex].LocalName) &&
                                     telNodeChildren[telChildIndex].LocalName.Equals("CompleteNumber"))
                                 {
-                                    phone = telNodeChildren[telChildIndex].InnerText;
+                                    Phone = telNodeChildren[telChildIndex].InnerText;
                                 }
                             }
                         }
@@ -110,7 +110,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                                 if (!string.IsNullOrEmpty(emailNodeChildren[emailChildIndex].LocalName) &&
                                     emailNodeChildren[emailChildIndex].LocalName.Equals("URIID"))
                                 {
-                                    email = emailNodeChildren[emailChildIndex].InnerText;
+                                    Email = emailNodeChildren[emailChildIndex].InnerText;
                                 }
                             }
                         }
@@ -120,9 +120,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
 
-        public string? getName()
+        public string GetName()
 		{
-			return name;
+			return Name;
 		}
 
 		/// <summary>
@@ -130,15 +130,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// </summary>
 		/// <param name="name"> first and last name </param>
 		/// <returns> fluent setter </returns>
-		public virtual Contact setName(string name)
+		public virtual Contact SetName(string name)
 		{
-			this.name = name;
+			this.Name = name;
 			return this;
 		}
 
-		public string getPhone()
+		public string GetPhone()
 		{
-			return phone;
+			return Phone;
 		}
 
 		/// <summary>
@@ -146,15 +146,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// complete phone number of the contact </summary>
 		/// <param name="phone"> the complete phone number </param>
 		/// <returns> fluent setter </returns>
-		public virtual Contact setPhone(string phone)
+		public virtual Contact SetPhone(string phone)
 		{
-			this.phone = phone;
+			this.Phone = phone;
 			return this;
 		}
 
-		public string getFax()
+		public string GetFax()
 		{
-			return fax;
+			return Fax;
 		}
 
 		/// <summary>
@@ -162,15 +162,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// (optional) complete fax number </summary>
 		/// <param name="fax"> complete fax number of the contact </param>
 		/// <returns> fluent setter </returns>
-		public virtual Contact setFax(string fax)
+		public virtual Contact SetFax(string fax)
 		{
-			this.fax = fax;
+			this.Fax = fax;
 			return this;
 		}
 
-		public virtual string getEMail()
+		public virtual string GetEMail()
 		{
-			return email;
+			return Email;
 		}
 
 		/// <summary>
@@ -178,15 +178,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// personal email address of the contact person </summary>
 		/// <param name="email"> the email address of the contact </param>
 		/// <returns> fluent setter </returns>
-		public virtual Contact setEMail(string email)
+		public virtual Contact SetEMail(string email)
 		{
-			this.email = email;
+			this.Email = email;
 			return this;
 		}
 
-		public virtual string getZIP()
+		public virtual string GetZip()
 		{
-			return zip;
+			return Zip;
 		}
 
 		/// <summary>
@@ -194,15 +194,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// the postcode, if the address is different to the organisation </summary>
 		/// <param name="zip"> the postcode of the contact </param>
 		/// <returns> fluent setter </returns>
-		public virtual Contact setZIP(string zip)
+		public virtual Contact SetZip(string zip)
 		{
-			this.zip = zip;
+			this.Zip = zip;
 			return this;
 		}
 
-		public string getStreet()
+		public string GetStreet()
 		{
-			return street;
+			return Street;
 		}
 
 		/// <summary>
@@ -210,14 +210,14 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// </summary>
 		/// <param name="street"> street and number of the contact </param>
 		/// <returns> fluent setter </returns>
-		public virtual Contact setStreet(string street)
+		public virtual Contact SetStreet(string street)
 		{
-			this.street = street;
+			this.Street = street;
 			return this;
 		}
-		public string getLocation()
+		public string GetLocation()
 		{
-			return location;
+			return Location;
 		}
 
 		/// <summary>
@@ -225,15 +225,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// city of the contact person, if different from organisation </summary>
 		/// <param name="location"> city </param>
 		/// <returns> fluent setter </returns>
-		public virtual Contact setLocation(string location)
+		public virtual Contact SetLocation(string location)
 		{
-			this.location = location;
+			this.Location = location;
 			return this;
 		}
 
-		public string getCountry()
+		public string GetCountry()
 		{
-			return country;
+			return Country;
 		}
 
 		/// <summary>
@@ -241,9 +241,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// two-letter ISO country code of the contact, if different from organisation </summary>
 		/// <param name="country"> two-letter iso code </param>
 		/// <returns> fluent setter </returns>
-		public virtual Contact setCountry(string country)
+		public virtual Contact SetCountry(string country)
 		{
-			this.country = country;
+			this.Country = country;
 			return this;
 		}
 

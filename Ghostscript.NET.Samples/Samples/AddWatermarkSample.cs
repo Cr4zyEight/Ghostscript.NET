@@ -35,7 +35,7 @@ namespace Ghostscript.NET.Samples
     public class AddWatermarkSample : ISample
     {
 
-        private const string POSTSCRIPT_APPEND_WATERMARK = @"
+        private const string PostscriptAppendWatermark = @"
             /watermarkText { (WATERMARK TEXT) } def
             /watermarkFont { /Helvetica-Bold 72 selectfont } def
             /watermarkColor { .75 setgray } def
@@ -77,14 +77,14 @@ namespace Ghostscript.NET.Samples
 
         private void Extract_Pdf_Pages_As_Png_And_Add_Watermark()
         {
-            GhostscriptPngDevice dev = new GhostscriptPngDevice(GhostscriptPngDeviceType.Png16m);
-            dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V_4;
-            dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V_4;
-            dev.ResolutionXY = new GhostscriptImageDeviceResolution(96, 96);
+            GhostscriptPngDevice dev = new GhostscriptPngDevice(GhostscriptPngDeviceType.Png16M);
+            dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+            dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+            dev.ResolutionXy = new GhostscriptImageDeviceResolution(96, 96);
             dev.InputFiles.Add(@"E:\gss_test\indispensable.pdf");
             dev.Pdf.FirstPage = 2;
             dev.Pdf.LastPage = 4;
-            dev.PostScript = POSTSCRIPT_APPEND_WATERMARK;
+            dev.PostScript = PostscriptAppendWatermark;
             dev.OutputPath = @"E:\gss_test\output\indispensable_color_page_%03d.png";
             dev.Process();
         }
@@ -104,7 +104,7 @@ namespace Ghostscript.NET.Samples
             switches.Add("-sDEVICE=pdfwrite");
             switches.Add("-sOutputFile=" + outputFile);
             switches.Add("-c");
-            switches.Add(POSTSCRIPT_APPEND_WATERMARK);
+            switches.Add(PostscriptAppendWatermark);
             switches.Add("-f");
             switches.Add(inputFile);
 

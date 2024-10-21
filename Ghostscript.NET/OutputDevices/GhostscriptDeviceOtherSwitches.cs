@@ -80,7 +80,7 @@ namespace Ghostscript.NET
         /// (The vmreclaim operator is not disabled.) Useful only for debugging.
         /// </summary>
         [GhostscriptSwitch("-dNOGC")]
-        public GhostscriptOptionalSwitch? NoGC { get; set; }
+        public GhostscriptOptionalSwitch? NoGc { get; set; }
 
         #endregion
 

@@ -29,28 +29,28 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.WinAny
 {
-    internal static unsafe class WinNT
+    internal static unsafe class WinNt
     {
 
         #region Helpers
 
         #region IMAGE_FIRST_SECTION
 
-        public static IMAGE_SECTION_HEADER* IMAGE_FIRST_SECTION(byte* ptr_image_nt_headers)
+        public static ImageSectionHeader* IMAGE_FIRST_SECTION(byte* ptrImageNtHeaders)
         {
             if (Environment.Is64BitProcess)
             {
-                IMAGE_NT_HEADERS64* image_nt_headers = (IMAGE_NT_HEADERS64*)ptr_image_nt_headers;
-                return (IMAGE_SECTION_HEADER*)((long)image_nt_headers +
-                                               (long)Marshal.OffsetOf(typeof(IMAGE_NT_HEADERS64), "OptionalHeader") +
-                                               image_nt_headers->FileHeader.SizeOfOptionalHeader);
+                ImageNtHeaders64* imageNtHeaders = (ImageNtHeaders64*)ptrImageNtHeaders;
+                return (ImageSectionHeader*)((long)imageNtHeaders +
+                                               (long)Marshal.OffsetOf(typeof(ImageNtHeaders64), "OptionalHeader") +
+                                               imageNtHeaders->FileHeader.SizeOfOptionalHeader);
             }
             else
             {
-                IMAGE_NT_HEADERS32* image_nt_headers = (IMAGE_NT_HEADERS32*)ptr_image_nt_headers;
-                return (IMAGE_SECTION_HEADER*)((long)image_nt_headers +
-                                               (long)Marshal.OffsetOf(typeof(IMAGE_NT_HEADERS32), "OptionalHeader") +
-                                               image_nt_headers->FileHeader.SizeOfOptionalHeader);
+                ImageNtHeaders32* imageNtHeaders = (ImageNtHeaders32*)ptrImageNtHeaders;
+                return (ImageSectionHeader*)((long)imageNtHeaders +
+                                               (long)Marshal.OffsetOf(typeof(ImageNtHeaders32), "OptionalHeader") +
+                                               imageNtHeaders->FileHeader.SizeOfOptionalHeader);
             }
         }
 
@@ -62,11 +62,11 @@ namespace Microsoft.WinAny
         {
             if (Environment.Is64BitProcess)
             {
-                return ((((ulong)*ordinal) & IMAGE_ORDINAL_FLAG64) != 0);
+                return ((((ulong)*ordinal) & ImageOrdinalFlag64) != 0);
             }
             else
             {
-                return ((((uint)*ordinal) & IMAGE_ORDINAL_FLAG32) != 0);
+                return ((((uint)*ordinal) & ImageOrdinalFlag32) != 0);
             }
         }
 
@@ -85,172 +85,172 @@ namespace Microsoft.WinAny
 
         #region Constants
 
-        public const uint IMAGE_DOS_SIGNATURE                   = 0x5A4D;      // MZ
-        public const uint IMAGE_OS2_SIGNATURE                   = 0x454E;      // NE
-        public const uint IMAGE_OS2_SIGNATURE_LE                = 0x454C;      // LE
-        public const uint IMAGE_VXD_SIGNATURE                   = 0x454C;      // LE
-        public const uint IMAGE_NT_SIGNATURE                    = 0x00004550;  // PE00
+        public const uint ImageDosSignature                   = 0x5A4D;      // MZ
+        public const uint ImageOs2Signature                   = 0x454E;      // NE
+        public const uint ImageOs2SignatureLe                = 0x454C;      // LE
+        public const uint ImageVxdSignature                   = 0x454C;      // LE
+        public const uint ImageNtSignature                    = 0x00004550;  // PE00
 
-        public const int IMAGE_SIZEOF_SHORT_NAME               = 8;
+        public const int ImageSizeofShortName               = 8;
 
-        public const int IMAGE_NUMBEROF_DIRECTORY_ENTRIES      = 16;
+        public const int ImageNumberofDirectoryEntries      = 16;
 
-        public const ulong IMAGE_ORDINAL_FLAG64                = 0x8000000000000000;
-        public const uint  IMAGE_ORDINAL_FLAG32                = 0x80000000;
+        public const ulong ImageOrdinalFlag64                = 0x8000000000000000;
+        public const uint  ImageOrdinalFlag32                = 0x80000000;
 
-        public const uint IMAGE_SCN_TYPE_NO_PAD                = 0x00000008;  // Reserved.
+        public const uint ImageScnTypeNoPad                = 0x00000008;  // Reserved.
 
-        public const uint IMAGE_SCN_CNT_CODE                   = 0x00000020;  // Section contains code.
-        public const uint IMAGE_SCN_CNT_INITIALIZED_DATA       = 0x00000040;  // Section contains initialized data.
-        public const uint IMAGE_SCN_CNT_UNINITIALIZED_DATA     = 0x00000080;  // Section contains uninitialized data.
+        public const uint ImageScnCntCode                   = 0x00000020;  // Section contains code.
+        public const uint ImageScnCntInitializedData       = 0x00000040;  // Section contains initialized data.
+        public const uint ImageScnCntUninitializedData     = 0x00000080;  // Section contains uninitialized data.
 
-        public const uint IMAGE_SCN_LNK_OTHER                  = 0x00000100;  // Reserved.
-        public const uint IMAGE_SCN_LNK_INFO                   = 0x00000200;  // Section contains comments or some other type of information.
+        public const uint ImageScnLnkOther                  = 0x00000100;  // Reserved.
+        public const uint ImageScnLnkInfo                   = 0x00000200;  // Section contains comments or some other type of information.
 
-        public const uint IMAGE_SCN_LNK_REMOVE                 = 0x00000800;  // Section contents will not become part of image.
-        public const uint IMAGE_SCN_LNK_COMDAT                 = 0x00001000;  // Section contents comdat.
+        public const uint ImageScnLnkRemove                 = 0x00000800;  // Section contents will not become part of image.
+        public const uint ImageScnLnkComdat                 = 0x00001000;  // Section contents comdat.
 
-        public const uint IMAGE_SCN_NO_DEFER_SPEC_EXC          = 0x00004000;  // Reset speculative exceptions handling bits in the TLB entries for this section.
-        public const uint IMAGE_SCN_GPREL                      = 0x00008000;  // Section content can be accessed relative to GP
-        public const uint IMAGE_SCN_MEM_FARDATA                = 0x00008000;
+        public const uint ImageScnNoDeferSpecExc          = 0x00004000;  // Reset speculative exceptions handling bits in the TLB entries for this section.
+        public const uint ImageScnGprel                      = 0x00008000;  // Section content can be accessed relative to GP
+        public const uint ImageScnMemFardata                = 0x00008000;
 
-        public const uint IMAGE_SCN_MEM_PURGEABLE              = 0x00020000;
-        public const uint IMAGE_SCN_MEM_16BIT                  = 0x00020000;
-        public const uint IMAGE_SCN_MEM_LOCKED                 = 0x00040000;
-        public const uint IMAGE_SCN_MEM_PRELOAD                = 0x00080000;
+        public const uint ImageScnMemPurgeable              = 0x00020000;
+        public const uint ImageScnMem16Bit                  = 0x00020000;
+        public const uint ImageScnMemLocked                 = 0x00040000;
+        public const uint ImageScnMemPreload                = 0x00080000;
 
-        public const uint IMAGE_SCN_ALIGN_1BYTES               = 0x00100000;  //
-        public const uint IMAGE_SCN_ALIGN_2BYTES               = 0x00200000;  //
-        public const uint IMAGE_SCN_ALIGN_4BYTES               = 0x00300000;  //
-        public const uint IMAGE_SCN_ALIGN_8BYTES               = 0x00400000;  //
-        public const uint IMAGE_SCN_ALIGN_16BYTES              = 0x00500000;  // Default alignment if no others are specified.
-        public const uint IMAGE_SCN_ALIGN_32BYTES              = 0x00600000;  //
-        public const uint IMAGE_SCN_ALIGN_64BYTES              = 0x00700000;  //
-        public const uint IMAGE_SCN_ALIGN_128BYTES             = 0x00800000;  //
-        public const uint IMAGE_SCN_ALIGN_256BYTES             = 0x00900000;  //
-        public const uint IMAGE_SCN_ALIGN_512BYTES             = 0x00A00000;  //
-        public const uint IMAGE_SCN_ALIGN_1024BYTES            = 0x00B00000;  //
-        public const uint IMAGE_SCN_ALIGN_2048BYTES            = 0x00C00000;  //
-        public const uint IMAGE_SCN_ALIGN_4096BYTES            = 0x00D00000;  //
-        public const uint IMAGE_SCN_ALIGN_8192BYTES            = 0x00E00000;  //
+        public const uint ImageScnAlign1Bytes               = 0x00100000;  //
+        public const uint ImageScnAlign2Bytes               = 0x00200000;  //
+        public const uint ImageScnAlign4Bytes               = 0x00300000;  //
+        public const uint ImageScnAlign8Bytes               = 0x00400000;  //
+        public const uint ImageScnAlign16Bytes              = 0x00500000;  // Default alignment if no others are specified.
+        public const uint ImageScnAlign32Bytes              = 0x00600000;  //
+        public const uint ImageScnAlign64Bytes              = 0x00700000;  //
+        public const uint ImageScnAlign128Bytes             = 0x00800000;  //
+        public const uint ImageScnAlign256Bytes             = 0x00900000;  //
+        public const uint ImageScnAlign512Bytes             = 0x00A00000;  //
+        public const uint ImageScnAlign1024Bytes            = 0x00B00000;  //
+        public const uint ImageScnAlign2048Bytes            = 0x00C00000;  //
+        public const uint ImageScnAlign4096Bytes            = 0x00D00000;  //
+        public const uint ImageScnAlign8192Bytes            = 0x00E00000;  //
         // Unused                                    0x00F00000;
-        public const uint IMAGE_SCN_ALIGN_MASK                 = 0x00F00000;
+        public const uint ImageScnAlignMask                 = 0x00F00000;
 
-        public const uint IMAGE_SCN_LNK_NRELOC_OVFL            = 0x01000000;  // Section contains extended relocations.
-        public const uint IMAGE_SCN_MEM_DISCARDABLE            = 0x02000000;  // Section can be discarded.
-        public const uint IMAGE_SCN_MEM_NOT_CACHED             = 0x04000000;  // Section is not cachable.
-        public const uint IMAGE_SCN_MEM_NOT_PAGED              = 0x08000000;  // Section is not pageable.
-        public const uint IMAGE_SCN_MEM_SHARED                 = 0x10000000;  // Section is shareable.
-        public const uint IMAGE_SCN_MEM_EXECUTE                = 0x20000000;  // Section is executable.
-        public const uint IMAGE_SCN_MEM_READ                   = 0x40000000;  // Section is readable.
-        public const uint IMAGE_SCN_MEM_WRITE                  = 0x80000000;  // Section is writeable.
+        public const uint ImageScnLnkNrelocOvfl            = 0x01000000;  // Section contains extended relocations.
+        public const uint ImageScnMemDiscardable            = 0x02000000;  // Section can be discarded.
+        public const uint ImageScnMemNotCached             = 0x04000000;  // Section is not cachable.
+        public const uint ImageScnMemNotPaged              = 0x08000000;  // Section is not pageable.
+        public const uint ImageScnMemShared                 = 0x10000000;  // Section is shareable.
+        public const uint ImageScnMemExecute                = 0x20000000;  // Section is executable.
+        public const uint ImageScnMemRead                   = 0x40000000;  // Section is readable.
+        public const uint ImageScnMemWrite                  = 0x80000000;  // Section is writeable.
 
-        public const uint PAGE_NOACCESS                     = 0x01;     
-        public const uint PAGE_READONLY                     = 0x02;     
-        public const uint PAGE_READWRITE                    = 0x04;    
-        public const uint PAGE_WRITECOPY                    = 0x08;     
-        public const uint PAGE_EXECUTE                      = 0x10;    
-        public const uint PAGE_EXECUTE_READ                 = 0x20;     
-        public const uint PAGE_EXECUTE_READWRITE            = 0x40;     
-        public const uint PAGE_EXECUTE_WRITECOPY            = 0x80;     
-        public const uint PAGE_GUARD                        = 0x100;     
-        public const uint PAGE_NOCACHE                      = 0x200;     
-        public const uint PAGE_WRITECOMBINE                 = 0x400;
+        public const uint PageNoaccess                     = 0x01;     
+        public const uint PageReadonly                     = 0x02;     
+        public const uint PageReadwrite                    = 0x04;    
+        public const uint PageWritecopy                    = 0x08;     
+        public const uint PageExecute                      = 0x10;    
+        public const uint PageExecuteRead                 = 0x20;     
+        public const uint PageExecuteReadwrite            = 0x40;     
+        public const uint PageExecuteWritecopy            = 0x80;     
+        public const uint PageGuard                        = 0x100;     
+        public const uint PageNocache                      = 0x200;     
+        public const uint PageWritecombine                 = 0x400;
 
-        public const uint MEM_COMMIT                        = 0x1000;     
-        public const uint MEM_RESERVE                       = 0x2000;     
-        public const uint MEM_DECOMMIT                      = 0x4000;     
-        public const uint MEM_RELEASE                       = 0x8000;     
-        public const uint MEM_FREE                          = 0x10000;     
-        public const uint MEM_PRIVATE                       = 0x20000;     
-        public const uint MEM_MAPPED                        = 0x40000;     
-        public const uint MEM_RESET                         = 0x80000;     
-        public const uint MEM_TOP_DOWN                      = 0x100000;     
-        public const uint MEM_WRITE_WATCH                   = 0x200000;     
-        public const uint MEM_PHYSICAL                      = 0x400000;     
-        public const uint MEM_ROTATE                        = 0x800000;     
-        public const uint MEM_LARGE_PAGES                   = 0x20000000;
-        public const uint MEM_4MB_PAGES                     = 0x80000000;
-        public const uint MEM_IMAGE                         = SEC_IMAGE;
+        public const uint MemCommit                        = 0x1000;     
+        public const uint MemReserve                       = 0x2000;     
+        public const uint MemDecommit                      = 0x4000;     
+        public const uint MemRelease                       = 0x8000;     
+        public const uint MemFree                          = 0x10000;     
+        public const uint MemPrivate                       = 0x20000;     
+        public const uint MemMapped                        = 0x40000;     
+        public const uint MemReset                         = 0x80000;     
+        public const uint MemTopDown                      = 0x100000;     
+        public const uint MemWriteWatch                   = 0x200000;     
+        public const uint MemPhysical                      = 0x400000;     
+        public const uint MemRotate                        = 0x800000;     
+        public const uint MemLargePages                   = 0x20000000;
+        public const uint Mem4MbPages                     = 0x80000000;
+        public const uint MemImage                         = SecImage;
 
-        public const uint SEC_FILE                          = 0x800000;     
-        public const uint SEC_IMAGE                         = 0x1000000;     
-        public const uint SEC_PROTECTED_IMAGE               = 0x2000000;  
-        public const uint SEC_RESERVE                       = 0x4000000;     
-        public const uint SEC_COMMIT                        = 0x8000000;     
-        public const uint SEC_NOCACHE                       = 0x10000000;     
-        public const uint SEC_WRITECOMBINE                  = 0x40000000;     
-        public const uint SEC_LARGE_PAGES                   = 0x80000000;
+        public const uint SecFile                          = 0x800000;     
+        public const uint SecImage                         = 0x1000000;     
+        public const uint SecProtectedImage               = 0x2000000;  
+        public const uint SecReserve                       = 0x4000000;     
+        public const uint SecCommit                        = 0x8000000;     
+        public const uint SecNocache                       = 0x10000000;     
+        public const uint SecWritecombine                  = 0x40000000;     
+        public const uint SecLargePages                   = 0x80000000;
 
-        public const int WRITE_WATCH_FLAG_RESET            = 0x01;
+        public const int WriteWatchFlagReset            = 0x01;
 
         // Directory Entries
 
-        public const int IMAGE_DIRECTORY_ENTRY_EXPORT              = 0;   // Export Directory
-        public const int IMAGE_DIRECTORY_ENTRY_IMPORT              = 1;   // Import Directory
-        public const int IMAGE_DIRECTORY_ENTRY_RESOURCE            = 2;   // Resource Directory
-        public const int IMAGE_DIRECTORY_ENTRY_EXCEPTION           = 3;   // Exception Directory
-        public const int IMAGE_DIRECTORY_ENTRY_SECURITY            = 4;   // Security Directory
-        public const int IMAGE_DIRECTORY_ENTRY_BASERELOC           = 5;   // Base Relocation Table
-        public const int IMAGE_DIRECTORY_ENTRY_DEBUG               = 6;   // Debug Directory
-        public const int IMAGE_DIRECTORY_ENTRY_ARCHITECTURE        = 7;   // Architecture Specific Data
-        public const int IMAGE_DIRECTORY_ENTRY_GLOBALPTR           = 8;   // RVA of GP
-        public const int IMAGE_DIRECTORY_ENTRY_TLS                 = 9;   // TLS Directory
-        public const int IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG         = 10;   // Load Configuration Directory
-        public const int IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT        = 11;   // Bound Import Directory in headers
-        public const int IMAGE_DIRECTORY_ENTRY_IAT                 = 12;   // Import Address Table
-        public const int IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT        = 13;   // Delay Load Import Descriptors
-        public const int IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR      = 14;   // COM Runtime descriptor
+        public const int ImageDirectoryEntryExport              = 0;   // Export Directory
+        public const int ImageDirectoryEntryImport              = 1;   // Import Directory
+        public const int ImageDirectoryEntryResource            = 2;   // Resource Directory
+        public const int ImageDirectoryEntryException           = 3;   // Exception Directory
+        public const int ImageDirectoryEntrySecurity            = 4;   // Security Directory
+        public const int ImageDirectoryEntryBasereloc           = 5;   // Base Relocation Table
+        public const int ImageDirectoryEntryDebug               = 6;   // Debug Directory
+        public const int ImageDirectoryEntryArchitecture        = 7;   // Architecture Specific Data
+        public const int ImageDirectoryEntryGlobalptr           = 8;   // RVA of GP
+        public const int ImageDirectoryEntryTls                 = 9;   // TLS Directory
+        public const int ImageDirectoryEntryLoadConfig         = 10;   // Load Configuration Directory
+        public const int ImageDirectoryEntryBoundImport        = 11;   // Bound Import Directory in headers
+        public const int ImageDirectoryEntryIat                 = 12;   // Import Address Table
+        public const int ImageDirectoryEntryDelayImport        = 13;   // Delay Load Import Descriptors
+        public const int ImageDirectoryEntryComDescriptor      = 14;   // COM Runtime descriptor
 
-        public const int IMAGE_REL_BASED_ABSOLUTE              = 0;
-        public const int IMAGE_REL_BASED_HIGH                  = 1;
-        public const int IMAGE_REL_BASED_LOW                   = 2;
-        public const int IMAGE_REL_BASED_HIGHLOW               = 3;
-        public const int IMAGE_REL_BASED_HIGHADJ               = 4;
-        public const int IMAGE_REL_BASED_MIPS_JMPADDR          = 5;
-        public const int IMAGE_REL_BASED_MIPS_JMPADDR16        = 9;
-        public const int IMAGE_REL_BASED_IA64_IMM64            = 9;
-        public const int IMAGE_REL_BASED_DIR64                 = 10;
+        public const int ImageRelBasedAbsolute              = 0;
+        public const int ImageRelBasedHigh                  = 1;
+        public const int ImageRelBasedLow                   = 2;
+        public const int ImageRelBasedHighlow               = 3;
+        public const int ImageRelBasedHighadj               = 4;
+        public const int ImageRelBasedMipsJmpaddr          = 5;
+        public const int ImageRelBasedMipsJmpaddr16        = 9;
+        public const int ImageRelBasedIa64Imm64            = 9;
+        public const int ImageRelBasedDir64                 = 10;
 
 
-        public const uint DLL_PROCESS_ATTACH                  = 1;    
-        public const uint DLL_THREAD_ATTACH                   = 2;    
-        public const uint DLL_THREAD_DETACH                   = 3;    
-        public const uint DLL_PROCESS_DETACH                  = 0;
+        public const uint DllProcessAttach                  = 1;    
+        public const uint DllThreadAttach                   = 2;    
+        public const uint DllThreadDetach                   = 3;    
+        public const uint DllProcessDetach                  = 0;
 
         /* These are the settings of the Machine field. */
-        public const ushort IMAGE_FILE_MACHINE_UNKNOWN = 0;
-        public const ushort IMAGE_FILE_MACHINE_I860 = 0x014d;
-        public const ushort IMAGE_FILE_MACHINE_I386 = 0x014c;
-        public const ushort IMAGE_FILE_MACHINE_R3000 = 0x0162;
-        public const ushort IMAGE_FILE_MACHINE_R4000 = 0x0166;
-        public const ushort IMAGE_FILE_MACHINE_R10000 = 0x0168;
-        public const ushort IMAGE_FILE_MACHINE_WCEMIPSV2 = 0x0169;
-        public const ushort IMAGE_FILE_MACHINE_ALPHA = 0x0184;
-        public const ushort IMAGE_FILE_MACHINE_SH3 = 0x01a2;
-        public const ushort IMAGE_FILE_MACHINE_SH3DSP = 0x01a3;
-        public const ushort IMAGE_FILE_MACHINE_SH3E = 0x01a4;
-        public const ushort IMAGE_FILE_MACHINE_SH4 = 0x01a6;
-        public const ushort IMAGE_FILE_MACHINE_SH5 = 0x01a8;
-        public const ushort IMAGE_FILE_MACHINE_ARM = 0x01c0;
-        public const ushort IMAGE_FILE_MACHINE_THUMB = 0x01c2;
-        public const ushort IMAGE_FILE_MACHINE_ARMNT = 0x01c4;
-        public const ushort IMAGE_FILE_MACHINE_ARM64 = 0xaa64;
-        public const ushort IMAGE_FILE_MACHINE_AM33 = 0x01d3;
-        public const ushort IMAGE_FILE_MACHINE_POWERPC = 0x01f0;
-        public const ushort IMAGE_FILE_MACHINE_POWERPCFP = 0x01f1;
-        public const ushort IMAGE_FILE_MACHINE_IA64 = 0x0200;
-        public const ushort IMAGE_FILE_MACHINE_MIPS16 = 0x0266;
-        public const ushort IMAGE_FILE_MACHINE_ALPHA64 = 0x0284;
-        public const ushort IMAGE_FILE_MACHINE_MIPSFPU = 0x0366;
-        public const ushort IMAGE_FILE_MACHINE_MIPSFPU16 = 0x0466;
-        public const ushort IMAGE_FILE_MACHINE_AXP64 = IMAGE_FILE_MACHINE_ALPHA64;
-        public const ushort IMAGE_FILE_MACHINE_TRICORE = 0x0520;
-        public const ushort IMAGE_FILE_MACHINE_CEF = 0x0cef;
-        public const ushort IMAGE_FILE_MACHINE_EBC = 0x0ebc;
-        public const ushort IMAGE_FILE_MACHINE_AMD64 = 0x8664;
-        public const ushort IMAGE_FILE_MACHINE_M32R = 0x9041;
-        public const ushort IMAGE_FILE_MACHINE_CEE = 0xc0ee;
+        public const ushort ImageFileMachineUnknown = 0;
+        public const ushort ImageFileMachineI860 = 0x014d;
+        public const ushort ImageFileMachineI386 = 0x014c;
+        public const ushort ImageFileMachineR3000 = 0x0162;
+        public const ushort ImageFileMachineR4000 = 0x0166;
+        public const ushort ImageFileMachineR10000 = 0x0168;
+        public const ushort ImageFileMachineWcemipsv2 = 0x0169;
+        public const ushort ImageFileMachineAlpha = 0x0184;
+        public const ushort ImageFileMachineSh3 = 0x01a2;
+        public const ushort ImageFileMachineSh3Dsp = 0x01a3;
+        public const ushort ImageFileMachineSh3E = 0x01a4;
+        public const ushort ImageFileMachineSh4 = 0x01a6;
+        public const ushort ImageFileMachineSh5 = 0x01a8;
+        public const ushort ImageFileMachineArm = 0x01c0;
+        public const ushort ImageFileMachineThumb = 0x01c2;
+        public const ushort ImageFileMachineArmnt = 0x01c4;
+        public const ushort ImageFileMachineArm64 = 0xaa64;
+        public const ushort ImageFileMachineAm33 = 0x01d3;
+        public const ushort ImageFileMachinePowerpc = 0x01f0;
+        public const ushort ImageFileMachinePowerpcfp = 0x01f1;
+        public const ushort ImageFileMachineIa64 = 0x0200;
+        public const ushort ImageFileMachineMips16 = 0x0266;
+        public const ushort ImageFileMachineAlpha64 = 0x0284;
+        public const ushort ImageFileMachineMipsfpu = 0x0366;
+        public const ushort ImageFileMachineMipsfpu16 = 0x0466;
+        public const ushort ImageFileMachineAxp64 = ImageFileMachineAlpha64;
+        public const ushort ImageFileMachineTricore = 0x0520;
+        public const ushort ImageFileMachineCef = 0x0cef;
+        public const ushort ImageFileMachineEbc = 0x0ebc;
+        public const ushort ImageFileMachineAmd64 = 0x8664;
+        public const ushort ImageFileMachineM32R = 0x9041;
+        public const ushort ImageFileMachineCee = 0xc0ee;
 
         #endregion
 
@@ -259,7 +259,7 @@ namespace Microsoft.WinAny
         #region IMAGE_DOS_HEADER
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_DOS_HEADER                         // DOS .EXE header
+        public struct ImageDosHeader                         // DOS .EXE header
         {
             public ushort e_magic;                      // Magic number
             public ushort e_cblp;                       // Bytes on last page of file
@@ -287,11 +287,11 @@ namespace Microsoft.WinAny
         #region IMAGE_NT_HEADERS32
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_NT_HEADERS32
+        public struct ImageNtHeaders32
         {
             public uint Signature;
-            public IMAGE_FILE_HEADER FileHeader;
-            public IMAGE_OPTIONAL_HEADER32 OptionalHeader;
+            public ImageFileHeader FileHeader;
+            public ImageOptionalHeader32 OptionalHeader;
         }
 
         #endregion
@@ -299,11 +299,11 @@ namespace Microsoft.WinAny
         #region IMAGE_NT_HEADERS64
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_NT_HEADERS64
+        public struct ImageNtHeaders64
         {
             public uint Signature;
-            public IMAGE_FILE_HEADER FileHeader;
-            public IMAGE_OPTIONAL_HEADER64 OptionalHeader;
+            public ImageFileHeader FileHeader;
+            public ImageOptionalHeader64 OptionalHeader;
         }
 
         #endregion
@@ -311,7 +311,7 @@ namespace Microsoft.WinAny
         #region IMAGE_FILE_HEADER
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_FILE_HEADER
+        public struct ImageFileHeader
         {
             public ushort Machine;
             public ushort NumberOfSections;
@@ -327,7 +327,7 @@ namespace Microsoft.WinAny
         #region IMAGE_OPTIONAL_HEADER32
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_OPTIONAL_HEADER32
+        public struct ImageOptionalHeader32
         {
             public ushort Magic;
             public byte MajorLinkerVersion;
@@ -359,7 +359,7 @@ namespace Microsoft.WinAny
             public uint SizeOfHeapCommit;
             public uint LoaderFlags;
             public uint NumberOfRvaAndSizes;
-            public fixed ulong DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];
+            public fixed ulong DataDirectory[ImageNumberofDirectoryEntries];
         }
 
         #endregion
@@ -367,7 +367,7 @@ namespace Microsoft.WinAny
         #region IMAGE_OPTIONAL_HEADER64
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_OPTIONAL_HEADER64
+        public struct ImageOptionalHeader64
         {
             public ushort Magic;
             public byte MajorLinkerVersion;
@@ -398,7 +398,7 @@ namespace Microsoft.WinAny
             public ulong SizeOfHeapCommit;
             public uint LoaderFlags;
             public uint NumberOfRvaAndSizes;
-            public fixed ulong DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];
+            public fixed ulong DataDirectory[ImageNumberofDirectoryEntries];
         }
 
         #endregion
@@ -406,7 +406,7 @@ namespace Microsoft.WinAny
         #region IMAGE_DATA_DIRECTORY
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_DATA_DIRECTORY
+        public struct ImageDataDirectory
         {
             public uint VirtualAddress;
             public uint Size;
@@ -417,9 +417,9 @@ namespace Microsoft.WinAny
         #region IMAGE_SECTION_HEADER
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_SECTION_HEADER
+        public struct ImageSectionHeader
         {
-            public fixed byte Name[IMAGE_SIZEOF_SHORT_NAME];
+            public fixed byte Name[ImageSizeofShortName];
             public uint PhysicalAddress;
             public uint VirtualAddress;
             public uint SizeOfRawData;
@@ -436,7 +436,7 @@ namespace Microsoft.WinAny
         #region IMAGE_BASE_RELOCATION
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_BASE_RELOCATION
+        public struct ImageBaseRelocation
         {
             public uint VirtualAddress;
             public uint SizeOfBlock;
@@ -447,7 +447,7 @@ namespace Microsoft.WinAny
         #region IMAGE_IMPORT_DESCRIPTOR
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_IMPORT_DESCRIPTOR
+        public struct ImageImportDescriptor
         {
             public uint Characteristics;                
             public uint TimeDateStamp;                  
@@ -461,7 +461,7 @@ namespace Microsoft.WinAny
         #region IMAGE_IMPORT_BY_NAME
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_IMPORT_BY_NAME
+        public struct ImageImportByName
         {
             public ushort Hint;
             public fixed byte Name[1];
@@ -472,7 +472,7 @@ namespace Microsoft.WinAny
         #region IMAGE_EXPORT_DIRECTORY
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct IMAGE_EXPORT_DIRECTORY
+        public struct ImageExportDirectory
         {
             public uint Characteristics;
             public uint TimeDateStamp;

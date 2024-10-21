@@ -9,16 +9,16 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 	/// </summary>
 	//JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
 	//ORIGINAL LINE: @JsonIgnoreProperties(ignoreUnknown = true) public class TradeParty implements IZUGFeRDExportableTradeParty
-	public class TradeParty : IZUGFeRDExportableTradeParty
+	public class TradeParty : IZugFeRdExportableTradeParty
 	{
 
-		protected internal string name, zip, street, location, country;
-		protected internal string taxID = null, vatID = null;
-		protected internal string ID = null;
-		protected internal string additionalAddress = null;
-		protected internal IList<BankDetails> bankDetails = new List<BankDetails>();
+		protected internal string Name, Zip, Street, Location, Country;
+		protected internal string TaxId = null, VatId = null;
+		protected internal string Id = null;
+		protected internal string AdditionalAddress = null;
+		protected internal IList<BankDetails> BankDetails = new List<BankDetails>();
 		//protected internal IList<IZUGFeRDTradeSettlementDebit> debitDetails = new List<IZUGFeRDTradeSettlementDebit>();
-		protected internal Contact contact = null;
+		protected internal Contact Contact = null;
 		//	protected internal LegalOrganisation legalOrg = null;
 
 		/// <summary>
@@ -40,11 +40,11 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// <param name="country"> two letter ISO code </param>
 		public TradeParty(string name, string street, string zip, string location, string country)
 		{
-			this.name = name;
-			this.street = street;
-			this.zip = zip;
-			this.location = location;
-			this.country = country;
+			this.Name = name;
+			this.Street = street;
+			this.Zip = zip;
+			this.Location = location;
+			this.Country = country;
 
 		}
 		/// <summary>
@@ -53,31 +53,31 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		//JAVA TO C# CONVERTER WARNING: The following constructor is declared outside of its associated class:
 		//ORIGINAL LINE: public TradeParty(NodeList nodes)
 
-		public string getID()
+		public string GetId()
 		{
-			return ID;
+			return Id;
 		}
 
 		/// <summary>
 		/// if it's a customer, this can e.g. be the customer ID
 		/// </summary>
-		/// <param name="ID"> customer/seller number </param>
+		/// <param name="id"> customer/seller number </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty setID(string ID)
+		public virtual TradeParty SetId(string id)
 		{
-			this.ID = ID;
+			this.Id = id;
 			return this;
 		}
 
 		/// <summary>
 		///*
 		/// (optional) a named contact person </summary>
-		/// <seealso cref="Contact"/>
+		/// <seealso cref="ZUGFeRD.Contact"/>
 		/// <param name="c"> the named contact person </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty setContact(Contact c)
+		public virtual TradeParty SetContact(Contact c)
 		{
-			this.contact = c;
+			this.Contact = c;
 			return this;
 		}
 
@@ -86,9 +86,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// required (for senders, if payment is not debit): the BIC and IBAN </summary>
 		/// <param name="s"> bank credentials </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty addBankDetails(BankDetails s)
+		public virtual TradeParty AddBankDetails(BankDetails s)
 		{
-			bankDetails.Add(s);
+			BankDetails.Add(s);
 			return this;
 		}
 
@@ -114,58 +114,58 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 				return this;
 			}
 		*/
-		public virtual IList<BankDetails> getBankDetails()
+		public virtual IList<BankDetails> GetBankDetails()
 		{
-			return bankDetails;
+			return BankDetails;
 		}
 
 		/// <summary>
 		///*
 		/// a general tax ID </summary>
-		/// <param name="taxID"> tax number of the organisation </param>
+		/// <param name="taxId"> tax number of the organisation </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty addTaxID(string taxID)
+		public virtual TradeParty AddTaxId(string taxId)
 		{
-			this.taxID = taxID;
+			this.TaxId = taxId;
 			return this;
 		}
 
 		/// <summary>
 		///*
 		/// the USt-ID </summary>
-		/// <param name="vatID"> Ust-ID </param>
+		/// <param name="vatId"> Ust-ID </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty addVATID(string vatID)
+		public virtual TradeParty AddVatid(string vatId)
 		{
-			this.vatID = vatID;
+			this.VatId = vatId;
 			return this;
 		}
 
-		public string getVATID()
+		public string GetVatid()
 		{
-			return vatID;
+			return VatId;
 		}
 
-		public virtual TradeParty setVATID(string VATid)
+		public virtual TradeParty SetVatid(string vaTid)
 		{
-			this.vatID = VATid;
+			this.VatId = vaTid;
 			return this;
 		}
 
-		public string getTaxID()
+		public string GetTaxId()
 		{
-			return taxID;
+			return TaxId;
 		}
 
-		public virtual TradeParty setTaxID(string tax)
+		public virtual TradeParty SetTaxId(string tax)
 		{
-			this.taxID = tax;
+			this.TaxId = tax;
 			return this;
 		}
 
-		public virtual string getName()
+		public virtual string GetName()
 		{
-			return name;
+			return Name;
 		}
 
 		/// <summary>
@@ -173,16 +173,16 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// required, usually done in the constructor: the complete name of the organisation </summary>
 		/// <param name="name"> complete legal name </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty setName(string name)
+		public virtual TradeParty SetName(string name)
 		{
-			this.name = name;
+			this.Name = name;
 			return this;
 		}
 
 
-		public virtual string getZIP()
+		public virtual string GetZip()
 		{
-			return zip;
+			return Zip;
 		}
 
 		/// <summary>
@@ -190,15 +190,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// usually set in the constructor, required for recipients in german invoices: postcode </summary>
 		/// <param name="zip"> postcode </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty setZIP(string zip)
+		public virtual TradeParty SetZip(string zip)
 		{
-			this.zip = zip;
+			this.Zip = zip;
 			return this;
 		}
 
-		public string getStreet()
+		public string GetStreet()
 		{
-			return street;
+			return Street;
 		}
 
 		/// <summary>
@@ -206,15 +206,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// usually set in constructor, required in germany, street and house number </summary>
 		/// <param name="street"> street name and number </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty setStreet(string street)
+		public virtual TradeParty SetStreet(string street)
 		{
-			this.street = street;
+			this.Street = street;
 			return this;
 		}
 
-		public string getLocation()
+		public string GetLocation()
 		{
-			return location;
+			return Location;
 		}
 
 		/// <summary>
@@ -222,15 +222,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// usually set in constructor, usually required in germany, the city of the organisation </summary>
 		/// <param name="location"> city </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty setLocation(string location)
+		public virtual TradeParty SetLocation(string location)
 		{
-			this.location = location;
+			this.Location = location;
 			return this;
 		}
 
-		public string getCountry()
+		public string GetCountry()
 		{
-			return country;
+			return Country;
 		}
 
 		/// <summary>
@@ -238,36 +238,36 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// two-letter ISO code of the country </summary>
 		/// <param name="country"> two-letter-code </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty setCountry(string country)
+		public virtual TradeParty SetCountry(string country)
 		{
-			this.country = country;
+			this.Country = country;
 			return this;
 		}
 
 
-		public virtual string getVatID()
+		public virtual string GetVatId()
 		{
-			return vatID;
+			return VatId;
 		}
 
-		public IZUGFeRDExportableContact getContact()
+		public IZugFeRdExportableContact GetContact()
 		{
-			return contact;
+			return Contact;
 		}
 
-		public virtual IZUGFeRDTradeSettlement[]? getAsTradeSettlement()
+		public virtual IZugFeRdTradeSettlement[]? GetAsTradeSettlement()
 		{
-			if (bankDetails.Count == 0)
+			if (BankDetails.Count == 0)
 			{
 				return null;
 			}
-			return bankDetails.ToArray();
+			return BankDetails.ToArray();
 		}
 
 
-		public string getAdditionalAddress()
+		public string GetAdditionalAddress()
 		{
-			return additionalAddress;
+			return AdditionalAddress;
 		}
 
 
@@ -277,9 +277,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// Street address will become "lineOne", this will become "lineTwo" </summary>
 		/// <param name="additionalAddress"> additional address description </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty setAdditionalAddress(string additionalAddress)
+		public virtual TradeParty SetAdditionalAddress(string additionalAddress)
 		{
-			this.additionalAddress = additionalAddress;
+			this.AdditionalAddress = additionalAddress;
 			return this;
 		}
 

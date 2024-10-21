@@ -5,19 +5,19 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 	/// <summary>
 	/// provides e.g. the IBAN to transfer money to :-)
 	/// </summary>
-	public class BankDetails : IZUGFeRDTradeSettlementPayment
+	public class BankDetails : IZugFeRdTradeSettlementPayment
 	{
-		protected internal string IBAN, BIC, accountName = null;
+		protected internal string Iban, Bic, AccountName = null;
 
-		public BankDetails(string IBAN, string BIC)
+		public BankDetails(string iban, string bic)
 		{
-			this.IBAN = IBAN;
-			this.BIC = BIC;
+			this.Iban = iban;
+			this.Bic = bic;
 		}
 
-		public virtual string getIBAN()
+		public virtual string GetIban()
 		{
-			return IBAN;
+			return Iban;
 		}
 
 		/// <summary>
@@ -25,27 +25,27 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// identify the IBAN. Of course you will specify your own IBAN in full length but
 		/// if you deduct from a customer's account you may e.g. leave out the first or last
 		/// digits so that nobody spying on the invoice gets to know the complete number </summary>
-		/// <param name="IBAN"> the "IBAN ID", i.e. the IBAN or parts of it </param>
+		/// <param name="iban"> the "IBAN ID", i.e. the IBAN or parts of it </param>
 		/// <returns> fluent setter </returns>
-		public virtual BankDetails setIBAN(string IBAN)
+		public virtual BankDetails SetIban(string iban)
 		{
-			this.IBAN = IBAN;
+			this.Iban = iban;
 			return this;
 		}
 
-		public virtual string getBIC()
+		public virtual string GetBic()
 		{
-			return BIC;
+			return Bic;
 		}
 
 		/// <summary>
 		///*
 		/// The bank identifier. Bank name is no longer neccessary in SEPA. </summary>
-		/// <param name="BIC"> the bic code </param>
+		/// <param name="bic"> the bic code </param>
 		/// <returns> fluent setter </returns>
-		public virtual BankDetails setBIC(string BIC)
+		public virtual BankDetails SetBic(string bic)
 		{
-			this.BIC = BIC;
+			this.Bic = bic;
 			return this;
 		}
 
@@ -55,15 +55,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// 
 		/// </summary>
 		[Obsolete]
-		public string getOwnBIC()
+		public string GetOwnBic()
 		{
-			return getBIC();
+			return GetBic();
 		}
 
 		[Obsolete]
-		public string getOwnIBAN()
+		public string GetOwnIban()
 		{
-			return getIBAN();
+			return GetIban();
 		}
 
 
@@ -71,28 +71,28 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// set Holder </summary>
 		/// <param name="name"> account name (usually account holder if != sender) </param>
 		/// <returns> fluent setter </returns>
-		public virtual BankDetails setAccountName(string name)
+		public virtual BankDetails SetAccountName(string name)
 		{
-			accountName = name;
+			AccountName = name;
 			return this;
 		}
 
-		public string getAccountName()
+		public string GetAccountName()
 		{
-			return accountName;
+			return AccountName;
 		}
-		public string getSettlementXML()
+		public string GetSettlementXml()
 		{
 			string accountNameStr = "";
-			if (getAccountName() != null)
+			if (GetAccountName() != null)
 			{
-				accountNameStr = "<ram:AccountName>" + XMLTools.encodeXML(getAccountName()) + "</ram:AccountName>\n";
+				accountNameStr = "<ram:AccountName>" + XmlTools.EncodeXml(GetAccountName()) + "</ram:AccountName>\n";
 
 			}
 
-			string xml = "			<ram:SpecifiedTradeSettlementPaymentMeans>\n" + "				<ram:TypeCode>58</ram:TypeCode>\n" + "				<ram:Information>SEPA credit transfer</ram:Information>\n" + "				<ram:PayeePartyCreditorFinancialAccount>\n" + "					<ram:IBANID>" + XMLTools.encodeXML(getOwnIBAN()) + "</ram:IBANID>\n";
+			string xml = "			<ram:SpecifiedTradeSettlementPaymentMeans>\n" + "				<ram:TypeCode>58</ram:TypeCode>\n" + "				<ram:Information>SEPA credit transfer</ram:Information>\n" + "				<ram:PayeePartyCreditorFinancialAccount>\n" + "					<ram:IBANID>" + XmlTools.EncodeXml(GetOwnIban()) + "</ram:IBANID>\n";
 			xml += accountNameStr;
-			xml += "				</ram:PayeePartyCreditorFinancialAccount>\n" + "				<ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "					<ram:BICID>" + XMLTools.encodeXML(getOwnBIC()) + "</ram:BICID>\n" + "				</ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "			</ram:SpecifiedTradeSettlementPaymentMeans>\n";
+			xml += "				</ram:PayeePartyCreditorFinancialAccount>\n" + "				<ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "					<ram:BICID>" + XmlTools.EncodeXml(GetOwnBic()) + "</ram:BICID>\n" + "				</ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "			</ram:SpecifiedTradeSettlementPaymentMeans>\n";
 			return xml;
 		}
 

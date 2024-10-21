@@ -1,20 +1,20 @@
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
-	public interface IZUGFeRDTradeSettlement
+	public interface IZugFeRdTradeSettlement
 	{
 
 		/// <summary>
 		///*
 		/// </summary>
 		/// <returns> zf2 xml for applicableHeaderTradeSettlement </returns>
-		string getSettlementXML();
+		string GetSettlementXml();
 
 
 		/// <summary>
 		///*
 		/// </summary>
 		/// <returns> zf2 xml for applicableHeaderTradePayment </returns>
-		string getPaymentXML()
+		string GetPaymentXml()
 		{
 			return null;
 		}

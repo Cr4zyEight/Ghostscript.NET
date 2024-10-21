@@ -82,7 +82,7 @@ namespace Ghostscript.NET
         /// <summary>
         /// Gets lower-left x.
         /// </summary>
-        public float llx
+        public float Llx
         {
             get { return _llx; }
             set { _llx = value; }
@@ -95,7 +95,7 @@ namespace Ghostscript.NET
         /// <summary>
         /// Gets lower-left y.
         /// </summary>
-        public float lly
+        public float Lly
         {
             get { return _lly; }
             set { _lly = value; }
@@ -108,7 +108,7 @@ namespace Ghostscript.NET
         /// <summary>
         /// Gets upper-right x.
         /// </summary>
-        public float urx
+        public float Urx
         {
             get { return _urx; }
             set { _urx = value; }
@@ -121,7 +121,7 @@ namespace Ghostscript.NET
         /// <summary>
         /// Gets upper-right y.
         /// </summary>
-        public float ury
+        public float Ury
         {
             get { return _ury; }
             set { _ury = value; }

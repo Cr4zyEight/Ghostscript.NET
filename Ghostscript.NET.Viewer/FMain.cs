@@ -50,13 +50,13 @@ namespace Ghostscript.NET.Viewer
         {
             InitializeComponent();
 
-            this.Text = Program.NAME;
+            this.Text = Program.Name;
 
             pbPage.Width = 100;
             pbPage.Height = 100;
 
             _viewer = new GhostscriptViewer();
-            _viewer.AttachStdIO(new GhostscriptStdIOHandler(_stdOut, _stdErr));
+            _viewer.AttachStdIo(new GhostscriptStdIoHandler(_stdOut, _stdErr));
 
             _viewer.DisplaySize += new GhostscriptViewerViewEventHandler(_viewer_DisplaySize);
             _viewer.DisplayUpdate += new GhostscriptViewerViewEventHandler(_viewer_DisplayUpdate);
@@ -109,7 +109,7 @@ namespace Ghostscript.NET.Viewer
 
                 _viewer.Open(ofd.FileName, _gsVersion, false);
 
-                this.Text = System.IO.Path.GetFileName(ofd.FileName) + " - " + Program.NAME;
+                this.Text = System.IO.Path.GetFileName(ofd.FileName) + " - " + Program.Name;
             }
         }
 
@@ -121,7 +121,7 @@ namespace Ghostscript.NET.Viewer
             _stdErr.Clear();
 
             pbPage.Image = null;
-            this.Text = Program.NAME;
+            this.Text = Program.Name;
             tbPageNumber.Text = string.Empty;
             tbTotalPages.Text = string.Empty;
         }
@@ -174,7 +174,7 @@ namespace Ghostscript.NET.Viewer
 
         private void mnuAbout_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(this, "Powered by Ghostscript.NET & Josip Habjan (habjan@gmail.com)", "About " + Program.NAME, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(this, "Powered by Ghostscript.NET & Josip Habjan (habjan@gmail.com)", "About " + Program.Name, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void mnuNext_Click(object sender, EventArgs e)

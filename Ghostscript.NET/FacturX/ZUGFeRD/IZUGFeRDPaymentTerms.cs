@@ -4,12 +4,12 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
 
 
-    public interface IZUGFeRDPaymentTerms
+    public interface IZugFeRdPaymentTerms
     {
 
-        string getDescription();
+        string GetDescription();
 
-        DateTime getDueDate();
+        DateTime GetDueDate();
 
         //		IZUGFeRDPaymentDiscountTerms getDiscountTerms();
     }

@@ -6,11 +6,11 @@ using System.Windows.Forms;
 
 namespace Ghostscript.NET.DisplayTest
 {
-    public class StdIOHandler : GhostscriptStdIO
+    public class StdIoHandler : GhostscriptStdIo
     {
         private TextBox _outputTextBox = null;
 
-        public StdIOHandler(TextBox outputTextBox) : base(true, true, true)
+        public StdIoHandler(TextBox outputTextBox) : base(true, true, true)
         {
             _outputTextBox = outputTextBox;
         }

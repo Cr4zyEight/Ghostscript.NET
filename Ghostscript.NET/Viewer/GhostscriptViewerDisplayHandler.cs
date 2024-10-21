@@ -189,7 +189,7 @@ namespace Ghostscript.NET.Viewer
                     {
                         _synchTriggered = false;
 
-                        ImageMemoryHelper.Set24bppRgbImageColor(_destImage.Scan0, _destImage.Width, _destImage.Height, 255, 255, 255);
+                        ImageMemoryHelper.Set24BppRgbImageColor(_destImage.Scan0, _destImage.Width, _destImage.Height, 255, 255, 255);
                     }
 
                     if (w == _destImage.Width && h == _destImage.Height)

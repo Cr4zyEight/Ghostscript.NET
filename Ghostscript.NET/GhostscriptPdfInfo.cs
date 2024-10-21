@@ -51,7 +51,7 @@ namespace Ghostscript.NET
         /// <returns>A dictionary of a page numbers with the ink coverage.</returns>
         public static Dictionary<int, GhostscriptPageInkCoverage> GetInkCoverage(Stream stream)
         {
-            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL);
+            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl);
             return GetInkCoverage(stream, 0, 0, gvi);
         }
 
@@ -69,7 +69,7 @@ namespace Ghostscript.NET
         /// <returns>A dictionary of a page numbers with the ink coverage.</returns>
         public static Dictionary<int, GhostscriptPageInkCoverage> GetInkCoverage(Stream stream, GhostscriptVersionInfo versionInfo)
         {
-            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL);
+            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl);
             return GetInkCoverage(stream, 0, 0, versionInfo);
         }
 
@@ -88,7 +88,7 @@ namespace Ghostscript.NET
         /// <returns>Dictionary of page numbers with ink coverage.</returns>
         public static Dictionary<int, GhostscriptPageInkCoverage> GetInkCoverage(Stream stream, int firstPage, int lastPage)
         {
-            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL);
+            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl);
             return GetInkCoverage(stream, firstPage, lastPage, gvi);
         }
 
@@ -136,7 +136,7 @@ namespace Ghostscript.NET
         /// <returns>A dictionary of a page numbers with the ink coverage.</returns>
         public static Dictionary<int, GhostscriptPageInkCoverage> GetInkCoverage(string path)
         {
-            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL);
+            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl);
             return GetInkCoverage(path, 0, 0, gvi);
         }
 
@@ -154,7 +154,7 @@ namespace Ghostscript.NET
         /// <returns>A dictionary of a page numbers with the ink coverage.</returns>
         public static Dictionary<int, GhostscriptPageInkCoverage> GetInkCoverage(string path, GhostscriptVersionInfo versionInfo)
         {
-            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL);
+            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl);
             return GetInkCoverage(path, 0, 0, versionInfo);
         }
 
@@ -173,7 +173,7 @@ namespace Ghostscript.NET
         /// <returns>A dictionary of a page numbers with the ink coverage.</returns>
         public static Dictionary<int, GhostscriptPageInkCoverage> GetInkCoverage(string path, int firstPage, int lastPage)
         {
-            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.GPL | GhostscriptLicense.AFPL, GhostscriptLicense.GPL);
+            GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl, GhostscriptLicense.Gpl);
             return GetInkCoverage(path, firstPage, lastPage, gvi);
         }
 

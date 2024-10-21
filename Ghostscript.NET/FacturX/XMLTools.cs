@@ -9,15 +9,15 @@ namespace Ghostscript.NET.FacturX
 
 
 
-    public class XMLTools
+    public class XmlTools
 	{
-		public virtual string escapeAttributeEntities(string s)
+		public virtual string EscapeAttributeEntities(string s)
 		{
 //			return base.escapeAttributeEntities(s);
 			return s;
 		}
 
-		public virtual string escapeElementEntities(string s)
+		public virtual string EscapeElementEntities(string s)
 		{
 //			return base.escapeElementEntities(s);
 			return s;
@@ -37,7 +37,7 @@ namespace Ghostscript.NET.FacturX
 		}
 
 
-		public static string encodeXML(string s)
+		public static string EncodeXml(string s)
 		{
 			 return SecurityElement.Escape(s);
 		}
@@ -77,7 +77,7 @@ namespace Ghostscript.NET.FacturX
 		/// removes utf8 byte order marks from byte arrays, in case one is there </summary>
 		/// <param name="zugferdRaw"> the CII XML </param>
 		/// <returns> the byte array without bom </returns>
-		public static byte[] removeBOM(byte[] zugferdRaw)
+		public static byte[] RemoveBom(byte[] zugferdRaw)
 		{
 			byte[] zugferdData;
 			if ((zugferdRaw[0] == unchecked((byte) 0xEF)) && (zugferdRaw[1] == unchecked((byte) 0xBB)) && (zugferdRaw[2] == unchecked((byte) 0xBF)))

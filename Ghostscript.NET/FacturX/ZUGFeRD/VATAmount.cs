@@ -4,40 +4,40 @@ using System;
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
 
-	public class VATAmount
+	public class VatAmount
 	{
 
-		public VATAmount(decimal basis, decimal calculated, string categoryCode) : base()
+		public VatAmount(decimal basis, decimal calculated, string categoryCode) : base()
 		{
-			this.basis = basis;
-			this.calculated = calculated;
-			this.categoryCode = categoryCode;
+			this.Basis = basis;
+			this.Calculated = calculated;
+			this.CategoryCode = categoryCode;
 		}
 
-		internal decimal basis, calculated, applicablePercent;
+		internal decimal Basis, Calculated, ApplicablePercent;
 
-		internal string categoryCode;
+		internal string CategoryCode;
 
-		public virtual decimal getApplicablePercent()
+		public virtual decimal GetApplicablePercent()
 		{
 
-			return applicablePercent;
+			return ApplicablePercent;
 		}
-		public virtual VATAmount setApplicablePercent(decimal value)
+		public virtual VatAmount SetApplicablePercent(decimal value)
 		{
-			this.applicablePercent = value;
+			this.ApplicablePercent = value;
 			return this;
 		}
 
 
-		public virtual decimal getBasis()
+		public virtual decimal GetBasis()
 		{
 
-			return basis;
+			return Basis;
 		}
-		public virtual VATAmount setBasis(decimal value)
+		public virtual VatAmount SetBasis(decimal value)
 		{
-			this.basis = Math.Round(value, 2, MidpointRounding.AwayFromZero);
+			this.Basis = Math.Round(value, 2, MidpointRounding.AwayFromZero);
 			return this;
 
 		}
@@ -46,57 +46,57 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
 
 
-		public virtual decimal getCalculated() {
-			return calculated;
+		public virtual decimal GetCalculated() {
+			return Calculated;
 		}
 
 
-		public virtual VATAmount setCalculated(decimal value) {
+		public virtual VatAmount SetCalculated(decimal value) {
 
-			this.calculated = value;
+			this.Calculated = value;
 			return this;
 		}
 
 
 		/// 
-		/// @deprecated Use <seealso cref="getCategoryCode() instead"/> 
+		/// @deprecated Use <seealso cref="GetCategoryCode"/> 
 		/// <returns> string with category code </returns>
 		[Obsolete("Use <seealso cref=\"getCategoryCode() instead\"/>")]
-		public virtual string getDocumentCode()
+		public virtual string GetDocumentCode()
 		{
 
-			return categoryCode;
+			return CategoryCode;
 		}
-		public virtual VATAmount setDocumentCode(string value)
+		public virtual VatAmount SetDocumentCode(string value)
 
 		{
-			this.categoryCode = value;
+			this.CategoryCode = value;
 			return this;
 		}
 
 
 
-		public virtual string getCategoryCode()
+		public virtual string GetCategoryCode()
 		{
 
-			return categoryCode;
+			return CategoryCode;
 		}
-		public virtual VATAmount setCategoryCode(string value)
+		public virtual VatAmount SetCategoryCode(string value)
 		{
-			this.categoryCode = value;
+			this.CategoryCode = value;
 			return this;
 		}
 
 
 
-		public virtual VATAmount add(VATAmount v)
+		public virtual VatAmount Add(VatAmount v)
 		{
-			return new VATAmount(basis + v.getBasis(), calculated + v.getCalculated(), this.categoryCode);
+			return new VatAmount(Basis + v.GetBasis(), Calculated + v.GetCalculated(), this.CategoryCode);
 		}
 
-		public virtual VATAmount subtract(VATAmount v)
+		public virtual VatAmount Subtract(VatAmount v)
 		{
-			return new VATAmount(basis - v.getBasis(), calculated - v.getCalculated(), this.categoryCode);
+			return new VatAmount(Basis - v.GetBasis(), Calculated - v.GetCalculated(), this.CategoryCode);
 		}
 
 	}

@@ -1,7 +1,7 @@
 
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
-	public interface IZUGFeRDExportableProduct
+	public interface IZugFeRdExportableProduct
 	{
 
 		/// 
@@ -26,26 +26,26 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// WEE	week
 		/// </summary>
 		/// <returns> a UN/ECE rec 20 unit code see https://www.unece.org/fileadmin/DAM/cefact/recommendations/rec20/rec20_rev3_Annex2e.pdf </returns>
-		string getUnit();
+		string GetUnit();
 
 		/// <summary>
 		/// Short name of the product
 		/// </summary>
 		/// <returns> Short name of the product </returns>
-		string getName();
+		string GetName();
 
 		/// <summary>
 		/// long description of the product
 		/// </summary>
 		/// <returns> long description of the product </returns>
-		string getDescription();
+		string GetDescription();
 
 		/// <summary>
 		/// Get the ID that had been assigned by the seller to
 		/// identify the product
 		/// </summary>
 		/// <returns> seller assigned product ID </returns>
-		string getSellerAssignedID()
+		string GetSellerAssignedId()
 		{
 			return null;
 		}
@@ -55,7 +55,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// identify the product
 		/// </summary>
 		/// <returns> buyer assigned product ID </returns>
-		string getBuyerAssignedID()
+		string GetBuyerAssignedId()
 		{
 			return null;
 		}
@@ -64,19 +64,19 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// VAT percent of the product (e.g. 19, or 5.1 if you like)
 		/// </summary>
 		/// <returns> VAT percent of the product </returns>
-		decimal getVATPercent();
+		decimal GetVatPercent();
 
-		bool getIntraCommunitySupply()
+		bool GetIntraCommunitySupply()
 		{
 			return false;
 		}
 
-		bool getReverseCharge()
+		bool GetReverseCharge()
 		{
 			return false;
 		}
 
-		string getTaxCategoryCode()
+		string GetTaxCategoryCode()
 		{
 			/*	if (isIntraCommunitySupply())
 				{
@@ -98,7 +98,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 						//}
 		}
 
-		string getTaxExemptionReason()
+		string GetTaxExemptionReason()
 		{
 			/*	if (isIntraCommunitySupply())
 				{

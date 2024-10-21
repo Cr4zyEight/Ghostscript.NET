@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace Ghostscript.NET
 {
-    public partial class ierrors
+    public partial class Ierrors
     {
         public static bool IsError(int code)
         {
@@ -38,22 +38,22 @@ namespace Ghostscript.NET
 
         public static bool IsErrorIgnoreQuit(int code)
         {
-            return (code < 0) && (code != ierrors.e_Quit);
+            return (code < 0) && (code != Ierrors.EQuit);
         }
 
         public static bool IsFatalIgnoreNeedInput(int code)
         {
-            return (code <= ierrors.e_Fatal) && (code != ierrors.e_NeedInput);
+            return (code <= Ierrors.EFatal) && (code != Ierrors.ENeedInput);
         }
 
         public static bool IsInterrupt(int ecode)
         {
-            return ((ecode) == e_interrupt || (ecode) == e_timeout);
+            return ((ecode) == EInterrupt || (ecode) == ETimeout);
         }
 
         public static bool IsFatal(int code)
         {
-            return code <= ierrors.e_Fatal;
+            return code <= Ierrors.EFatal;
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Ghostscript.NET
         public static string GetErrorName(int code)
         {
             int errorNameIndex = ~code + 1;
-            return ERROR_NAMES[errorNameIndex];
+            return ErrorNames[errorNameIndex];
         }
     }
 }

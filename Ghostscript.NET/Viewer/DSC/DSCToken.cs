@@ -31,7 +31,7 @@ using System;
 namespace Ghostscript.NET.Viewer.DSC
 {
 
-    internal class DSCToken
+    internal class DscToken
     {
 
         #region Private variables
@@ -39,7 +39,7 @@ namespace Ghostscript.NET.Viewer.DSC
         private long _startPosition;
         private long _length;
         private string _text;
-        private DSCTokenEnding _ending;
+        private DscTokenEnding _ending;
 
         #endregion
 
@@ -75,7 +75,7 @@ namespace Ghostscript.NET.Viewer.DSC
 
         #region Ending
 
-        public DSCTokenEnding Ending
+        public DscTokenEnding Ending
         {
             get { return _ending; }
             set { _ending = value; }
