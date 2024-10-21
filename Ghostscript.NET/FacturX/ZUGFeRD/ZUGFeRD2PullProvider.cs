@@ -9,7 +9,7 @@ using System.Reflection;
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
 
-    public class ZugFeRd2PullProvider
+    public class ZUGFeRD2PullProvider
     {
 
         //// MAIN CLASS

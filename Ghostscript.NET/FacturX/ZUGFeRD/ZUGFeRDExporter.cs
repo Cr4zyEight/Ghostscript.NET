@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
 
-    public class ZugFeRdExporter
+    public class ZUGFeRDExporter
     {
         protected string GsDll = null;
         protected string SourcePdf = null;
@@ -16,11 +16,11 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         protected int Version = 2;
         protected IExportableTransaction? Trans = null;
 
-        public ZugFeRdExporter(string gsDll)
+        public ZUGFeRDExporter(string gsDll)
         {
             this.GsDll = gsDll;
         }
-        public ZugFeRdExporter Load(string pdFfilename)
+        public ZUGFeRDExporter Load(string pdFfilename)
         {
             string basename=Path.GetFileName(pdFfilename);
             this.SourcePdf = Path.GetTempPath() + basename;
@@ -33,19 +33,19 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             }
             return this;
         }
-        public ZugFeRdExporter SetTransaction(IExportableTransaction trans)
+        public ZUGFeRDExporter SetTransaction(IExportableTransaction trans)
         {
             this.Trans = trans;
             return this;
         }
 
-        public ZugFeRdExporter SetZugFeRdVersion(int version)
+        public ZUGFeRDExporter SetZUGFeRDVersion(int version)
         {
             this.Version = version;
             return this;
         }
 
-        public ZugFeRdExporter SetProfile(string profile)
+        public ZUGFeRDExporter SetProfile(string profile)
         {
             this.Profile = profile;
             return this;
@@ -57,7 +57,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
             PdfConverter pc = new PdfConverter(SourcePdf, targetFilename);
 
-            ZugFeRd2PullProvider zf2P = new ZugFeRd2PullProvider();
+            ZUGFeRD2PullProvider zf2P = new ZUGFeRD2PullProvider();
             zf2P.SetProfile(Profiles.GetByName(Profile));
             zf2P.GenerateXml(Trans);
             System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();

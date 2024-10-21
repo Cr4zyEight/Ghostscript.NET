@@ -28,7 +28,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
     using Item = Ghostscript.NET.FacturX.ZUGFeRD.Item;
     using Product = Ghostscript.NET.FacturX.ZUGFeRD.Product;
 
-    public class ZugFeRdImporter
+    public class ZUGFeRDImporter
     {
 
         /// <summary>
@@ -50,15 +50,15 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// </summary>
         private string _xmpString = null; // XMP metadata
 
-        private readonly ILogger<ZugFeRdImporter> _logger;
+        private readonly ILogger<ZUGFeRDImporter> _logger;
 
 
-        protected internal ZugFeRdImporter()
+        protected internal ZUGFeRDImporter()
         {
             //constructor for extending classes
         }
 
-        public ZugFeRdImporter(string pdfFilename)
+        public ZUGFeRDImporter(string pdfFilename)
         {
             using var loggerFactory = LoggerFactory.Create(builder =>
         {
@@ -72,7 +72,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                 throw new Exception("File not found");
             }
 
-            _logger = loggerFactory.CreateLogger<ZugFeRdImporter>();
+            _logger = loggerFactory.CreateLogger<ZUGFeRDImporter>();
             _logger.LogInformation("Example log message");
             FromPdf(pdfFilename);
             //FileStream fs = File.OpenRead(pdfFilename);
@@ -80,7 +80,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
 
-        public ZugFeRdImporter(Stream pdfStream)
+        public ZUGFeRDImporter(Stream pdfStream)
         {
             try
             {
@@ -337,7 +337,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <returns> the ZUGFeRD Profile </returns>
-        public virtual string GetZugFeRdProfil()
+        public virtual string GetZUGFeRDProfil()
         {
             switch (ExtractString("//*[local-name() = 'GuidelineSpecifiedDocumentContextParameter']//*[local-name() = 'ID']"))
             {
