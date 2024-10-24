@@ -51,11 +51,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             return this;
         }
 
-
         public void Export(string targetFilename)
         {
-
-            PdfConverter pc = new PdfConverter(SourcePdf, targetFilename);
+            using PdfConverter pc = new (SourcePdf, targetFilename);
 
             ZUGFeRD2PullProvider zf2P = new ZUGFeRD2PullProvider();
             zf2P.SetProfile(Profiles.GetByName(Profile));
@@ -71,7 +69,6 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             if (!NoSourceCopy) {
                 File.Delete(SourcePdf);
             }
-
         }
     }
 }

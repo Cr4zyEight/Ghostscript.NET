@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using Ghostscript.NET.FacturX.assets;
 using Microsoft.VisualBasic;
 using Ghostscript.NET.Processor;
 
@@ -13,21 +14,22 @@ using Ghostscript.NET.FacturX.ZUGFeRD;
 /// ''' </summary>
 namespace Ghostscript.NET.FacturX
 {
-    public class PdfConverter
+    public class PdfConverter : IDisposable
     {
-        private string _fileGsdllDll = null;
-        private readonly string _fileAdobeRgb1998Icc = null;
-        private readonly string _fileBigscriptPs = null;
+        private string _fileGsdllDll;
 
-        private readonly string _resourceDir = Path.GetTempPath();
-        private GhostscriptVersionInfo _gsVersion = null;
+        private readonly string _resourceDir = "assets";
+        private GhostscriptVersionInfo _gsVersion;
 
-        protected string MPdfInFile = ""; // 08.06.20
-        protected string MPdfOutFile = "";
-        protected string MXmlOutFile = null;
+        private readonly string _fileAdobeRgb1998Icc;
+        private readonly string _fileAdobeCompatv2Icc;
+        private readonly string _fileBigscriptPs;
+
+        protected string MPdfInFile; // 08.06.20
+        protected string MPdfOutFile;
+        protected string MXmlOutFile;
         protected string FxVersion = "1.0";
         protected Profile UsedProfile = Profiles.GetByName("EN16931");
-
 
         /// <summary>
         ///     ''' Konstruktor mit Angabe Datenbankdatei, intern-nummer, KlassenID (und Gruppenpositionen) wenn ZUGFeRD geschrieben werden soll
@@ -36,18 +38,21 @@ namespace Ghostscript.NET.FacturX
         ///     ''' <param name="pPdfOutFile">PDF-A/3 Ausgabedatei</param>
         public PdfConverter(string pPdfInFile, string pPdfOutFile)
         {
-            _fileAdobeRgb1998Icc = this._resourceDir + "\\AdobeCompat-v2.icc";
-            _fileBigscriptPs = this._resourceDir + "\\pdfconvert.ps";
+            _fileAdobeRgb1998Icc = EmbeddedResourceAccessor.WriteResourceAndGetPath("AdobeRGB1998.icc");
+            _fileAdobeCompatv2Icc = EmbeddedResourceAccessor.WriteResourceAndGetPath("AdobeCompat-v2.icc");
+            _fileBigscriptPs = EmbeddedResourceAccessor.WriteResourceAndGetPath("pdfconvert.ps");
 
             MPdfInFile = pPdfInFile;
             MPdfOutFile = pPdfOutFile;
         }
-        public PdfConverter SetFxVersion(string pZfVersion) {
+        public PdfConverter SetFxVersion(string pZfVersion)
+        {
             FxVersion = pZfVersion;
 
             return this;
         }
-        public PdfConverter SetFxProfile(Profile p) {
+        public PdfConverter SetFxProfile(Profile p)
+        {
             UsedProfile = p;
 
             return this;
@@ -88,7 +93,7 @@ namespace Ghostscript.NET.FacturX
         ///     ''' </summary>
         ///     ''' <param name="pEmbeddedAdobeRgb1998IccFile">ICC-Farbprofildatei bspw von https://www.adobe.com/support/downloads/iccprofiles/iccprofiles_win.html </param>
         ///     '''
-        protected void WritePdfMark(string pEmbeddedAdobeRgb1998IccFile)
+        protected void WritePdfMark()
         {
             string escapedEmbeddedXmlFile = "";
 
@@ -101,17 +106,6 @@ namespace Ghostscript.NET.FacturX
                 escapedEmbeddedXmlFile = MXmlOutFile.Replace(@"\", @"\\"); // in PDFMark werden \ zu \\ gequoted
             }
 
-
-
-            if (!File.Exists(pEmbeddedAdobeRgb1998IccFile))
-            {
-                throw new Exception("Datei " + _fileAdobeRgb1998Icc + " existiert nicht");
-            }
-            /*        if (!pEmbeddedAdobeRGB1998ICCFile.Contains(Directory.GetCurrentDirectory()))
-                    {
-                        throw new Exception("Datei " + file_AdobeRGB1998_ICC + " muss unterhalb des absolut angegebenen Applikationspfades " + Directory.GetCurrentDirectory() + " liegen.");
-                    }
-                    */
             string escapedEmbeddedIccFile = _fileAdobeRgb1998Icc.Replace(Directory.GetCurrentDirectory(), @".\").Replace(@"\", @"\\");
 
             if (MPdfInFile == MPdfOutFile)
@@ -427,9 +421,7 @@ bind def
 
             */
 
-
-
-            WritePdfMark(_fileAdobeRgb1998Icc);
+            WritePdfMark();
 
             // MsgBox(gsVersion.ToString)
             GhostscriptLibrary gsL = null/* TODO Change to default(_) if this is not a reference type */;
@@ -451,8 +443,8 @@ bind def
             switches.Add("-dRenderIntent=3"); // 'in A/3 umwandeln Teil 3 von 3
             //switches.Add("-sGenericResourceDir=\"" + resourceDir + "/\""); // ' hier kann ein zustzliches Verzeichnis angegeben werden in dem Ressourcen wie die icc-Datei liegen drfen
             switches.Add(_fileBigscriptPs); // ' die PDFMark-Programmdatei die interpretiert werden soll. Anders als die ICC und ggf. einzubettende XML-Datei ist das keine Ressourcendatei und die kann liegen wo sie will.
-                                             // siehe https://www.adobe.com/content/dam/acom/en/devnet/acrobat/pdfs/pdfmark_reference.pdf
-                                             // und https://gitlab.com/crossref/pdfmark
+                                            // siehe https://www.adobe.com/content/dam/acom/en/devnet/acrobat/pdfs/pdfmark_reference.pdf
+                                            // und https://gitlab.com/crossref/pdfmark
             switches.Add(MPdfInFile); // ' PDF-Eingabedatei
 
             bool success = false;
@@ -494,4 +486,12 @@ bind def
                 input = "debug input";
             }
         }
-    } }
+
+        public void Dispose()
+        {
+            File.Delete(_fileAdobeCompatv2Icc);
+            File.Delete(_fileAdobeRgb1998Icc);
+            File.Delete(_fileBigscriptPs);
+        }
+    }
+}

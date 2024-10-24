@@ -145,7 +145,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 		/// the USt-ID </summary>
 		/// <param name="vatId"> Ust-ID </param>
 		/// <returns> fluent setter </returns>
-		public virtual TradeParty AddVatid(string vatId)
+		public virtual TradeParty AddVatId(string vatId)
 		{
 			this.VatId = vatId;
 			return this;

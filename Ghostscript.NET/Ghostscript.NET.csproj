@@ -51,9 +51,24 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="FacturX\assets\AdobeCompat-v2.icc" />
+    <None Remove="FacturX\assets\AdobeRGB1998.icc" />
+    <None Remove="FacturX\assets\pdfconvert.ps" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="FacturX\assets\AdobeCompat-v2.icc" />
+    <EmbeddedResource Include="FacturX\assets\AdobeRGB1998.icc" />
+    <EmbeddedResource Include="FacturX\assets\pdfconvert.ps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="itext7" Version="8.0.3" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.8" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="lib\" />
   </ItemGroup>
 </Project>

@@ -365,7 +365,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         [Obsolete]
         public virtual Invoice SetOwnVatid(string ownVatid)
         {
-            Sender.AddVatid(ownVatid);
+            Sender.AddVatId(ownVatid);
             return this;
         }
 

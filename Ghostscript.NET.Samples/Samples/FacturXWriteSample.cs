@@ -43,7 +43,7 @@ namespace Ghostscript.NET.Samples
         public void Start()
         {
             
-            Invoice i = (new Invoice()).SetDueDate(DateTime.Now).SetIssueDate(DateTime.Now).SetDeliveryDate(DateTime.Now).SetSender((new TradeParty("Test company", "teststr", "55232", "teststadt", "DE")).AddTaxId("DE4711").AddVatid("DE0815").SetContact(new Contact("Hans Test", "+49123456789", "test@example.org")).AddBankDetails(new BankDetails("DE12500105170648489890", "COBADEFXXX"))).SetRecipient(new TradeParty("Franz Müller", "teststr.12", "55232", "Entenhausen", "DE")).SetReferenceNumber("991-01484-64").SetNumber("123").
+            Invoice i = (new Invoice()).SetDueDate(DateTime.Now).SetIssueDate(DateTime.Now).SetDeliveryDate(DateTime.Now).SetSender((new TradeParty("Test company", "teststr", "55232", "teststadt", "DE")).AddTaxId("DE4711").AddVatId("DE0815").SetContact(new Contact("Hans Test", "+49123456789", "test@example.org")).AddBankDetails(new BankDetails("DE12500105170648489890", "COBADEFXXX"))).SetRecipient(new TradeParty("Franz Müller", "teststr.12", "55232", "Entenhausen", "DE")).SetReferenceNumber("991-01484-64").SetNumber("123").
                     AddItem(new Item(new Product("Testprodukt", "", "C62", new decimal(19)), decimal.One, decimal.One));
 
             ZUGFeRD2PullProvider zf2P = new ZUGFeRD2PullProvider();
