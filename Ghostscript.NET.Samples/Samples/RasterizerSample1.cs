@@ -57,7 +57,7 @@ public class RasterizerSample1 : ISample
 
         GhostscriptVersionInfo gvi = new(@"C:\Program Files\gs\gs9.53.3\bin\gsdll64.dll");
 
-        using (GhostscriptRasterizer rasterizer = new GhostscriptRasterizer())
+        using (GhostscriptRasterizer rasterizer = new())
         {
             rasterizer.Open(inputPdfPath, gvi, false);
 
@@ -80,12 +80,12 @@ public class RasterizerSample1 : ISample
         string inputPdfPath = @"E:\gss_test\test.pdf";
         string outputPath = @"E:\gss_test\output\";
 
-        DelegateStdIoHandler output = new DelegateStdIoHandler(
+        DelegateStdIoHandler output = new(
             stdOut: Console.WriteLine,
             stdErr: Console.WriteLine
         );
 
-        using (GhostscriptRasterizer rasterizer = new GhostscriptRasterizer(output))
+        using (GhostscriptRasterizer rasterizer = new(output))
         {
             rasterizer.Open(inputPdfPath);
 
