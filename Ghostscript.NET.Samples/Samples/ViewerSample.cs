@@ -24,119 +24,112 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-
-// required Ghostscript.NET namespaces
-using Ghostscript.NET;
 using Ghostscript.NET.Viewer;
+// required Ghostscript.NET namespaces
 
-namespace Ghostscript.NET.Samples
+namespace Ghostscript.NET.Samples;
+
+public class ViewerSample : ISample
 {
-    public class ViewerSample : ISample
+    private GhostscriptVersionInfo _lastInstalledVersion;
+    private Bitmap _pdfPage;
+    private GhostscriptViewer _viewer;
+
+    public void Start()
     {
-        private GhostscriptVersionInfo _lastInstalledVersion = null;
-        private GhostscriptViewer _viewer = null;
-        private Bitmap _pdfPage = null;
+        // there can be multiple Ghostscript versions installed on the system
+        // and we can choose which one we will use. In this sample we will use
+        // the last installed Ghostscript version. We can choose if we want to 
+        // use GPL or AFPL (commercial) version of the Ghostscript. By setting 
+        // the parameters below we told that we want to fetch the last version 
+        // of the GPL or AFPL Ghostscript and if both are available we prefer 
+        // to use GPL version.
 
-        public void Start()
-        {
-            // there can be multiple Ghostscript versions installed on the system
-            // and we can choose which one we will use. In this sample we will use
-            // the last installed Ghostscript version. We can choose if we want to 
-            // use GPL or AFPL (commercial) version of the Ghostscript. By setting 
-            // the parameters below we told that we want to fetch the last version 
-            // of the GPL or AFPL Ghostscript and if both are available we prefer 
-            // to use GPL version.
+        _lastInstalledVersion =
+            GhostscriptVersionInfo.GetLastInstalledVersion();
 
-            _lastInstalledVersion = 
-                GhostscriptVersionInfo.GetLastInstalledVersion();
+        // create a new instance of the viewer
+        _viewer = new GhostscriptViewer();
 
-            // create a new instance of the viewer
-            _viewer = new GhostscriptViewer();
+        // set the display update interval to 10 times per second. This value
+        // is milliseconds based and updating display every 100 milliseconds
+        // is optimal value. The smaller value you set the rasterizing will 
+        // take longer as DisplayUpdate event will be raised more often.
+        _viewer.ProgressiveUpdateInterval = 100;
 
-            // set the display update interval to 10 times per second. This value
-            // is milliseconds based and updating display every 100 milliseconds
-            // is optimal value. The smaller value you set the rasterizing will 
-            // take longer as DisplayUpdate event will be raised more often.
-            _viewer.ProgressiveUpdateInterval = 100;
+        // attach three main viewer events
+        _viewer.DisplaySize += _viewer_DisplaySize;
+        _viewer.DisplayUpdate += _viewer_DisplayUpdate;
+        _viewer.DisplayPage += _viewer_DisplayPage;
 
-            // attach three main viewer events
-            _viewer.DisplaySize += new GhostscriptViewerViewEventHandler(_viewer_DisplaySize);
-            _viewer.DisplayUpdate += new GhostscriptViewerViewEventHandler(_viewer_DisplayUpdate);
-            _viewer.DisplayPage += new GhostscriptViewerViewEventHandler(_viewer_DisplayPage);
+        // open PDF file using the last Ghostscript version. If you want to use
+        // multiple viewers withing a single process then you need to pass 'true' 
+        // value as the last parameter of the method below in order to tell the
+        // viewer to load Ghostscript from the memory and not from the disk.
+        _viewer.Open("E:\test\test.pdf", _lastInstalledVersion, false);
+    }
 
-            // open PDF file using the last Ghostscript version. If you want to use
-            // multiple viewers withing a single process then you need to pass 'true' 
-            // value as the last parameter of the method below in order to tell the
-            // viewer to load Ghostscript from the memory and not from the disk.
-            _viewer.Open("E:\test\test.pdf",_lastInstalledVersion, false);
-        }
+    // this is the first raised event before PDF page starts rasterizing. 
+    // this event is raised only once per page showing and it tells us 
+    // the dimensions of the PDF page and gives us page image reference.
+    private void _viewer_DisplaySize(object sender, GhostscriptViewerViewEventArgs e)
+    {
+        // store PDF page image reference
+        _pdfPage = e.Image;
+    }
 
-        // this is the first raised event before PDF page starts rasterizing. 
-        // this event is raised only once per page showing and it tells us 
-        // the dimensions of the PDF page and gives us page image reference.
-        void _viewer_DisplaySize(object sender, GhostscriptViewerViewEventArgs e)
-        {
-            // store PDF page image reference
-            _pdfPage = e.Image;
-        }
+    // this event is raised when a tile or the part of the page is rasterized
+    // code in this event must be fast or it will slow down the Ghostscript
+    // rasterizing. 
+    private void _viewer_DisplayUpdate(object sender, GhostscriptViewerViewEventArgs e)
+    {
+        // if we are displaying the image in the PictureBox we can update 
+        // it by calling PictureBox.Invalidate() and PictureBox.Update()
+        // methods. We dont need to set image reference again because
+        // Ghostscript.NET is changing Image object directly in the
+        // memory and does not create new Bitmap instance.
+    }
 
-        // this event is raised when a tile or the part of the page is rasterized
-        // code in this event must be fast or it will slow down the Ghostscript
-        // rasterizing. 
-        void _viewer_DisplayUpdate(object sender, GhostscriptViewerViewEventArgs e)
-        {
-            // if we are displaying the image in the PictureBox we can update 
-            // it by calling PictureBox.Invalidate() and PictureBox.Update()
-            // methods. We dont need to set image reference again because
-            // Ghostscript.NET is changing Image object directly in the
-            // memory and does not create new Bitmap instance.
-        }
+    // this is the last raised event after complete page is rasterized
+    private void _viewer_DisplayPage(object sender, GhostscriptViewerViewEventArgs e)
+    {
+        // complete PDF page is rasterized and we can update our PictureBox
+        // once again by calling PictureBox.Invalidate() and PictureBox.Update()
+    }
 
-        // this is the last raised event after complete page is rasterized
-        void _viewer_DisplayPage(object sender, GhostscriptViewerViewEventArgs e)
-        {
-            // complete PDF page is rasterized and we can update our PictureBox
-            // once again by calling PictureBox.Invalidate() and PictureBox.Update()
-        }
-
-        // dummy method just to list other viewer properties and methods
-        private void Other_Viewer_Methods()
-        {
-            // show first pdf page
-            _viewer.ShowFirstPage();
-            // show previous pdf page
-            _viewer.ShowPreviousPage();
-            // show next pdf page
-            _viewer.ShowNextPage();
-            // show last pdf page
-            _viewer.ShowLastPage();
-            // show page based on page number
-            _viewer.ShowPage(6);
-            // refresh current page / rasterize it again
-            _viewer.RefreshPage();
-            // zoom in
-            _viewer.ZoomIn();
-            // zoom out
-            _viewer.ZoomOut();
-            // get first page number
-            int fpn = _viewer.FirstPageNumber;
-            // get last page number
-            int lpn = _viewer.LastPageNumber;
-            // get current page number
-            int cpn = _viewer.CurrentPageNumber;
-            // gets or sets eps clip on or off
-            bool epsClip = _viewer.EpsClip;
-            // gets or sets graphics aplha bits
-            int gab = _viewer.GraphicsAlphaBits;
-            // gets or sets text aplha bits
-            int gtb = _viewer.TextAlphaBits;
-            // gets or sets progressive update on or off
-            bool pu =_viewer.ProgressiveUpdate;
-        }
-
+    // dummy method just to list other viewer properties and methods
+    private void Other_Viewer_Methods()
+    {
+        // show first pdf page
+        _viewer.ShowFirstPage();
+        // show previous pdf page
+        _viewer.ShowPreviousPage();
+        // show next pdf page
+        _viewer.ShowNextPage();
+        // show last pdf page
+        _viewer.ShowLastPage();
+        // show page based on page number
+        _viewer.ShowPage(6);
+        // refresh current page / rasterize it again
+        _viewer.RefreshPage();
+        // zoom in
+        _viewer.ZoomIn();
+        // zoom out
+        _viewer.ZoomOut();
+        // get first page number
+        int fpn = _viewer.FirstPageNumber;
+        // get last page number
+        int lpn = _viewer.LastPageNumber;
+        // get current page number
+        int cpn = _viewer.CurrentPageNumber;
+        // gets or sets eps clip on or off
+        bool epsClip = _viewer.EpsClip;
+        // gets or sets graphics aplha bits
+        int gab = _viewer.GraphicsAlphaBits;
+        // gets or sets text aplha bits
+        int gtb = _viewer.TextAlphaBits;
+        // gets or sets progressive update on or off
+        bool pu = _viewer.ProgressiveUpdate;
     }
 }
-

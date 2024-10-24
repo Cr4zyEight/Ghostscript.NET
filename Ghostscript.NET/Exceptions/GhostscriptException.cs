@@ -24,38 +24,28 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET;
 
-namespace Ghostscript.NET
+public class GhostscriptException : Exception
 {
-    public class GhostscriptException : Exception
+    public GhostscriptException(string message) : base(message)
     {
-        private int _code = -1000;
+    }
 
-        public GhostscriptException(string message) : base(message)
-        { }
+    public GhostscriptException(string message, int code) : base(message)
+    {
+        Code = code;
+    }
 
-        public GhostscriptException(string message, int code) : base(message)
+    public int Code { get; } = -1000;
+
+    public string CodeName
+    {
+        get
         {
-            _code = code;
-        }
+            if (Code <= -1000) return string.Empty;
 
-        public int Code
-        {
-            get { return _code; }
-        }
-
-        public string CodeName
-        {
-            get 
-            {
-                if (_code <= -1000)
-                {
-                    return string.Empty;
-                }
-
-                return Ierrors.GetErrorName(_code);
-            }
+            return Ierrors.GetErrorName(Code);
         }
     }
 }

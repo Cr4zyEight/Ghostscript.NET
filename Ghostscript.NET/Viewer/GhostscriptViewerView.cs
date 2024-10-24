@@ -24,52 +24,43 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Drawing;
 
-namespace Ghostscript.NET.Viewer
-{
-    #region delegate GhostscriptViewerViewEventHandler
+namespace Ghostscript.NET.Viewer;
 
-    public delegate void GhostscriptViewerViewEventHandler(object sender, GhostscriptViewerViewEventArgs e);
+#region delegate GhostscriptViewerViewEventHandler
+
+public delegate void GhostscriptViewerViewEventHandler(object sender, GhostscriptViewerViewEventArgs e);
+
+#endregion
+
+public class GhostscriptViewerViewEventArgs : EventArgs
+{
+    #region Constructor
+
+    internal GhostscriptViewerViewEventArgs(GhostscriptViewerImage image, Rectangle mediaBox)
+    {
+        _image = image;
+        MediaBox = mediaBox;
+    }
 
     #endregion
 
-    public class GhostscriptViewerViewEventArgs : EventArgs
-    {
-        #region Private variables
+    #region Image
 
-        private GhostscriptViewerImage _image;
-        private RectangleF _mediaBox;
+    public Bitmap Image => _image.Bitmap;
 
-        #endregion
+    #endregion
 
-        #region Constructor
+    #region MediaBox
 
-        internal GhostscriptViewerViewEventArgs(GhostscriptViewerImage image, Rectangle mediaBox)
-        {
-            _image = image;
-            _mediaBox = mediaBox;
-        }
+    public RectangleF MediaBox { get; }
 
-        #endregion
+    #endregion
 
-        #region Image
+    #region Private variables
 
-        public Bitmap Image
-        {
-            get { return _image.Bitmap; }
-        }
+    private readonly GhostscriptViewerImage _image;
 
-        #endregion
-
-        #region MediaBox
-
-        public RectangleF MediaBox
-        {
-            get { return _mediaBox; }
-        }
-
-        #endregion
-    }
+    #endregion
 }

@@ -24,23 +24,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET;
 
-namespace Ghostscript.NET
-{
-    /// <summary>
-    /// Callback function for stdio.
-    /// </summary>
-    /// <param name="handle"></param>
-    /// <param name="pointer"></param>
-    /// <param name="count"></param>
-    /// <returns></returns>
-    public delegate int GsapiStdioCallback(IntPtr handle, IntPtr pointer, int count);
+/// <summary>
+/// Callback function for stdio.
+/// </summary>
+/// <param name="handle"></param>
+/// <param name="pointer"></param>
+/// <param name="count"></param>
+/// <returns></returns>
+public delegate int GsapiStdioCallback(IntPtr handle, IntPtr pointer, int count);
 
-    /// <summary>
-    /// Callback function for gsapi_set_poll function.
-    /// </summary>
-    /// <param name="handle"></param>
-    /// <returns></returns>
-    public delegate int GsapiPoolCallback(IntPtr handle);
-}
+/// <summary>
+/// Callback function for gsapi_set_poll function.
+/// </summary>
+/// <param name="handle"></param>
+/// <returns></returns>
+public delegate int GsapiPoolCallback(IntPtr handle);

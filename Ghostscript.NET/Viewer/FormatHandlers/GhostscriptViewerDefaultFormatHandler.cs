@@ -26,82 +26,72 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Drawing;
+namespace Ghostscript.NET.Viewer;
 
-namespace Ghostscript.NET.Viewer
+internal class GhostscriptViewerDefaultFormatHandler : GhostscriptViewerFormatHandler
 {
-    internal class GhostscriptViewerDefaultFormatHandler : GhostscriptViewerFormatHandler
+    #region Constructor
+
+    public GhostscriptViewerDefaultFormatHandler(GhostscriptViewer viewer) : base(viewer)
     {
-
-        #region Constructor
-
-        public GhostscriptViewerDefaultFormatHandler(GhostscriptViewer viewer) : base(viewer) { }
-
-        #endregion
-
-        #region Initialize
-
-        public override void Initialize()
-        {
-            
-        }
-
-        #endregion
-
-        #region Open
-
-        public override void Open(string filePath)
-        {
-            
-        }
-
-        #endregion
-
-        #region StdInput
-
-        public override void StdInput(out string input, int count)
-        {
-            input = string.Empty;
-        }
-
-        #endregion
-
-        #region StdOutput
-
-        public override void StdOutput(string message)
-        {
-
-        }
-
-        #endregion
-
-        #region StdError
-
-        public override void StdError(string message)
-        {
-
-        }
-
-        #endregion
-
-        #region InitPage
-
-        public override void InitPage(int pageNumber)
-        {
-            
-        }
-
-        #endregion
-
-        #region ShowPage
-
-        public override void ShowPage(int pageNumber)
-        {
-            
-        }
-
-        #endregion
-
     }
+
+    #endregion
+
+    #region Initialize
+
+    public override void Initialize()
+    {
+    }
+
+    #endregion
+
+    #region Open
+
+    public override void Open(string filePath)
+    {
+    }
+
+    #endregion
+
+    #region StdInput
+
+    public override void StdInput(out string input, int count)
+    {
+        input = string.Empty;
+    }
+
+    #endregion
+
+    #region StdOutput
+
+    public override void StdOutput(string message)
+    {
+    }
+
+    #endregion
+
+    #region StdError
+
+    public override void StdError(string message)
+    {
+    }
+
+    #endregion
+
+    #region InitPage
+
+    public override void InitPage(int pageNumber)
+    {
+    }
+
+    #endregion
+
+    #region ShowPage
+
+    public override void ShowPage(int pageNumber)
+    {
+    }
+
+    #endregion
 }

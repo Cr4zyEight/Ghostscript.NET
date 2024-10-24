@@ -26,326 +26,323 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Runtime.InteropServices;
 
-namespace Ghostscript.NET
+namespace Ghostscript.NET;
+
+#region gdevdsp
+
+public class Gdevdsp
 {
+    public const int DisplayVersionMajorV3 = 3;
+    public const int DisplayVersionMinorV3 = 0;
 
-    #region gdevdsp
+    public const int DisplayVersionMajorV2 = 2;
+    public const int DisplayVersionMinorV2 = 0;
 
-    public class Gdevdsp
-    {
-        public const int DisplayVersionMajorV3 = 3;
-        public const int DisplayVersionMinorV3 = 0;
-
-        public const int DisplayVersionMajorV2 = 2;
-        public const int DisplayVersionMinorV2 = 0;
-
-        public const long DisplayColorsMask = 0x8000fL;
-        public const long DisplayAlphaMask = 0x00f0L;
-        public const long DisplayDepthMask = 0xff00L;
-        public const long DisplayEndianMask = 0x00010000L;
-        public const long DisplayFirstrowMask = 0x00020000L;
-        public const long Display555Mask = 0x00040000L;
-        public const long DisplayRowAlignMask = 0x00700000L;
-    }
-
-    #endregion
-
-    /* The display format is set by a combination of the following bitfields */
-
-    #region DISPLAY_FORMAT_COLOR
-
-    /// <summary>
-    /// Define the color space alternatives.
-    /// </summary>
-    public enum DisplayFormatColor : long
-    {
-        DisplayColorsNative = (1 << 0),
-        DisplayColorsGray = (1 << 1),
-        DisplayColorsRgb = (1 << 2),
-        DisplayColorsCmyk = (1 << 3),
-        DisplayColorsSeparation = (1 << 19),
-    }
-
-    #endregion
-
-    #region DISPLAY_FORMAT_ALPHA
-
-    /// <summary>
-    /// Define whether alpha information, or an extra unused bytes is included
-    /// DISPLAY_ALPHA_FIRST and DISPLAY_ALPHA_LAST are not implemented
-    /// </summary>
-    public enum DisplayFormatAlpha : long
-    {
-        DisplayAlphaNone   = (0<<4),
-        DisplayAlphaFirst  = (1<<4),
-        DisplayAlphaLast   = (1<<5),
-        DisplayUnusedFirst = (1<<6),	/* e.g. Mac xRGB */
-        DisplayUnusedLast  = (1<<7)	/* e.g. Windows BGRx */
-    }
-
-    #endregion
-
-    #region DISPLAY_FORMAT_DEPTH
-
-    /// <summary>
-    /// Define the depth per component for DISPLAY_COLORS_GRAY,
-    /// DISPLAY_COLORS_RGB and DISPLAY_COLORS_CMYK,
-    /// or the depth per pixel for DISPLAY_COLORS_NATIVE
-    /// DISPLAY_DEPTH_2 and DISPLAY_DEPTH_12 have not been tested.
-    /// </summary>
-    public enum DisplayFormatDepth : long
-    {
-        DisplayDepth1 = (1 << 8),
-        DisplayDepth2 = (1 << 9),
-        DisplayDepth4 = (1 << 10),
-        DisplayDepth8 = (1 << 11),
-        DisplayDepth12 = (1 << 12),
-        DisplayDepth16 = (1 << 13)
-        /* unused (1<<14) */
-        /* unused (1<<15) */
-    }
-
-    #endregion
-
-    #region DISPLAY_FORMAT_ENDIAN
-
-    /// <summary>
-    /// Define whether Red/Cyan should come first,
-    /// or whether Blue/Black should come first
-    /// </summary>
-    public enum DisplayFormatEndian
-    {
-        DisplayBigendian = (0 << 16),	/* Red/Cyan first */
-        DisplayLittleendian = (1 << 16)	/* Blue/Black first */
-    }
-
-    #endregion
-
-    #region DISPLAY_FORMAT_FIRSTROW
-
-    /// <summary>
-    /// Define whether the raster starts at the top or bottom of the bitmap
-    /// </summary>
-    public enum DisplayFormatFirstrow
-    {
-        DisplayTopfirst = (0 << 17),	/* Unix, Mac */
-        DisplayBottomfirst = (1 << 17)	/* Windows */
-    }
-
-    #endregion
-
-    #region DISPLAY_FORMAT_555
-
-    /// <summary>
-    /// Define whether packing RGB in 16-bits should use 555
-    /// or 565 (extra bit for green)
-    /// </summary>
-    public enum DisplayFormat555
-    {
-        DisplayNative555 = (0 << 18),
-        DisplayNative565 = (1 << 18)
-    }
-
-    #endregion
-
-    #region DISPLAY_FORMAT_ROW_ALIGN
-
-    /// <summary>
-    /// Define the row alignment, which must be equal to or greater than
-    /// the size of a pointer.
-    /// The default (DISPLAY_ROW_ALIGN_DEFAULT) is the size of a pointer,
-    /// 4 bytes (DISPLAY_ROW_ALIGN_4) on 32-bit systems or 8 bytes
-    /// (DISPLAY_ROW_ALIGN_8) on 64-bit systems.
-    /// </summary>
-    public enum DisplayFormatRowAlign
-    {
-        DisplayRowAlignDefault = (0 << 20),
-        /* DISPLAY_ROW_ALIGN_1 = (1<<20), */
-        /* not currently possible */
-        /* DISPLAY_ROW_ALIGN_2 = (2<<20), */
-        /* not currently possible */
-        DisplayRowAlign4 = (3 << 20),
-        DisplayRowAlign8 = (4 << 20),
-        DisplayRowAlign16 = (5 << 20),
-        DisplayRowAlign32 = (6 << 20),
-        DisplayRowAlign64 = (7 << 20)
-    }
-
-    #endregion
-
-    #region display_callback_v3
-
-    /// <summary>
-    /// Display device callback structure.
-    /// 
-    /// Note that for Windows, the display callback functions are
-    /// cdecl, not stdcall.  This differs from those in iapi.h.
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public class DisplayCallbackV3 : DisplayCallback
-    {
-        /// <summary>
-        /// Added in V3 */
-        /// If non NULL, then this gives the callback provider a chance to
-        /// a) be informed of and b) control the bandheight used by the
-        /// display device. If a call to allocate the page mode bitmap fails
-        /// (either an internal allocation or a display_memalloc call), then
-        /// Ghostscript will look for the presence of a
-        /// display_rectangle_request callback. If it exists, then it will
-        /// attempt to use retangle request mode.
-        /// 
-        /// As part of this, it will pick an appropriate bandheight. If
-        /// this callback exists, it will be called so the callback provider
-        /// can know (and, optionally, tweak) the bandheight to be used.
-        /// This is purely for performance. The callback should only ever
-        /// *reduce* the bandheight given here.
-        /// 
-        /// Return the adjusted bandheight (or 0 for no change).
-        /// </summary>
-        public DisplayAdjustBandHeight display_adjust_band_height;
-
-        /// <summary>
-        /// Ask the callback for a rectangle to render (and a block to render
-        /// it in). Each subsequent call tells the caller that any previous
-        /// call has finished. To signal 'no more rectangles' return with
-        /// *w or *h = 0.
-        /// 
-        /// On entry: *raster and *plane_raster are set to the standard
-        ///   values. All other values are undefined.
-        /// On return: *memory should point to a block of memory to use.
-        ///   Pixel (*ox,*oy) is the first pixel represented in that block.
-        ///   *raster = the number of bytes difference between the address of
-        ///   component 0 of Pixel(*ox,*oy) and the address of component 0 of
-        ///   Pixel(*ox,1+*oy).
-        ///   *plane_raster = the number of bytes difference between the
-        ///   address of component 0 of Pixel(*ox,*oy) and the address of
-        ///   component 1 of Pixel(*ox,*oy), if in planar mode, 0 otherwise.
-        ///   *x, *y, *w, *h = rectangle requested within that memory block.
-        /// </summary>
-        public DisplayRectangleRequest display_rectangle_request;
-
-    }
-
-    #endregion
-
-
-    #region display_callback
-
-    /// <summary>
-    /// Display device callback structure.
-    /// 
-    /// Note that for Windows, the display callback functions are
-    /// cdecl, not stdcall.  This differs from those in iapi.h.
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public class DisplayCallback
-    {
-        /// <summary>
-        /// Size of this structure
-        /// Used for checking if we have been handed a valid structure
-        /// </summary>
-        public int size;
-
-        /// <summary>
-        /// Major version of this structure
-        /// The major version number will change if this structure changes.
-        /// </summary>
-        public int version_major;
-
-        /// <summary>
-        /// Minor version of this structure 
-        /// The minor version number will change if new features are added
-        /// without changes to this structure.  For example, a new color
-        /// format.
-        /// </summary>
-        public int version_minor;
-
-        /// <summary>
-        /// New device has been opened 
-        /// This is the first event from this device.
-        /// </summary>
-        public DisplayOpenCallback display_open;
-
-        /// <summary>
-        /// Device is about to be closed. 
-        /// Device will not be closed until this function returns. 
-        /// </summary>
-        public DisplayPrecloseCallback display_preclose;
-
-        /// <summary>
-        /// Device has been closed. 
-        /// This is the last event from this device. 
-        /// </summary>
-        public DisplayCloseCallback display_close;
-
-
-        /// <summary>
-        /// Device is about to be resized. 
-        /// Resize will only occur if this function returns 0. 
-        /// raster is byte count of a row.
-        /// </summary>
-        public DisplayPresizeCallback display_presize;
-
-        /// <summary>
-        /// Device has been resized. 
-        /// New pointer to raster returned in pimage
-        /// </summary>
-        public DisplaySizeCallback display_size;
-
-        /// <summary>
-        /// flushpage
-        /// </summary>
-        public DisplaySyncCallback display_sync;
-
-        /// <summary>
-        /// showpage 
-        /// If you want to pause on showpage, then don't return immediately
-        /// </summary>
-        public DisplayPageCallback display_page;
-
-        /// <summary>
-        /// Notify the caller whenever a portion of the raster is updated.
-        /// This can be used for cooperative multitasking or for
-        /// progressive update of the display.
-        /// This function pointer may be set to NULL if not required.
-        /// </summary>
-        public DisplayUpdateCallback display_update;
-
-        /// <summary>
-        /// Allocate memory for bitmap 
-        /// This is provided in case you need to create memory in a special
-        /// way, e.g. shared.  If this is NULL, the Ghostscript memory device
-        /// allocates the bitmap. This will only called to allocate the
-        /// image buffer. The first row will be placed at the address
-        /// returned by display_memalloc.
-        /// </summary>
-        public DisplayMemallocCallback display_memalloc;
-
-        /// <summary>
-        /// Free memory for bitmap 
-        /// If this is NULL, the Ghostscript memory device will free the bitmap
-        /// </summary>
-        public DisplayMemfreeCallback display_memfree;
-
-        /// <summary>
-        /// Added in V2 
-        /// When using separation color space (DISPLAY_COLORS_SEPARATION),
-        /// give a mapping for one separation component.
-        /// This is called for each new component found.
-        /// It may be called multiple times for each component.
-        /// It may be called at any time between display_size
-        /// and display_close.
-        /// The client uses this to map from the separations to CMYK
-        /// and hence to RGB for display.
-        /// GS must only use this callback if version_major >= 2.
-        /// The unsigned short c,m,y,k values are 65535 = 1.0.
-        /// This function pointer may be set to NULL if not required.
-        /// </summary>
-        public DisplaySeparationCallback display_separation;
-    }
-
-    #endregion
+    public const long DisplayColorsMask = 0x8000fL;
+    public const long DisplayAlphaMask = 0x00f0L;
+    public const long DisplayDepthMask = 0xff00L;
+    public const long DisplayEndianMask = 0x00010000L;
+    public const long DisplayFirstrowMask = 0x00020000L;
+    public const long Display555Mask = 0x00040000L;
+    public const long DisplayRowAlignMask = 0x00700000L;
 }
+
+#endregion
+
+/* The display format is set by a combination of the following bitfields */
+
+#region DISPLAY_FORMAT_COLOR
+
+/// <summary>
+/// Define the color space alternatives.
+/// </summary>
+public enum DisplayFormatColor : long
+{
+    DisplayColorsNative = 1 << 0,
+    DisplayColorsGray = 1 << 1,
+    DisplayColorsRgb = 1 << 2,
+    DisplayColorsCmyk = 1 << 3,
+    DisplayColorsSeparation = 1 << 19
+}
+
+#endregion
+
+#region DISPLAY_FORMAT_ALPHA
+
+/// <summary>
+/// Define whether alpha information, or an extra unused bytes is included
+/// DISPLAY_ALPHA_FIRST and DISPLAY_ALPHA_LAST are not implemented
+/// </summary>
+public enum DisplayFormatAlpha : long
+{
+    DisplayAlphaNone = 0 << 4,
+    DisplayAlphaFirst = 1 << 4,
+    DisplayAlphaLast = 1 << 5,
+    DisplayUnusedFirst = 1 << 6, /* e.g. Mac xRGB */
+    DisplayUnusedLast = 1 << 7 /* e.g. Windows BGRx */
+}
+
+#endregion
+
+#region DISPLAY_FORMAT_DEPTH
+
+/// <summary>
+/// Define the depth per component for DISPLAY_COLORS_GRAY,
+/// DISPLAY_COLORS_RGB and DISPLAY_COLORS_CMYK,
+/// or the depth per pixel for DISPLAY_COLORS_NATIVE
+/// DISPLAY_DEPTH_2 and DISPLAY_DEPTH_12 have not been tested.
+/// </summary>
+public enum DisplayFormatDepth : long
+{
+    DisplayDepth1 = 1 << 8,
+    DisplayDepth2 = 1 << 9,
+    DisplayDepth4 = 1 << 10,
+    DisplayDepth8 = 1 << 11,
+    DisplayDepth12 = 1 << 12,
+
+    DisplayDepth16 = 1 << 13
+    /* unused (1<<14) */
+    /* unused (1<<15) */
+}
+
+#endregion
+
+#region DISPLAY_FORMAT_ENDIAN
+
+/// <summary>
+/// Define whether Red/Cyan should come first,
+/// or whether Blue/Black should come first
+/// </summary>
+public enum DisplayFormatEndian
+{
+    DisplayBigendian = 0 << 16, /* Red/Cyan first */
+    DisplayLittleendian = 1 << 16 /* Blue/Black first */
+}
+
+#endregion
+
+#region DISPLAY_FORMAT_FIRSTROW
+
+/// <summary>
+/// Define whether the raster starts at the top or bottom of the bitmap
+/// </summary>
+public enum DisplayFormatFirstrow
+{
+    DisplayTopfirst = 0 << 17, /* Unix, Mac */
+    DisplayBottomfirst = 1 << 17 /* Windows */
+}
+
+#endregion
+
+#region DISPLAY_FORMAT_555
+
+/// <summary>
+/// Define whether packing RGB in 16-bits should use 555
+/// or 565 (extra bit for green)
+/// </summary>
+public enum DisplayFormat555
+{
+    DisplayNative555 = 0 << 18,
+    DisplayNative565 = 1 << 18
+}
+
+#endregion
+
+#region DISPLAY_FORMAT_ROW_ALIGN
+
+/// <summary>
+/// Define the row alignment, which must be equal to or greater than
+/// the size of a pointer.
+/// The default (DISPLAY_ROW_ALIGN_DEFAULT) is the size of a pointer,
+/// 4 bytes (DISPLAY_ROW_ALIGN_4) on 32-bit systems or 8 bytes
+/// (DISPLAY_ROW_ALIGN_8) on 64-bit systems.
+/// </summary>
+public enum DisplayFormatRowAlign
+{
+    DisplayRowAlignDefault = 0 << 20,
+
+    /* DISPLAY_ROW_ALIGN_1 = (1<<20), */
+    /* not currently possible */
+    /* DISPLAY_ROW_ALIGN_2 = (2<<20), */
+    /* not currently possible */
+    DisplayRowAlign4 = 3 << 20,
+    DisplayRowAlign8 = 4 << 20,
+    DisplayRowAlign16 = 5 << 20,
+    DisplayRowAlign32 = 6 << 20,
+    DisplayRowAlign64 = 7 << 20
+}
+
+#endregion
+
+#region display_callback_v3
+
+/// <summary>
+/// Display device callback structure.
+/// 
+/// Note that for Windows, the display callback functions are
+/// cdecl, not stdcall.  This differs from those in iapi.h.
+/// </summary>
+[StructLayout(LayoutKind.Sequential)]
+public class DisplayCallbackV3 : DisplayCallback
+{
+    /// <summary>
+    /// Added in V3 */
+    /// If non NULL, then this gives the callback provider a chance to
+    /// a) be informed of and b) control the bandheight used by the
+    /// display device. If a call to allocate the page mode bitmap fails
+    /// (either an internal allocation or a display_memalloc call), then
+    /// Ghostscript will look for the presence of a
+    /// display_rectangle_request callback. If it exists, then it will
+    /// attempt to use retangle request mode.
+    /// 
+    /// As part of this, it will pick an appropriate bandheight. If
+    /// this callback exists, it will be called so the callback provider
+    /// can know (and, optionally, tweak) the bandheight to be used.
+    /// This is purely for performance. The callback should only ever
+    /// *reduce* the bandheight given here.
+    /// 
+    /// Return the adjusted bandheight (or 0 for no change).
+    /// </summary>
+    public DisplayAdjustBandHeight display_adjust_band_height;
+
+    /// <summary>
+    /// Ask the callback for a rectangle to render (and a block to render
+    /// it in). Each subsequent call tells the caller that any previous
+    /// call has finished. To signal 'no more rectangles' return with
+    /// *w or *h = 0.
+    /// 
+    /// On entry: *raster and *plane_raster are set to the standard
+    ///   values. All other values are undefined.
+    /// On return: *memory should point to a block of memory to use.
+    ///   Pixel (*ox,*oy) is the first pixel represented in that block.
+    ///   *raster = the number of bytes difference between the address of
+    ///   component 0 of Pixel(*ox,*oy) and the address of component 0 of
+    ///   Pixel(*ox,1+*oy).
+    ///   *plane_raster = the number of bytes difference between the
+    ///   address of component 0 of Pixel(*ox,*oy) and the address of
+    ///   component 1 of Pixel(*ox,*oy), if in planar mode, 0 otherwise.
+    ///   *x, *y, *w, *h = rectangle requested within that memory block.
+    /// </summary>
+    public DisplayRectangleRequest display_rectangle_request;
+}
+
+#endregion
+
+#region display_callback
+
+/// <summary>
+/// Display device callback structure.
+/// 
+/// Note that for Windows, the display callback functions are
+/// cdecl, not stdcall.  This differs from those in iapi.h.
+/// </summary>
+[StructLayout(LayoutKind.Sequential)]
+public class DisplayCallback
+{
+    /// <summary>
+    /// Size of this structure
+    /// Used for checking if we have been handed a valid structure
+    /// </summary>
+    public int size;
+
+    /// <summary>
+    /// Major version of this structure
+    /// The major version number will change if this structure changes.
+    /// </summary>
+    public int version_major;
+
+    /// <summary>
+    /// Minor version of this structure 
+    /// The minor version number will change if new features are added
+    /// without changes to this structure.  For example, a new color
+    /// format.
+    /// </summary>
+    public int version_minor;
+
+    /// <summary>
+    /// New device has been opened 
+    /// This is the first event from this device.
+    /// </summary>
+    public DisplayOpenCallback display_open;
+
+    /// <summary>
+    /// Device is about to be closed. 
+    /// Device will not be closed until this function returns. 
+    /// </summary>
+    public DisplayPrecloseCallback display_preclose;
+
+    /// <summary>
+    /// Device has been closed. 
+    /// This is the last event from this device. 
+    /// </summary>
+    public DisplayCloseCallback display_close;
+
+
+    /// <summary>
+    /// Device is about to be resized. 
+    /// Resize will only occur if this function returns 0. 
+    /// raster is byte count of a row.
+    /// </summary>
+    public DisplayPresizeCallback display_presize;
+
+    /// <summary>
+    /// Device has been resized. 
+    /// New pointer to raster returned in pimage
+    /// </summary>
+    public DisplaySizeCallback display_size;
+
+    /// <summary>
+    /// flushpage
+    /// </summary>
+    public DisplaySyncCallback display_sync;
+
+    /// <summary>
+    /// showpage 
+    /// If you want to pause on showpage, then don't return immediately
+    /// </summary>
+    public DisplayPageCallback display_page;
+
+    /// <summary>
+    /// Notify the caller whenever a portion of the raster is updated.
+    /// This can be used for cooperative multitasking or for
+    /// progressive update of the display.
+    /// This function pointer may be set to NULL if not required.
+    /// </summary>
+    public DisplayUpdateCallback display_update;
+
+    /// <summary>
+    /// Allocate memory for bitmap 
+    /// This is provided in case you need to create memory in a special
+    /// way, e.g. shared.  If this is NULL, the Ghostscript memory device
+    /// allocates the bitmap. This will only called to allocate the
+    /// image buffer. The first row will be placed at the address
+    /// returned by display_memalloc.
+    /// </summary>
+    public DisplayMemallocCallback display_memalloc;
+
+    /// <summary>
+    /// Free memory for bitmap 
+    /// If this is NULL, the Ghostscript memory device will free the bitmap
+    /// </summary>
+    public DisplayMemfreeCallback display_memfree;
+
+    /// <summary>
+    /// Added in V2 
+    /// When using separation color space (DISPLAY_COLORS_SEPARATION),
+    /// give a mapping for one separation component.
+    /// This is called for each new component found.
+    /// It may be called multiple times for each component.
+    /// It may be called at any time between display_size
+    /// and display_close.
+    /// The client uses this to map from the separations to CMYK
+    /// and hence to RGB for display.
+    /// GS must only use this callback if version_major >= 2.
+    /// The unsigned short c,m,y,k values are 65535 = 1.0.
+    /// This function pointer may be set to NULL if not required.
+    /// </summary>
+    public DisplaySeparationCallback display_separation;
+}
+
+#endregion

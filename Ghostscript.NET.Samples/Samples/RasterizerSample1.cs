@@ -25,77 +25,78 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // required Ghostscript.NET namespaces
+
 using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using Ghostscript.NET.Rasterizer;
 using Ghostscript.NET.Samples.StdIOHandlers;
 
-namespace Ghostscript.NET.Samples
+namespace Ghostscript.NET.Samples;
+
+/// <summary>
+/// GhostscriptRasterizer allows you to rasterize pdf and postscript files into the 
+/// memory. If you want Ghostscript to store files on the disk use GhostscriptProcessor
+/// or one of the GhostscriptDevices (GhostscriptPngDevice, GhostscriptJpgDevice).
+/// </summary>
+public class RasterizerSample1 : ISample
 {
-    /// <summary>
-    /// GhostscriptRasterizer allows you to rasterize pdf and postscript files into the 
-    /// memory. If you want Ghostscript to store files on the disk use GhostscriptProcessor
-    /// or one of the GhostscriptDevices (GhostscriptPngDevice, GhostscriptJpgDevice).
-    /// </summary>
-    public class RasterizerSample1 : ISample
+    public void Start()
     {
-        public void Start()
+        Sample1();
+        Sample2();
+    }
+
+    public void Sample1()
+    {
+        int desiredDpi = 96;
+
+        string inputPdfPath = @"E:\gss_test\test.pdf";
+        string outputPath = @"E:\gss_test\output\";
+
+        GhostscriptVersionInfo gvi = new(@"C:\Program Files\gs\gs9.53.3\bin\gsdll64.dll");
+
+        using (GhostscriptRasterizer rasterizer = new GhostscriptRasterizer())
         {
-            Sample1();
-            Sample2();
-        }
+            rasterizer.Open(inputPdfPath, gvi, false);
 
-        public void Sample1()
-        {
-            int desiredDpi = 96;
-
-            string inputPdfPath = @"E:\gss_test\test.pdf";
-            string outputPath = @"E:\gss_test\output\";
-
-            GhostscriptVersionInfo gvi = new GhostscriptVersionInfo(@"C:\Program Files\gs\gs9.53.3\bin\gsdll64.dll");
-
-            using (var rasterizer = new GhostscriptRasterizer())
+            for (int pageNumber = 1; pageNumber <= rasterizer.PageCount; pageNumber++)
             {
-                rasterizer.Open(inputPdfPath, gvi, false);
+                string pageFilePath = Path.Combine(outputPath, string.Format("Page-{0}.png", pageNumber));
 
-                for (var pageNumber = 1; pageNumber <= rasterizer.PageCount; pageNumber++)
-                {
-                    var pageFilePath = Path.Combine(outputPath, string.Format("Page-{0}.png", pageNumber));
+                Image img = rasterizer.GetPage(desiredDpi, pageNumber);
+                img.Save(pageFilePath, ImageFormat.Png);
 
-                    var img = rasterizer.GetPage(desiredDpi, pageNumber);
-                    img.Save(pageFilePath, ImageFormat.Png);
-
-                    Console.WriteLine(pageFilePath);
-                }
+                Console.WriteLine(pageFilePath);
             }
         }
+    }
 
-        public void Sample2()
+    public void Sample2()
+    {
+        int desiredDpi = 96;
+
+        string inputPdfPath = @"E:\gss_test\test.pdf";
+        string outputPath = @"E:\gss_test\output\";
+
+        DelegateStdIoHandler output = new DelegateStdIoHandler(
+            stdOut: Console.WriteLine,
+            stdErr: Console.WriteLine
+        );
+
+        using (GhostscriptRasterizer rasterizer = new GhostscriptRasterizer(output))
         {
-            int desiredDpi = 96;
+            rasterizer.Open(inputPdfPath);
 
-            string inputPdfPath = @"E:\gss_test\test.pdf";
-            string outputPath = @"E:\gss_test\output\";
-
-            var output = new DelegateStdIoHandler(
-                stdOut: Console.WriteLine,
-                stdErr: Console.WriteLine
-                );
-
-            using (var rasterizer = new GhostscriptRasterizer(output))
+            for (int pageNumber = 1; pageNumber <= rasterizer.PageCount; pageNumber++)
             {
-                rasterizer.Open(inputPdfPath);
+                string pageFilePath = Path.Combine(outputPath, string.Format("Page-{0}.png", pageNumber));
 
-                for (var pageNumber = 1; pageNumber <= rasterizer.PageCount; pageNumber++)
-                {
-                    var pageFilePath = Path.Combine(outputPath, string.Format("Page-{0}.png", pageNumber));
+                Image img = rasterizer.GetPage(desiredDpi, pageNumber);
+                img.Save(pageFilePath, ImageFormat.Png);
 
-                    var img = rasterizer.GetPage(desiredDpi, pageNumber);
-                    img.Save(pageFilePath, ImageFormat.Png);
-
-                    Console.WriteLine(pageFilePath);
-                }
+                Console.WriteLine(pageFilePath);
             }
         }
     }

@@ -25,35 +25,24 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using Ghostscript.NET;
-using Ghostscript.NET.Processor;
 using System.IO;
-
+using System.Text;
 using Ghostscript.NET.FacturX.ZUGFeRD;
 
+namespace Ghostscript.NET.Samples;
 
-namespace Ghostscript.NET.Samples
+public class FacturXWriteSample : ISample
 {
-    public class FacturXWriteSample : ISample
+    public void Start()
     {
+        Invoice i = new Invoice().SetDueDate(DateTime.Now).SetIssueDate(DateTime.Now).SetDeliveryDate(DateTime.Now).SetSender(new TradeParty("Test company", "teststr", "55232", "teststadt", "DE").AddTaxId("DE4711").AddVatId("DE0815").SetContact(new Contact("Hans Test", "+49123456789", "test@example.org")).AddBankDetails(new BankDetails("DE12500105170648489890", "COBADEFXXX"))).SetRecipient(new TradeParty("Franz Müller", "teststr.12", "55232", "Entenhausen", "DE")).SetReferenceNumber("991-01484-64").SetNumber("123").AddItem(new Item(new Product("Testprodukt", "", "C62", new decimal(19)), decimal.One, decimal.One));
 
+        ZUGFeRD2PullProvider zf2P = new();
+        zf2P.SetProfile(Profiles.GetByName("XRechnung"));
+        zf2P.GenerateXml(i);
+        UTF8Encoding encoding = new();
 
-        public void Start()
-        {
-            
-            Invoice i = (new Invoice()).SetDueDate(DateTime.Now).SetIssueDate(DateTime.Now).SetDeliveryDate(DateTime.Now).SetSender((new TradeParty("Test company", "teststr", "55232", "teststadt", "DE")).AddTaxId("DE4711").AddVatId("DE0815").SetContact(new Contact("Hans Test", "+49123456789", "test@example.org")).AddBankDetails(new BankDetails("DE12500105170648489890", "COBADEFXXX"))).SetRecipient(new TradeParty("Franz Müller", "teststr.12", "55232", "Entenhausen", "DE")).SetReferenceNumber("991-01484-64").SetNumber("123").
-                    AddItem(new Item(new Product("Testprodukt", "", "C62", new decimal(19)), decimal.One, decimal.One));
-
-            ZUGFeRD2PullProvider zf2P = new ZUGFeRD2PullProvider();
-            zf2P.SetProfile(Profiles.GetByName("XRechnung"));
-            zf2P.GenerateXml(i);
-            System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
-
-            string outfilename = "xrechnung.xml";
-            File.WriteAllBytes(outfilename, zf2P.GetXml());
-        }
-
+        string outfilename = "xrechnung.xml";
+        File.WriteAllBytes(outfilename, zf2P.GetXml());
     }
 }

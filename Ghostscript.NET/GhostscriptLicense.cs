@@ -24,26 +24,25 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET;
 
-namespace Ghostscript.NET
+/// <summary>
+/// Ghostscript license type.
+/// </summary>
+public enum GhostscriptLicense
 {
     /// <summary>
-    /// Ghostscript license type.
+    /// Open source releases.
     /// </summary>
-    public enum GhostscriptLicense
-    {
-        /// <summary>
-        /// Open source releases.
-        /// </summary>
-        Gpl = 0,
-        /// <summary>
-        /// Old open source releases.
-        /// </summary>
-        Afpl = 1,
-        /// <summary>
-        /// Commercially licensed release.
-        /// </summary>
-        Artifex = 2
-    }
+    Gpl = 0,
+
+    /// <summary>
+    /// Old open source releases.
+    /// </summary>
+    Afpl = 1,
+
+    /// <summary>
+    /// Commercially licensed release.
+    /// </summary>
+    Artifex = 2
 }

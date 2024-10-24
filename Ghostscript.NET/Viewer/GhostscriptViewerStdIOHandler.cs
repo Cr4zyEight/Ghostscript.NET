@@ -24,104 +24,91 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Text;
 
-namespace Ghostscript.NET.Viewer
+namespace Ghostscript.NET.Viewer;
+
+internal class GhostscriptViewerStdIoHandler : GhostscriptStdIo
 {
-    internal class GhostscriptViewerStdIoHandler : GhostscriptStdIo
+    #region Constructor
+
+    public GhostscriptViewerStdIoHandler(GhostscriptViewer viewer, GhostscriptViewerFormatHandler formatHandler) : base(true, true, true)
     {
-
-        #region Private variables
-
-        private GhostscriptViewer _viewer;
-        private GhostscriptViewerFormatHandler _formatHandler;
-        private StringBuilder _outputMessages = new StringBuilder();
-        private StringBuilder _errorMessages = new StringBuilder();
-
-        #endregion
-
-        #region Constructor
-
-        public GhostscriptViewerStdIoHandler(GhostscriptViewer viewer, GhostscriptViewerFormatHandler formatHandler) : base(true, true, true)
-        {
-            _viewer = viewer;
-            _formatHandler = formatHandler;
-        }
-
-        #endregion
-
-        #region StdIn
-
-        public override void StdIn(out string input, int count)
-        {
-            input = string.Empty;
-
-            if (_formatHandler != null)
-            {
-                _formatHandler.StdInput(out input, count);
-            }
-        }
-
-        #endregion
-
-        #region StdOut
-
-        public override void StdOut(string output)
-        {
-            lock (_outputMessages)
-            {
-                _outputMessages.Append(output);
-
-                int rIndex = _outputMessages.ToString().IndexOf("\r\n");
-
-                while (rIndex > -1)
-                {
-                    string line = _outputMessages.ToString().Substring(0, rIndex);
-                    _outputMessages = _outputMessages.Remove(0, rIndex + 2);
-
-                    _viewer.StdOutput(line);
-
-                    if (_formatHandler != null)
-                    {
-                        _formatHandler.StdOutput(line);
-                    }
-
-                    rIndex = _outputMessages.ToString().IndexOf("\r\n");
-                }
-            }
-        }
-
-        #endregion
-
-        #region StdError
-
-        public override void StdError(string error)
-        {
-            lock (_errorMessages)
-            {
-                _errorMessages.Append(error);
-
-                int rIndex = _errorMessages.ToString().IndexOf("\r\n");
-
-                while (rIndex > -1)
-                {
-                    string line = _errorMessages.ToString().Substring(0, rIndex);
-                    _errorMessages = _errorMessages.Remove(0, rIndex + 2);
-
-                    _viewer.StdError(line);
-
-                    if (_formatHandler != null)
-                    {
-                        _formatHandler.StdError(line);
-                    }
-
-                    rIndex = _errorMessages.ToString().IndexOf("\r\n");
-                }
-            }
-        }
-
-        #endregion
-
+        _viewer = viewer;
+        _formatHandler = formatHandler;
     }
+
+    #endregion
+
+    #region StdIn
+
+    public override void StdIn(out string input, int count)
+    {
+        input = string.Empty;
+
+        if (_formatHandler != null) _formatHandler.StdInput(out input, count);
+    }
+
+    #endregion
+
+    #region StdOut
+
+    public override void StdOut(string output)
+    {
+        lock (_outputMessages)
+        {
+            _outputMessages.Append(output);
+
+            int rIndex = _outputMessages.ToString().IndexOf("\r\n");
+
+            while (rIndex > -1)
+            {
+                string line = _outputMessages.ToString().Substring(0, rIndex);
+                _outputMessages = _outputMessages.Remove(0, rIndex + 2);
+
+                _viewer.StdOutput(line);
+
+                if (_formatHandler != null) _formatHandler.StdOutput(line);
+
+                rIndex = _outputMessages.ToString().IndexOf("\r\n");
+            }
+        }
+    }
+
+    #endregion
+
+    #region StdError
+
+    public override void StdError(string error)
+    {
+        lock (_errorMessages)
+        {
+            _errorMessages.Append(error);
+
+            int rIndex = _errorMessages.ToString().IndexOf("\r\n");
+
+            while (rIndex > -1)
+            {
+                string line = _errorMessages.ToString().Substring(0, rIndex);
+                _errorMessages = _errorMessages.Remove(0, rIndex + 2);
+
+                _viewer.StdError(line);
+
+                if (_formatHandler != null) _formatHandler.StdError(line);
+
+                rIndex = _errorMessages.ToString().IndexOf("\r\n");
+            }
+        }
+    }
+
+    #endregion
+
+    #region Private variables
+
+    private readonly GhostscriptViewer _viewer;
+    private readonly GhostscriptViewerFormatHandler _formatHandler;
+    private StringBuilder _outputMessages = new();
+    private StringBuilder _errorMessages = new();
+
+    #endregion
 }

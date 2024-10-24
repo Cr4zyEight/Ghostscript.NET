@@ -28,70 +28,71 @@ using System;
 using System.Collections.Generic;
 using Ghostscript.NET.Processor;
 
-namespace Ghostscript.NET.Samples
+namespace Ghostscript.NET.Samples;
+
+public class ProcessorSample2 : ISample
 {
-    public class ProcessorSample2 : ISample
+    public void Start()
     {
-        public void Start()
+        string inputFile = @"E:\gss_test\test.pdf";
+        string outputFile = @"E:\gss_test\output\page-%03d.png";
+
+        int pageFrom = 1;
+        int pageTo = 50;
+
+        GhostscriptVersionInfo gv = GhostscriptVersionInfo.GetLastInstalledVersion();
+
+        using (GhostscriptProcessor processor = new(gv, true))
         {
-            string inputFile = @"E:\gss_test\test.pdf";
-            string outputFile = @"E:\gss_test\output\page-%03d.png";
+            processor.Processing += processor_Processing;
 
-            int pageFrom = 1;
-            int pageTo = 50;
+            List<string> switches = new();
+            switches.Add("-empty");
+            switches.Add("-dSAFER");
+            switches.Add("-dBATCH");
+            switches.Add("-dNOPAUSE");
+            switches.Add("-dNOPROMPT");
+            switches.Add(@"-sFONTPATH=" + Environment.GetFolderPath(Environment.SpecialFolder.Fonts));
+            switches.Add("-dFirstPage=" + pageFrom);
+            switches.Add("-dLastPage=" + pageTo);
+            switches.Add("-sDEVICE=png16m");
+            switches.Add("-r96");
+            switches.Add("-dTextAlphaBits=4");
+            switches.Add("-dGraphicsAlphaBits=4");
+            switches.Add(@"-sOutputFile=" + outputFile);
+            switches.Add(@"-f");
+            switches.Add(inputFile);
 
-            GhostscriptVersionInfo gv = GhostscriptVersionInfo.GetLastInstalledVersion();
+            // if you dont want to handle stdio, you can pass 'null' value as the last parameter
+            LogStdio stdio = new();
+            processor.StartProcessing(switches.ToArray(), stdio);
+        }
+    }
 
-            using (GhostscriptProcessor processor = new GhostscriptProcessor(gv, true))
-            {
-                processor.Processing += new GhostscriptProcessorProcessingEventHandler(processor_Processing);
+    private void processor_Processing(object sender, GhostscriptProcessorProcessingEventArgs e)
+    {
+        Console.WriteLine(e.CurrentPage + " / " + e.TotalPages);
+    }
 
-                List<string> switches = new List<string>();
-                switches.Add("-empty");
-                switches.Add("-dSAFER");
-                switches.Add("-dBATCH");
-                switches.Add("-dNOPAUSE");
-                switches.Add("-dNOPROMPT");
-                switches.Add(@"-sFONTPATH=" + System.Environment.GetFolderPath(System.Environment.SpecialFolder.Fonts));
-                switches.Add("-dFirstPage=" + pageFrom.ToString());
-                switches.Add("-dLastPage=" + pageTo.ToString());
-                switches.Add("-sDEVICE=png16m");
-                switches.Add("-r96");
-                switches.Add("-dTextAlphaBits=4");
-                switches.Add("-dGraphicsAlphaBits=4");
-                switches.Add(@"-sOutputFile=" + outputFile);
-                switches.Add(@"-f");
-                switches.Add(inputFile);
-
-                // if you dont want to handle stdio, you can pass 'null' value as the last parameter
-                LogStdio stdio = new LogStdio();
-                processor.StartProcessing(switches.ToArray(), stdio);
-            }
+    public class LogStdio : GhostscriptStdIo
+    {
+        public LogStdio() : base(true, true, true)
+        {
         }
 
-        void processor_Processing(object sender, GhostscriptProcessorProcessingEventArgs e)
+        public override void StdIn(out string input, int count)
         {
-            Console.WriteLine(e.CurrentPage.ToString() + " / " + e.TotalPages.ToString());
+            input = new string('\n', count);
         }
 
-        public class LogStdio : GhostscriptStdIo
+        public override void StdOut(string output)
         {
-            public LogStdio() : base(true, true, true) { }
+            // Log.Write(output);
+        }
 
-            public override void StdIn(out string input, int count)
-            {
-                input = new string('\n', count);
-            }
-
-            public override void StdOut(string output)
-            {
-                // Log.Write(output);
-            }
-
-            public override void StdError(string error)
-            {
-                // Log.Write("Error: " + error);
-            }
+        public override void StdError(string error)
+        {
+            // Log.Write("Error: " + error);
         }
     }
 }

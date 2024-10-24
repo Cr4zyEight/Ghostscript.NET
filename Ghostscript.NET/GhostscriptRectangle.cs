@@ -24,110 +24,86 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET;
 
-namespace Ghostscript.NET
+/// <summary>
+/// Stores a set of four float values that represent lower-left and upper-right corner of rectangle.
+/// </summary>
+public class GhostscriptRectangle
 {
+    #region Static variables
+
+    public static GhostscriptRectangle Empty = new();
+
+    #endregion
+
+    #region Constructor
+
     /// <summary>
-    /// Stores a set of four float values that represent lower-left and upper-right corner of rectangle.
+    /// Initializes a new instance of the Ghostscript.NET.GhostscriptRectangle class.
     /// </summary>
-    public class GhostscriptRectangle
+    public GhostscriptRectangle()
     {
-
-        #region Private values
-
-        private float _llx;
-        private float _lly;
-        private float _urx;
-        private float _ury;
-
-        #endregion
-
-        #region Static variables
-
-        public static GhostscriptRectangle Empty = new GhostscriptRectangle();
-
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Initializes a new instance of the Ghostscript.NET.GhostscriptRectangle class.
-        /// </summary>
-        public GhostscriptRectangle() { }
-
-        #endregion
-
-        #region Constructor - llx, lly, urx, ury
-
-        /// <summary>
-        /// Initializes a new instance of the Ghostscript.NET.GhostscriptRectangle class.
-        /// </summary>
-        /// <param name="llx">Lower-left x.</param>
-        /// <param name="lly">Lower-left y.</param>
-        /// <param name="urx">Upper-right x.</param>
-        /// <param name="ury">Upper-right y.</param>
-        public GhostscriptRectangle(float llx, float lly, float urx, float ury)
-        {
-            _llx = llx;
-            _lly = lly;
-            _urx = urx;
-            _ury = ury;
-        }
-
-        #endregion
-
-        #region llx
-
-        /// <summary>
-        /// Gets lower-left x.
-        /// </summary>
-        public float Llx
-        {
-            get { return _llx; }
-            set { _llx = value; }
-        }
-
-        #endregion
-
-        #region lly
-
-        /// <summary>
-        /// Gets lower-left y.
-        /// </summary>
-        public float Lly
-        {
-            get { return _lly; }
-            set { _lly = value; }
-        }
-
-        #endregion
-
-        #region urx
-
-        /// <summary>
-        /// Gets upper-right x.
-        /// </summary>
-        public float Urx
-        {
-            get { return _urx; }
-            set { _urx = value; }
-        }
-
-        #endregion
-
-        #region ury
-
-        /// <summary>
-        /// Gets upper-right y.
-        /// </summary>
-        public float Ury
-        {
-            get { return _ury; }
-            set { _ury = value; }
-        }
-
-        #endregion
-
     }
+
+    #endregion
+
+    #region Constructor - llx, lly, urx, ury
+
+    /// <summary>
+    /// Initializes a new instance of the Ghostscript.NET.GhostscriptRectangle class.
+    /// </summary>
+    /// <param name="llx">Lower-left x.</param>
+    /// <param name="lly">Lower-left y.</param>
+    /// <param name="urx">Upper-right x.</param>
+    /// <param name="ury">Upper-right y.</param>
+    public GhostscriptRectangle(float llx, float lly, float urx, float ury)
+    {
+        Llx = llx;
+        Lly = lly;
+        Urx = urx;
+        Ury = ury;
+    }
+
+    #endregion
+
+    #region llx
+
+    /// <summary>
+    /// Gets lower-left x.
+    /// </summary>
+    public float Llx { get; set; }
+
+    #endregion
+
+    #region lly
+
+    /// <summary>
+    /// Gets lower-left y.
+    /// </summary>
+    public float Lly { get; set; }
+
+    #endregion
+
+    #region urx
+
+    /// <summary>
+    /// Gets upper-right x.
+    /// </summary>
+    public float Urx { get; set; }
+
+    #endregion
+
+    #region ury
+
+    /// <summary>
+    /// Gets upper-right y.
+    /// </summary>
+    public float Ury { get; set; }
+
+    #endregion
+
+    #region Private values
+
+    #endregion
 }

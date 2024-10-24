@@ -24,50 +24,41 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.IO;
-using System.Collections.Generic;
+namespace Ghostscript.NET;
 
-namespace Ghostscript.NET
+internal class FileCleanupHelper
 {
-    internal class FileCleanupHelper
+    #region Private variables
+
+    private readonly List<string> _paths = new();
+
+    #endregion
+
+    #region Add
+
+    public void Add(string path)
     {
-
-        #region Private variables
-
-        private List<string> _paths = new List<string>();
-
-        #endregion
-
-        #region Add
-
-        public void Add(string path)
-        {
-            _paths.Add(path);
-        }
-
-        #endregion
-
-        #region Cleanup
-
-        public void Cleanup()
-        {
-            foreach (string path in _paths)
-            {
-                if (File.Exists(path))
-                {
-                    try
-                    {
-                        File.Delete(path);
-                    }
-                    catch { }
-                }
-            }
-
-            _paths.Clear();
-        }
-
-        #endregion
-
+        _paths.Add(path);
     }
+
+    #endregion
+
+    #region Cleanup
+
+    public void Cleanup()
+    {
+        foreach (string path in _paths)
+            if (File.Exists(path))
+                try
+                {
+                    File.Delete(path);
+                }
+                catch
+                {
+                }
+
+        _paths.Clear();
+    }
+
+    #endregion
 }

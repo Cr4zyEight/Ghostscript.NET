@@ -28,52 +28,47 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-
-// required Ghostscript.NET namespaces
-using Ghostscript.NET;
 using Ghostscript.NET.Rasterizer;
+// required Ghostscript.NET namespaces
 
-namespace Ghostscript.NET.Samples
+namespace Ghostscript.NET.Samples;
+
+/// <summary>
+/// GhostscriptRasterizer allows you to rasterize pdf and postscript files into the 
+/// memory. If you want Ghostscript to store files on the disk use GhostscriptProcessor
+/// or one of the GhostscriptDevices (GhostscriptPngDevice, GhostscriptJpgDevice).
+/// </summary>
+public class RasterizerSample2 : ISample
 {
-
-    /// <summary>
-    /// GhostscriptRasterizer allows you to rasterize pdf and postscript files into the 
-    /// memory. If you want Ghostscript to store files on the disk use GhostscriptProcessor
-    /// or one of the GhostscriptDevices (GhostscriptPngDevice, GhostscriptJpgDevice).
-    /// </summary>
-    public class RasterizerSample2 : ISample
+    public void Start()
     {
-        public void Start()
+        int desiredDpi = 96;
+
+        string inputPdfPath = @"E:\gss_test\test.pdf";
+        string outputPath = @"E:\gss_test\output\";
+
+        using (GhostscriptRasterizer rasterizer = new())
         {
-            int desiredDpi = 96;
+            /* custom switches can be added before the file is opened
 
-            string inputPdfPath = @"E:\gss_test\test.pdf";
-            string outputPath = @"E:\gss_test\output\";
+            rasterizer.CustomSwitches.Add("-dPrinted");
 
-            using (GhostscriptRasterizer rasterizer = new GhostscriptRasterizer())
+            */
+
+            byte[] buffer = File.ReadAllBytes(inputPdfPath);
+            MemoryStream ms = new(buffer);
+
+            rasterizer.Open(ms);
+
+            for (int pageNumber = 1; pageNumber <= rasterizer.PageCount; pageNumber++)
             {
-                /* custom switches can be added before the file is opened
-                
-                rasterizer.CustomSwitches.Add("-dPrinted");
-                 
-                */
+                string pageFilePath = Path.Combine(outputPath, "Page-" + pageNumber + ".png");
 
-                byte[] buffer = File.ReadAllBytes(inputPdfPath);
-                MemoryStream ms = new MemoryStream(buffer);
+                Image img = rasterizer.GetPage(desiredDpi, pageNumber);
+                img.Save(pageFilePath, ImageFormat.Png);
 
-                rasterizer.Open(ms);
-
-                for (int pageNumber = 1; pageNumber <= rasterizer.PageCount; pageNumber++)
-                {
-                    string pageFilePath = Path.Combine(outputPath, "Page-" + pageNumber.ToString() + ".png");
-
-                    Image img = rasterizer.GetPage(desiredDpi, pageNumber);
-                    img.Save(pageFilePath, ImageFormat.Png);
-
-                    Console.WriteLine(pageFilePath);
-                }
+                Console.WriteLine(pageFilePath);
             }
         }
     }
 }
-

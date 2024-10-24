@@ -25,33 +25,30 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 using System.Reflection;
+using System.Windows.Forms;
 
-namespace Ghostscript.NET.Viewer
+namespace Ghostscript.NET.Viewer;
+
+internal static class Program
 {
-    static class Program
+    public static string Name = "Ghostscript.NET.Viewer " + Assembly.GetEntryAssembly().GetName().Version.ToString(3);
+
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    private static void Main()
     {
-        public static string Name = "Ghostscript.NET.Viewer " + Assembly.GetEntryAssembly().GetName().Version.ToString(3);
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
 
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
+        if (!GhostscriptVersionInfo.IsGhostscriptInstalled)
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-
-            if (!GhostscriptVersionInfo.IsGhostscriptInstalled)
-            {
-                MessageBox.Show("Ghostscript not installed on this machine. This application requires Ghostscript library in order to run!", Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            Application.Run(new FMain());
+            MessageBox.Show("Ghostscript not installed on this machine. This application requires Ghostscript library in order to run!", Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
         }
+
+        Application.Run(new FMain());
     }
 }

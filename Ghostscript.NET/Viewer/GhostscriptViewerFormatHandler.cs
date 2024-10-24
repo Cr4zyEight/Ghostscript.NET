@@ -24,229 +24,163 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Drawing;
+namespace Ghostscript.NET.Viewer;
 
-namespace Ghostscript.NET.Viewer
+internal abstract class GhostscriptViewerFormatHandler : IDisposable
 {
-    internal abstract class GhostscriptViewerFormatHandler : IDisposable
+    #region Constructor
+
+    public GhostscriptViewerFormatHandler(GhostscriptViewer viewer)
     {
-
-        #region Private variables
-
-        private bool _disposed = false;
-        private GhostscriptViewer _viewer = null;
-        private int _firstPageNumber;
-        private int _lastPageNumber;
-        private int _currentPageNumber = 1;
-        private GhostscriptRectangle _mediaBox = GhostscriptRectangle.Empty;
-        private GhostscriptRectangle _boundingBox = GhostscriptRectangle.Empty;
-        private GhostscriptRectangle _cropBox = GhostscriptRectangle.Empty;
-        private GhostscriptPageOrientation _pageOrientation = GhostscriptPageOrientation.Portrait;
-        private bool _showPagePostScriptCommandInvoked = false;
-
-        #endregion
-
-        #region Constructor
-
-        public GhostscriptViewerFormatHandler(GhostscriptViewer viewer)
-        {
-            _viewer = viewer;
-        }
-
-        #endregion
-
-        #region Destructor
-
-        ~GhostscriptViewerFormatHandler()
-        {
-            this.Dispose(false);
-        }
-
-        #endregion
-
-        #region Dispose
-
-        #region Dispose
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
-
-        #region Dispose - disposing
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-
-                }
-
-                _disposed = true;
-            }
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Abstract methods
-
-        public abstract void Initialize();
-        public abstract void Open(string filePath);
-        public abstract void StdInput(out string input, int count);
-        public abstract void StdOutput(string message);
-        public abstract void StdError(string message);
-        public abstract void InitPage(int pageNumber);
-        public abstract void ShowPage(int pageNumber);
-
-        #endregion
-
-        #region Execute
-
-        public int Execute(string str)
-        {
-            return _viewer.Interpreter.Run(str);
-        }
-
-        #endregion
-
-        #region Execute
-
-        internal int Execute(IntPtr str)
-        {
-            return _viewer.Interpreter.Run(str);
-        }
-
-        #endregion
-
-        #region Viewer
-
-        public GhostscriptViewer Viewer
-        {
-            get { return _viewer; }
-        }
-
-        #endregion
-
-        #region FirstPageNumber
-
-        public int FirstPageNumber
-        {
-            get { return _firstPageNumber; }
-            set { _firstPageNumber = value; }
-        }
-
-        #endregion
-
-        #region LastPageNumber
-
-        public int LastPageNumber
-        {
-            get { return _lastPageNumber; }
-            set { _lastPageNumber = value; }
-        }
-
-        #endregion
-
-        #region CurrentPageNumber
-
-        public int CurrentPageNumber
-        {
-            get { return _currentPageNumber; }
-            internal set { _currentPageNumber = value; }
-        }
-
-        #endregion
-
-        #region MediaBox
-
-        public GhostscriptRectangle MediaBox
-        {
-            get { return _mediaBox; }
-            set { _mediaBox = value; }
-        }
-
-        #endregion
-
-        #region BoundingBox
-
-        public GhostscriptRectangle BoundingBox
-        {
-            get { return _boundingBox; }
-            set { _boundingBox = value; }
-        }
-
-        #endregion
-
-        #region CropBox
-
-        public GhostscriptRectangle CropBox
-        {
-            get { return _cropBox; }
-            set { _cropBox = value; }
-        }
-
-        #endregion
-
-        #region IsMediaBoxSet
-
-        public bool IsMediaBoxSet
-        {
-            get { return _mediaBox != GhostscriptRectangle.Empty; }
-        }
-
-        #endregion
-
-        #region IsBoundingBoxSet
-
-        public bool IsBoundingBoxSet
-        {
-            get { return _boundingBox != GhostscriptRectangle.Empty; }
-        }
-
-        #endregion
-
-        #region IsCropBoxSet
-
-        public bool IsCropBoxSet
-        {
-            get { return _cropBox != GhostscriptRectangle.Empty; }
-        }
-
-        #endregion
-
-        #region PageOrientation
-
-        public GhostscriptPageOrientation PageOrientation
-        {
-            get { return _pageOrientation; }
-            set { _pageOrientation = value; }
-        }
-
-        #endregion
-
-        #region ShowPageInvoked
-
-        internal bool ShowPagePostScriptCommandInvoked
-        {
-            get
-            {
-                return _showPagePostScriptCommandInvoked;
-            }
-            set
-            {
-                _showPagePostScriptCommandInvoked = value;
-            }
-        }
-
-        #endregion
-
+        Viewer = viewer;
     }
+
+    #endregion
+
+    #region Viewer
+
+    public GhostscriptViewer Viewer { get; }
+
+    #endregion
+
+    #region FirstPageNumber
+
+    public int FirstPageNumber { get; set; }
+
+    #endregion
+
+    #region LastPageNumber
+
+    public int LastPageNumber { get; set; }
+
+    #endregion
+
+    #region CurrentPageNumber
+
+    public int CurrentPageNumber { get; internal set; } = 1;
+
+    #endregion
+
+    #region MediaBox
+
+    public GhostscriptRectangle MediaBox { get; set; } = GhostscriptRectangle.Empty;
+
+    #endregion
+
+    #region BoundingBox
+
+    public GhostscriptRectangle BoundingBox { get; set; } = GhostscriptRectangle.Empty;
+
+    #endregion
+
+    #region CropBox
+
+    public GhostscriptRectangle CropBox { get; set; } = GhostscriptRectangle.Empty;
+
+    #endregion
+
+    #region IsMediaBoxSet
+
+    public bool IsMediaBoxSet => MediaBox != GhostscriptRectangle.Empty;
+
+    #endregion
+
+    #region IsBoundingBoxSet
+
+    public bool IsBoundingBoxSet => BoundingBox != GhostscriptRectangle.Empty;
+
+    #endregion
+
+    #region IsCropBoxSet
+
+    public bool IsCropBoxSet => CropBox != GhostscriptRectangle.Empty;
+
+    #endregion
+
+    #region PageOrientation
+
+    public GhostscriptPageOrientation PageOrientation { get; set; } = GhostscriptPageOrientation.Portrait;
+
+    #endregion
+
+    #region ShowPageInvoked
+
+    internal bool ShowPagePostScriptCommandInvoked { get; set; }
+
+    #endregion
+
+    #region Destructor
+
+    ~GhostscriptViewerFormatHandler()
+    {
+        Dispose(false);
+    }
+
+    #endregion
+
+    #region Execute
+
+    public int Execute(string str)
+    {
+        return Viewer.Interpreter.Run(str);
+    }
+
+    #endregion
+
+    #region Execute
+
+    internal int Execute(IntPtr str)
+    {
+        return Viewer.Interpreter.Run(str);
+    }
+
+    #endregion
+
+    #region Private variables
+
+    private bool _disposed;
+
+    #endregion
+
+    #region Dispose
+
+    #region Dispose
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    #endregion
+
+    #region Dispose - disposing
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+            }
+
+            _disposed = true;
+        }
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Abstract methods
+
+    public abstract void Initialize();
+    public abstract void Open(string filePath);
+    public abstract void StdInput(out string input, int count);
+    public abstract void StdOutput(string message);
+    public abstract void StdError(string message);
+    public abstract void InitPage(int pageNumber);
+    public abstract void ShowPage(int pageNumber);
+
+    #endregion
 }

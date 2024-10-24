@@ -24,50 +24,48 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Runtime.InteropServices;
 
-namespace Ghostscript.NET
-{
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int DisplayOpenCallback(IntPtr handle, IntPtr device);
+namespace Ghostscript.NET;
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int DisplayPrecloseCallback(IntPtr handle, IntPtr device);
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate int DisplayOpenCallback(IntPtr handle, IntPtr device);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int DisplayCloseCallback(IntPtr handle, IntPtr device);
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate int DisplayPrecloseCallback(IntPtr handle, IntPtr device);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int DisplayPresizeCallback(IntPtr handle, IntPtr device, Int32 width, Int32 height, Int32 raster, UInt32 format);
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate int DisplayCloseCallback(IntPtr handle, IntPtr device);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int DisplaySizeCallback(IntPtr handle, IntPtr device, Int32 width, Int32 height, Int32 raster, UInt32 format, IntPtr pimage);
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate int DisplayPresizeCallback(IntPtr handle, IntPtr device, int width, int height, int raster, uint format);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int DisplaySyncCallback(IntPtr handle, IntPtr device);
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate int DisplaySizeCallback(IntPtr handle, IntPtr device, int width, int height, int raster, uint format, IntPtr pimage);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int DisplayPageCallback(IntPtr handle, IntPtr device, Int32 copies, Int32 flush);
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate int DisplaySyncCallback(IntPtr handle, IntPtr device);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int DisplayUpdateCallback(IntPtr handle, IntPtr device, Int32 x, Int32 y, Int32 w, Int32 h);
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate int DisplayPageCallback(IntPtr handle, IntPtr device, int copies, int flush);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void DisplayMemallocCallback(IntPtr handle, IntPtr device, UInt32 size);
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate int DisplayUpdateCallback(IntPtr handle, IntPtr device, int x, int y, int w, int h);
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int DisplayMemfreeCallback(IntPtr handle, IntPtr device, IntPtr mem);
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate void DisplayMemallocCallback(IntPtr handle, IntPtr device, uint size);
 
-    // added in v2
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    public delegate int DisplaySeparationCallback(IntPtr handle, IntPtr device, Int32 component, string componentName, UInt16 c, UInt16 m, UInt16 y, UInt16 k);
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate int DisplayMemfreeCallback(IntPtr handle, IntPtr device, IntPtr mem);
 
-    // added in v3
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int DisplayAdjustBandHeight(IntPtr handle, IntPtr device, Int32 bandheight);
+// added in v2
+[UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+public delegate int DisplaySeparationCallback(IntPtr handle, IntPtr device, int component, string componentName, ushort c, ushort m, ushort y, ushort k);
 
-    // added in v3
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int DisplayRectangleRequest(IntPtr handle, IntPtr device, IntPtr memory, Int32 ox, Int32 oy, Int32 raster, Int32 planeRaster, Int32 x, Int32 y, Int32 w, Int32 h);
-}
+// added in v3
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate int DisplayAdjustBandHeight(IntPtr handle, IntPtr device, int bandheight);
+
+// added in v3
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate int DisplayRectangleRequest(IntPtr handle, IntPtr device, IntPtr memory, int ox, int oy, int raster, int planeRaster, int x, int y, int w, int h);

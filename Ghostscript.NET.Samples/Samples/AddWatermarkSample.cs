@@ -24,18 +24,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Ghostscript.NET;
 using Ghostscript.NET.Processor;
 
-namespace Ghostscript.NET.Samples
-{
-    public class AddWatermarkSample : ISample
-    {
+namespace Ghostscript.NET.Samples;
 
-        private const string PostscriptAppendWatermark = @"
+public class AddWatermarkSample : ISample
+{
+    private const string PostscriptAppendWatermark = @"
             /watermarkText { (WATERMARK TEXT) } def
             /watermarkFont { /Helvetica-Bold 72 selectfont } def
             /watermarkColor { .75 setgray } def
@@ -66,58 +63,56 @@ namespace Ghostscript.NET.Samples
 	            } bind
             >> setpagedevice";
 
-        public void Start()
-        {
-            // sample #1:
-            this.Extract_Pdf_Pages_As_Png_And_Add_Watermark();
+    public void Start()
+    {
+        // sample #1:
+        Extract_Pdf_Pages_As_Png_And_Add_Watermark();
 
-            // sample #2:
-            this.Add_Watermark_To_PDF_Document();
+        // sample #2:
+        Add_Watermark_To_PDF_Document();
+    }
+
+    private void Extract_Pdf_Pages_As_Png_And_Add_Watermark()
+    {
+        GhostscriptPngDevice dev = new(GhostscriptPngDeviceType.Png16M);
+        dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+        dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
+        dev.ResolutionXy = new GhostscriptImageDeviceResolution(96, 96);
+        dev.InputFiles.Add(@"E:\gss_test\indispensable.pdf");
+        dev.Pdf.FirstPage = 2;
+        dev.Pdf.LastPage = 4;
+        dev.PostScript = PostscriptAppendWatermark;
+        dev.OutputPath = @"E:\gss_test\output\indispensable_color_page_%03d.png";
+        dev.Process();
+    }
+
+    private void Add_Watermark_To_PDF_Document()
+    {
+        string inputFile = @"E:\gss_test\test.pdf";
+        string outputFile = @"E:\gss_test\output\test-watermarked.pdf";
+
+        List<string> switches = new();
+        switches.Add(string.Empty);
+
+        // set required switches
+        switches.Add("-dBATCH");
+        switches.Add("-dNOPAUSE");
+        switches.Add("-dNOPAUSE");
+        switches.Add("-sDEVICE=pdfwrite");
+        switches.Add("-sOutputFile=" + outputFile);
+        switches.Add("-c");
+        switches.Add(PostscriptAppendWatermark);
+        switches.Add("-f");
+        switches.Add(inputFile);
+
+        // create a new instance of the GhostscriptProcessor
+        using (GhostscriptProcessor processor = new())
+        {
+            // start processing pdf file
+            processor.StartProcessing(switches.ToArray(), null);
         }
 
-        private void Extract_Pdf_Pages_As_Png_And_Add_Watermark()
-        {
-            GhostscriptPngDevice dev = new GhostscriptPngDevice(GhostscriptPngDeviceType.Png16M);
-            dev.GraphicsAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
-            dev.TextAlphaBits = GhostscriptImageDeviceAlphaBits.V4;
-            dev.ResolutionXy = new GhostscriptImageDeviceResolution(96, 96);
-            dev.InputFiles.Add(@"E:\gss_test\indispensable.pdf");
-            dev.Pdf.FirstPage = 2;
-            dev.Pdf.LastPage = 4;
-            dev.PostScript = PostscriptAppendWatermark;
-            dev.OutputPath = @"E:\gss_test\output\indispensable_color_page_%03d.png";
-            dev.Process();
-        }
-
-        private void Add_Watermark_To_PDF_Document()
-        {
-            string inputFile = @"E:\gss_test\test.pdf";
-            string outputFile = @"E:\gss_test\output\test-watermarked.pdf";
-
-            List<string> switches = new List<string>();
-            switches.Add(string.Empty);
-
-            // set required switches
-            switches.Add("-dBATCH");
-            switches.Add("-dNOPAUSE");
-            switches.Add("-dNOPAUSE");
-            switches.Add("-sDEVICE=pdfwrite");
-            switches.Add("-sOutputFile=" + outputFile);
-            switches.Add("-c");
-            switches.Add(PostscriptAppendWatermark);
-            switches.Add("-f");
-            switches.Add(inputFile);
-
-            // create a new instance of the GhostscriptProcessor
-            using (GhostscriptProcessor processor = new GhostscriptProcessor())
-            {
-                // start processing pdf file
-                processor.StartProcessing(switches.ToArray(), null);
-            }
-
-            // show new pdf
-            Process.Start(outputFile);
-        }
-
+        // show new pdf
+        Process.Start(outputFile);
     }
 }

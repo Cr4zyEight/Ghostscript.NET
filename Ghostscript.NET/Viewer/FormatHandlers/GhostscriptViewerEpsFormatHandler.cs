@@ -26,152 +26,139 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.IO;
+using System.Globalization;
 using Ghostscript.NET.Viewer.DSC;
 
-namespace Ghostscript.NET.Viewer
+namespace Ghostscript.NET.Viewer;
+
+internal class GhostscriptViewerEpsFormatHandler : GhostscriptViewerFormatHandler
 {
-    internal class GhostscriptViewerEpsFormatHandler : GhostscriptViewerFormatHandler
+    #region Private variables
+
+    private string _content;
+
+    #endregion
+
+    #region Constructor
+
+    public GhostscriptViewerEpsFormatHandler(GhostscriptViewer viewer) : base(viewer)
     {
-        #region Private variables
+    }
 
-        private string _content;
+    #endregion
 
-        #endregion
+    #region Initialize
 
-        #region Constructor
+    public override void Initialize()
+    {
+    }
 
-        public GhostscriptViewerEpsFormatHandler(GhostscriptViewer viewer) : base(viewer) { }
+    #endregion
 
-        #endregion
+    #region Open
 
-        #region Initialize
+    public override void Open(string filePath)
+    {
+        _content = File.ReadAllText(filePath);
 
-        public override void Initialize()
-        {
-            
-        }
+        int i = _content.IndexOf("%!");
 
-        #endregion
+        if (i > 0) _content = _content.Substring(i, _content.Length - i - 1);
 
-        #region Open
+        i = _content.IndexOf("%%EOF");
 
-        public override void Open(string filePath)
-        {
-            _content = File.ReadAllText(filePath);
+        if (i > -1) _content = _content.Substring(0, i + 5);
 
-            int i = _content.IndexOf("%!");
-
-            if (i > 0)
+        if (Viewer.EpsClip)
+            unsafe
             {
-                _content = _content.Substring(i, _content.Length - i - 1);
-            }
-
-            i = _content.IndexOf("%%EOF");
-
-            if (i > -1)
-            {
-                _content = _content.Substring(0, i + 5);
-            }
-
-            if (this.Viewer.EpsClip)
-            {
-                unsafe
+                fixed (char* p = _content)
                 {
-                    fixed (char* p = _content)
-                    {
-                        UnmanagedMemoryStream ums = new UnmanagedMemoryStream((byte*)p, _content.Length);
-                        DscTokenizer tokenizer = new DscTokenizer(ums, true, BitConverter.IsLittleEndian);
+                    UnmanagedMemoryStream ums = new((byte*)p, _content.Length);
+                    DscTokenizer tokenizer = new(ums, true, BitConverter.IsLittleEndian);
 
-                        DscToken token = null;
+                    DscToken token = null;
 
-                        while ((token = tokenizer.GetNextDscKeywordToken()) != null)
+                    while ((token = tokenizer.GetNextDscKeywordToken()) != null)
+                        if (token.Text == "%%BoundingBox:")
                         {
-                            if (token.Text == "%%BoundingBox:")
+                            try
                             {
-                                try
-                                {
-                                    DscToken v1 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
-                                    DscToken v2 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
-                                    DscToken v3 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
-                                    DscToken v4 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
+                                DscToken v1 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
+                                DscToken v2 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
+                                DscToken v3 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
+                                DscToken v4 = tokenizer.GetNextDscValueToken(DscTokenEnding.Whitespace | DscTokenEnding.LineEnd);
 
-                                    this.BoundingBox = new GhostscriptRectangle(
-                                            float.Parse(v1.Text, System.Globalization.CultureInfo.InvariantCulture),
-                                            float.Parse(v2.Text, System.Globalization.CultureInfo.InvariantCulture),
-                                            float.Parse(v3.Text, System.Globalization.CultureInfo.InvariantCulture),
-                                            float.Parse(v4.Text, System.Globalization.CultureInfo.InvariantCulture));
-                                }
-                                catch { }
-
-                                break;
+                                BoundingBox = new GhostscriptRectangle(
+                                    float.Parse(v1.Text, CultureInfo.InvariantCulture),
+                                    float.Parse(v2.Text, CultureInfo.InvariantCulture),
+                                    float.Parse(v3.Text, CultureInfo.InvariantCulture),
+                                    float.Parse(v4.Text, CultureInfo.InvariantCulture));
                             }
+                            catch
+                            {
+                            }
+
+                            break;
                         }
 
-                        tokenizer.Dispose(); tokenizer = null;
-                        ums.Close(); ums.Dispose(); ums = null;
-                    }
+                    tokenizer.Dispose();
+                    tokenizer = null;
+                    ums.Close();
+                    ums.Dispose();
+                    ums = null;
                 }
             }
 
-            this.FirstPageNumber = 1;
-            this.LastPageNumber = 1;
-        }
-
-        #endregion
-
-        #region StdInput
-
-        public override void StdInput(out string input, int count)
-        {
-            input = string.Empty;
-        }
-
-        #endregion
-
-        #region StdOutput
-
-        public override void StdOutput(string message)
-        {
-            
-        }
-
-        #endregion
-
-        #region StdError
-
-        public override void StdError(string message)
-        {
-            
-        }
-
-        #endregion
-
-        #region InitPage
-
-        public override void InitPage(int pageNumber)
-        {
-            
-        }
-
-        #endregion
-
-        #region ShowPage
-
-        public override void ShowPage(int pageNumber)
-        {
-            this.ShowPagePostScriptCommandInvoked = false;
-
-            this.Execute(_content);
-
-            if (!this.ShowPagePostScriptCommandInvoked)
-            {
-                this.Execute("showpage");
-            }           
-        }
-
-        #endregion
-
+        FirstPageNumber = 1;
+        LastPageNumber = 1;
     }
+
+    #endregion
+
+    #region StdInput
+
+    public override void StdInput(out string input, int count)
+    {
+        input = string.Empty;
+    }
+
+    #endregion
+
+    #region StdOutput
+
+    public override void StdOutput(string message)
+    {
+    }
+
+    #endregion
+
+    #region StdError
+
+    public override void StdError(string message)
+    {
+    }
+
+    #endregion
+
+    #region InitPage
+
+    public override void InitPage(int pageNumber)
+    {
+    }
+
+    #endregion
+
+    #region ShowPage
+
+    public override void ShowPage(int pageNumber)
+    {
+        ShowPagePostScriptCommandInvoked = false;
+
+        Execute(_content);
+
+        if (!ShowPagePostScriptCommandInvoked) Execute("showpage");
+    }
+
+    #endregion
 }

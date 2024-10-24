@@ -24,47 +24,43 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
+namespace Ghostscript.NET;
 
-namespace Ghostscript.NET
+public partial class Ierrors
 {
-    public partial class Ierrors
+    public static bool IsError(int code)
     {
-        public static bool IsError(int code)
-        {
-            return code < 0;
-        }
+        return code < 0;
+    }
 
-        public static bool IsErrorIgnoreQuit(int code)
-        {
-            return (code < 0) && (code != Ierrors.EQuit);
-        }
+    public static bool IsErrorIgnoreQuit(int code)
+    {
+        return code < 0 && code != EQuit;
+    }
 
-        public static bool IsFatalIgnoreNeedInput(int code)
-        {
-            return (code <= Ierrors.EFatal) && (code != Ierrors.ENeedInput);
-        }
+    public static bool IsFatalIgnoreNeedInput(int code)
+    {
+        return code <= EFatal && code != ENeedInput;
+    }
 
-        public static bool IsInterrupt(int ecode)
-        {
-            return ((ecode) == EInterrupt || (ecode) == ETimeout);
-        }
+    public static bool IsInterrupt(int ecode)
+    {
+        return ecode == EInterrupt || ecode == ETimeout;
+    }
 
-        public static bool IsFatal(int code)
-        {
-            return code <= Ierrors.EFatal;
-        }
+    public static bool IsFatal(int code)
+    {
+        return code <= EFatal;
+    }
 
-        /// <summary>
-        /// Returns error name.
-        /// </summary>
-        /// <param name="returnCode">Return code from the Ghostscript.</param>
-        /// <returns>Error name.</returns>
-        public static string GetErrorName(int code)
-        {
-            int errorNameIndex = ~code + 1;
-            return ErrorNames[errorNameIndex];
-        }
+    /// <summary>
+    /// Returns error name.
+    /// </summary>
+    /// <param name="returnCode">Return code from the Ghostscript.</param>
+    /// <returns>Error name.</returns>
+    public static string GetErrorName(int code)
+    {
+        int errorNameIndex = ~code + 1;
+        return ErrorNames[errorNameIndex];
     }
 }

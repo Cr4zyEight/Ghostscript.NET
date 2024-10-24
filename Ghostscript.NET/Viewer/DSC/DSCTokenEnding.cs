@@ -26,11 +26,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace Ghostscript.NET.Viewer.DSC
+namespace Ghostscript.NET.Viewer.DSC;
+
+internal enum DscTokenEnding
 {
-    internal enum DscTokenEnding
-    {
-        LineEnd = 1,
-        Whitespace = 2
-    }
+    LineEnd = 1,
+    Whitespace = 2
 }

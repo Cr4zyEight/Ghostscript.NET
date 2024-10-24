@@ -24,33 +24,30 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.WinAny
+namespace Microsoft.WinAny;
+
+internal static unsafe class WinBase
 {
-    internal static unsafe class WinBase
-    {
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr LoadLibrary(string lpLibFileName);
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr LoadLibrary(string lpLibFileName);
 
-        [DllImport("kernel32.dll")]
-        public static extern bool FreeLibrary(IntPtr hModule);
+    [DllImport("kernel32.dll")]
+    public static extern bool FreeLibrary(IntPtr hModule);
 
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);
 
-        [DllImport("kernel32.dll")]
-        public static extern bool VirtualFree(IntPtr lpAddress, uint dwSize, uint dwFreeType);
+    [DllImport("kernel32.dll")]
+    public static extern bool VirtualFree(IntPtr lpAddress, uint dwSize, uint dwFreeType);
 
-        [DllImport("kernel32.dll")]
-        public static extern bool VirtualProtect(IntPtr lpAddress, uint dwSize, uint flNewProtect, uint* lpflOldProtect);
+    [DllImport("kernel32.dll")]
+    public static extern bool VirtualProtect(IntPtr lpAddress, uint dwSize, uint flNewProtect, uint* lpflOldProtect);
 
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
 
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr GetProcAddress(IntPtr hModule, byte* lpProcName);
-
-    }
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr GetProcAddress(IntPtr hModule, byte* lpProcName);
 }

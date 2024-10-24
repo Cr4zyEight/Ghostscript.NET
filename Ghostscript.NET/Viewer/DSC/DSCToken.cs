@@ -26,71 +26,44 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET.Viewer.DSC;
 
-namespace Ghostscript.NET.Viewer.DSC
+internal class DscToken
 {
+    #region StartPosition
 
-    internal class DscToken
+    public long StartPosition { get; set; }
+
+    #endregion
+
+    #region Length
+
+    public long Length { get; set; }
+
+    #endregion
+
+    #region Text
+
+    public string Text { get; set; }
+
+    #endregion
+
+    #region Ending
+
+    public DscTokenEnding Ending { get; set; }
+
+    #endregion
+
+    #region ToString
+
+    public override string ToString()
     {
-
-        #region Private variables
-
-        private long _startPosition;
-        private long _length;
-        private string _text;
-        private DscTokenEnding _ending;
-
-        #endregion
-
-        #region StartPosition
-
-        public long StartPosition
-        {
-            get { return _startPosition; }
-            set { _startPosition = value; }
-        }
-
-        #endregion
-
-        #region Length
-
-        public long Length
-        {
-            get { return _length; }
-            set { _length = value; }
-        }
-
-        #endregion
-
-        #region Text
-
-        public string Text
-        {
-            get { return _text; }
-            set { _text = value; }
-        }
-
-        #endregion
-
-        #region Ending
-
-        public DscTokenEnding Ending
-        {
-            get { return _ending; }
-            set { _ending = value; }
-        }
-
-        #endregion
-
-        #region ToString
-
-        public override string ToString()
-        {
-            return _text;
-        }
-
-        #endregion
-
+        return Text;
     }
+
+    #endregion
+
+    #region Private variables
+
+    #endregion
 }

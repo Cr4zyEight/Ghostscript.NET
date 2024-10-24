@@ -24,140 +24,140 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Drawing;
 
-namespace Ghostscript.NET
+namespace Ghostscript.NET;
+
+#region GhostscriptPngDeviceType
+
+public enum GhostscriptPngDeviceType
 {
+    /// <summary>
+    /// 24bit RGB color.
+    /// </summary>
+    [GhostscriptSwitchValue("png16m")]
+    Png16M,
 
-    #region GhostscriptPngDeviceType
+    /// <summary>
+    /// Transparency support.
+    /// </summary>
+    [GhostscriptSwitchValue("pngalpha")]
+    PngAlpha,
 
-    public enum GhostscriptPngDeviceType
+    /// <summary>
+    /// Grayscale output.
+    /// </summary>
+    [GhostscriptSwitchValue("pnggray")]
+    PngGray,
+
+    /// <summary>
+    /// 8-bit color.
+    /// </summary>
+    [GhostscriptSwitchValue("png256")]
+    Png256,
+
+    /// <summary>
+    /// 4-bit color.
+    /// </summary>
+    [GhostscriptSwitchValue("png16")]
+    Png16,
+
+    /// <summary>
+    /// Black-and-white only.
+    /// </summary>
+    [GhostscriptSwitchValue("pngmono")]
+    PngMono,
+
+    /// <summary>
+    /// Black-and-white, but the output is formed from an internal 8 bit grayscale rendering which is then error diffused and converted down to 1bpp.
+    /// </summary>
+    [GhostscriptSwitchValue("pngmonod")]
+    PngMonoD
+}
+
+#endregion
+
+#region GhostscriptPngDeviceMinFeatureSize
+
+public enum GhostscriptPngDeviceMinFeatureSize
+{
+    [GhostscriptSwitchValue("0")]
+    V0,
+
+    [GhostscriptSwitchValue("1")]
+    V1,
+
+    [GhostscriptSwitchValue("2")]
+    V2,
+
+    [GhostscriptSwitchValue("3")]
+    V3,
+
+    [GhostscriptSwitchValue("4")]
+    V4
+}
+
+#endregion
+
+public class GhostscriptPngDevice : GhostscriptImageDevice
+{
+    #region Constructor
+
+    public GhostscriptPngDevice() : this(GhostscriptPngDeviceType.Png16M)
     {
-        /// <summary>
-        /// 24bit RGB color.
-        /// </summary>
-        [GhostscriptSwitchValue("png16m")]
-        Png16M,
-        /// <summary>
-        /// Transparency support.
-        /// </summary>
-        [GhostscriptSwitchValue("pngalpha")]
-        PngAlpha,
-        /// <summary>
-        /// Grayscale output.
-        /// </summary>
-        [GhostscriptSwitchValue("pnggray")]
-        PngGray,
-        /// <summary>
-        /// 8-bit color.
-        /// </summary>
-        [GhostscriptSwitchValue("png256")]
-        Png256,
-        /// <summary>
-        /// 4-bit color.
-        /// </summary>
-        [GhostscriptSwitchValue("png16")]
-        Png16,
-        /// <summary>
-        /// Black-and-white only.
-        /// </summary>
-        [GhostscriptSwitchValue("pngmono")]
-        PngMono,
-        /// <summary>
-        /// Black-and-white, but the output is formed from an internal 8 bit grayscale rendering which is then error diffused and converted down to 1bpp.
-        /// </summary>
-        [GhostscriptSwitchValue("pngmonod")]
-        PngMonoD
     }
 
     #endregion
 
-    #region GhostscriptPngDeviceMinFeatureSize
+    #region Constructor - deviceType
 
-    public enum GhostscriptPngDeviceMinFeatureSize
+    public GhostscriptPngDevice(GhostscriptPngDeviceType deviceType)
     {
-        [GhostscriptSwitchValue("0")]
-        V0,
-        [GhostscriptSwitchValue("1")]
-        V1,
-        [GhostscriptSwitchValue("2")]
-        V2,
-        [GhostscriptSwitchValue("3")]
-        V3,
-        [GhostscriptSwitchValue("4")]
-        V4
+        Device = deviceType;
     }
 
     #endregion
 
-    public class GhostscriptPngDevice : GhostscriptImageDevice
+    #region Device
+
+    public new GhostscriptPngDeviceType Device
     {
-
-        #region Constructor
-
-        public GhostscriptPngDevice() : this(GhostscriptPngDeviceType.Png16M) { }
-
-        #endregion
-
-        #region Constructor - deviceType
-
-        public GhostscriptPngDevice(GhostscriptPngDeviceType deviceType)
-        {
-            this.Device = deviceType;
-        }
-
-        #endregion
-
-        #region Device
-
-        public new GhostscriptPngDeviceType Device
-        {
-            get
-            {
-                return (GhostscriptPngDeviceType)base.Device;
-            }
-            set
-            {
-                base.Device = value;
-            }
-        }
-
-        #endregion
-
-        #region DownScaleFactor
-
-        [GhostscriptSwitch("-dDownScaleFactor={0}")]
-        public int? DownScaleFactor { get; set; }
-
-        #endregion
-
-        #region MinFeatureSize
-
-        [GhostscriptSwitch("-dMinFeatureSize={0}")]
-        public GhostscriptPngDeviceMinFeatureSize? MinFeatureSize { get; set; }
-
-        #endregion
-
-        #region BackgroundColor
-
-        [GhostscriptSwitch("-dBackgroundColor={0}")]
-        public Color? BackgroundColor { get; set; }
-
-        #endregion
-
-        #region Process
-
-        public static void Process(GhostscriptPngDeviceType pngDeviceType, string[] inputFiles, string outputPath, GhostscriptStdIo stdIoCallback)
-        {
-            GhostscriptPngDevice dev = new GhostscriptPngDevice(pngDeviceType);
-            dev.InputFiles.AddRange(inputFiles);
-            dev.OutputPath = outputPath;
-            dev.Process(stdIoCallback);
-        }
-
-        #endregion
-
+        get => (GhostscriptPngDeviceType)base.Device;
+        set => base.Device = value;
     }
 
+    #endregion
+
+    #region DownScaleFactor
+
+    [GhostscriptSwitch("-dDownScaleFactor={0}")]
+    public int? DownScaleFactor { get; set; }
+
+    #endregion
+
+    #region MinFeatureSize
+
+    [GhostscriptSwitch("-dMinFeatureSize={0}")]
+    public GhostscriptPngDeviceMinFeatureSize? MinFeatureSize { get; set; }
+
+    #endregion
+
+    #region BackgroundColor
+
+    [GhostscriptSwitch("-dBackgroundColor={0}")]
+    public Color? BackgroundColor { get; set; }
+
+    #endregion
+
+    #region Process
+
+    public static void Process(GhostscriptPngDeviceType pngDeviceType, string[] inputFiles, string outputPath, GhostscriptStdIo stdIoCallback)
+    {
+        GhostscriptPngDevice dev = new(pngDeviceType);
+        dev.InputFiles.AddRange(inputFiles);
+        dev.OutputPath = outputPath;
+        dev.Process(stdIoCallback);
+    }
+
+    #endregion
 }

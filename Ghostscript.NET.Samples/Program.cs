@@ -31,10 +31,7 @@ using Ghostscript.NET.Samples;
 
 Console.WriteLine("Ghostscript.NET Samples");
 
-if (!GhostscriptVersionInfo.IsGhostscriptInstalled)
-{
-    throw new Exception("You don't have Ghostscript installed on this machine!");
-}
+if (!GhostscriptVersionInfo.IsGhostscriptInstalled) throw new Exception("You don't have Ghostscript installed on this machine!");
 
 List<ISample> samples = new()
 {

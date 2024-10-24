@@ -24,36 +24,33 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET.Processor;
 
-namespace Ghostscript.NET.Processor
+internal class GhostscriptProcessorInternalStdIoHandler : GhostscriptStdIo
 {
-    internal class GhostscriptProcessorInternalStdIoHandler : GhostscriptStdIo
+    private readonly StdErrorEventHandler _error;
+    private readonly StdInputEventHandler _input;
+    private readonly StdOutputEventHandler _output;
+
+    public GhostscriptProcessorInternalStdIoHandler(StdInputEventHandler input, StdOutputEventHandler output, StdErrorEventHandler error) : base(true, true, true)
     {
-        private StdInputEventHandler _input;
-        private StdOutputEventHandler _output;
-        private StdErrorEventHandler _error;
+        _input = input;
+        _output = output;
+        _error = error;
+    }
 
-        public GhostscriptProcessorInternalStdIoHandler(StdInputEventHandler input, StdOutputEventHandler output, StdErrorEventHandler error) : base(true, true, true) 
-        {
-            _input = input;
-            _output = output;
-            _error = error;
-        }
+    public override void StdIn(out string input, int count)
+    {
+        _input(out input, count);
+    }
 
-        public override void StdIn(out string input, int count)
-        {
-            _input(out input, count);
-        }
+    public override void StdOut(string output)
+    {
+        _output(output);
+    }
 
-        public override void StdOut(string output)
-        {
-            _output(output);
-        }
-
-        public override void StdError(string error)
-        {
-            _error(error);
-        }
+    public override void StdError(string error)
+    {
+        _error(error);
     }
 }

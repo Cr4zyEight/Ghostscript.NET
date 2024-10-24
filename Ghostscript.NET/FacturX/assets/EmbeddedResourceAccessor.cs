@@ -21,9 +21,7 @@ public class EmbeddedResourceAccessor
             File.WriteAllBytes(tempFileName, data);
             return tempFileName;
         }
-        else
-        {
-            throw new FileNotFoundException($"Embedded resource not found: {embeddedResourceName}");
-        }
+
+        throw new FileNotFoundException($"Embedded resource not found: {embeddedResourceName}");
     }
 }

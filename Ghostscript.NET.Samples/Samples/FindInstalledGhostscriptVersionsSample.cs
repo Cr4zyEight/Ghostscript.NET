@@ -27,49 +27,42 @@
 using System;
 using System.Collections.Generic;
 
-namespace Ghostscript.NET.Samples
+namespace Ghostscript.NET.Samples;
+
+public class FindInstalledGhostscriptVersionsSample : ISample
 {
-    public class FindInstalledGhostscriptVersionsSample : ISample
+    public void Start()
     {
-        public void Start()
-        {
-            Console.WriteLine("Sample #1");
-            Sample_1();
+        Console.WriteLine("Sample #1");
+        Sample_1();
 
-            Console.WriteLine("Sample #2");
-            Sample_2();
-        }
+        Console.WriteLine("Sample #2");
+        Sample_2();
+    }
 
-        private void Sample_1()
-        {
-            List<GhostscriptVersionInfo> gsVersions = GhostscriptVersionInfo.GetInstalledVersions();
+    private void Sample_1()
+    {
+        List<GhostscriptVersionInfo> gsVersions = GhostscriptVersionInfo.GetInstalledVersions();
 
-            foreach (GhostscriptVersionInfo gsv in gsVersions)
-            {
-                Console.WriteLine("Installed " + gsv.LicenseType.ToString() + " Ghostscript " + gsv.Version.ToString());
-            }
+        foreach (GhostscriptVersionInfo gsv in gsVersions) Console.WriteLine("Installed " + gsv.LicenseType + " Ghostscript " + gsv.Version);
 
-            GhostscriptVersionInfo lastVersion = GhostscriptVersionInfo.GetLastInstalledVersion();
+        GhostscriptVersionInfo lastVersion = GhostscriptVersionInfo.GetLastInstalledVersion();
 
-            Console.WriteLine("Ghostscript version used in this sample: " + 
-                lastVersion.LicenseType.ToString() + " Ghostscript " + lastVersion.Version.ToString());
-        }
+        Console.WriteLine("Ghostscript version used in this sample: " +
+                          lastVersion.LicenseType + " Ghostscript " + lastVersion.Version);
+    }
 
-        private void Sample_2()
-        {
-            List<GhostscriptVersionInfo> gsVersions =
-                GhostscriptVersionInfo.GetInstalledVersions(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl | GhostscriptLicense.Artifex);
+    private void Sample_2()
+    {
+        List<GhostscriptVersionInfo> gsVersions =
+            GhostscriptVersionInfo.GetInstalledVersions(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl | GhostscriptLicense.Artifex);
 
-            foreach (GhostscriptVersionInfo gsv in gsVersions)
-            {
-                Console.WriteLine("Installed " + gsv.LicenseType.ToString() + " Ghostscript " + gsv.Version.ToString());
-            }
+        foreach (GhostscriptVersionInfo gsv in gsVersions) Console.WriteLine("Installed " + gsv.LicenseType + " Ghostscript " + gsv.Version);
 
-            GhostscriptVersionInfo lastVersion =
-                GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl | GhostscriptLicense.Artifex, GhostscriptLicense.Gpl);
+        GhostscriptVersionInfo lastVersion =
+            GhostscriptVersionInfo.GetLastInstalledVersion(GhostscriptLicense.Gpl | GhostscriptLicense.Afpl | GhostscriptLicense.Artifex, GhostscriptLicense.Gpl);
 
-            Console.WriteLine("Ghostscript version used in this sample: " +
-                lastVersion.LicenseType.ToString() + " Ghostscript " + lastVersion.Version.ToString());
-        }
+        Console.WriteLine("Ghostscript version used in this sample: " +
+                          lastVersion.LicenseType + " Ghostscript " + lastVersion.Version);
     }
 }

@@ -25,69 +25,64 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.IO;
-using System.IO.Pipes;
-using System.Threading;
 using System.Collections.Generic;
-
 using Ghostscript.NET.Processor;
 
-namespace Ghostscript.NET.Samples
+namespace Ghostscript.NET.Samples;
+
+/// <summary>
+/// Sample that demonstrates how to tell Ghostscript to write the output result to 
+/// an anonymous pipe (memory) instead of the writing it to the disk.
+/// </summary>
+public class PipedOutputSample : ISample
 {
-    /// <summary>
-    /// Sample that demonstrates how to tell Ghostscript to write the output result to 
-    /// an anonymous pipe (memory) instead of the writing it to the disk.
-    /// </summary>
-    public class PipedOutputSample : ISample
+    public void Start()
     {
-        public void Start()
+        string inputFile = @"E:\gss_test\test_postscript.ps";
+
+        GhostscriptPipedOutput gsPipedOutput = new();
+
+        // pipe handle format: %handle%hexvalue
+        string outputPipeHandle = "%handle%" + int.Parse(gsPipedOutput.ClientHandle).ToString("X2");
+
+        using (GhostscriptProcessor processor = new())
         {
-            string inputFile = @"E:\gss_test\test_postscript.ps";
+            List<string> switches = new();
+            switches.Add("-empty");
+            switches.Add("-dQUIET");
+            switches.Add("-dSAFER");
+            switches.Add("-dBATCH");
+            switches.Add("-dNOPAUSE");
+            switches.Add("-dNOPROMPT");
+            switches.Add("-sDEVICE=pdfwrite");
+            switches.Add("-o" + outputPipeHandle);
+            switches.Add("-q");
+            switches.Add("-f");
+            switches.Add(inputFile);
 
-            GhostscriptPipedOutput gsPipedOutput = new GhostscriptPipedOutput();
-
-            // pipe handle format: %handle%hexvalue
-            string outputPipeHandle = "%handle%" + int.Parse(gsPipedOutput.ClientHandle).ToString("X2");
-
-            using (GhostscriptProcessor processor = new GhostscriptProcessor())
+            try
             {
-                List<string> switches = new List<string>();
-                switches.Add("-empty");
-                switches.Add("-dQUIET");
-                switches.Add("-dSAFER");
-                switches.Add("-dBATCH");
-                switches.Add("-dNOPAUSE");
-                switches.Add("-dNOPROMPT");
-                switches.Add("-sDEVICE=pdfwrite");
-                switches.Add("-o" + outputPipeHandle);
-                switches.Add("-q");
-                switches.Add("-f");
-                switches.Add(inputFile);
+                processor.StartProcessing(switches.ToArray(), null);
 
-                try
-                {
-                    processor.StartProcessing(switches.ToArray(), null);
+                byte[] rawDocumentData = gsPipedOutput.Data;
 
-                    byte[] rawDocumentData = gsPipedOutput.Data;
-
-                    //if (writeToDatabase)
-                    //{
-                    //    Database.ExecSP("add_document", rawDocumentData);
-                    //}
-                    //else if (writeToDisk)
-                    //{
-                    //    File.WriteAllBytes(@"E:\gss_test\output\test_piped_output.pdf", rawDocumentData);
-                    //}
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                finally
-                {
-                    gsPipedOutput.Dispose();
-                    gsPipedOutput = null;
-                }
+                //if (writeToDatabase)
+                //{
+                //    Database.ExecSP("add_document", rawDocumentData);
+                //}
+                //else if (writeToDisk)
+                //{
+                //    File.WriteAllBytes(@"E:\gss_test\output\test_piped_output.pdf", rawDocumentData);
+                //}
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                gsPipedOutput.Dispose();
+                gsPipedOutput = null;
             }
         }
     }

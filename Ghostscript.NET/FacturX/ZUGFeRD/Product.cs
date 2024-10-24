@@ -1,220 +1,203 @@
+namespace Ghostscript.NET.FacturX.ZUGFeRD;
 
-namespace Ghostscript.NET.FacturX.ZUGFeRD
-{
-	
-	/// <summary>
-	///*
-	/// describes a product, good or service used in an invoice item line
-	/// </summary>
+/// <summary>
+///*
+/// describes a product, good or service used in an invoice item line
+/// </summary>
 //JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
 //ORIGINAL LINE: @JsonIgnoreProperties(ignoreUnknown = true) public class Product implements org.mustangproject.ZUGFeRD.IZUGFeRDExportableProduct
-	public class Product : IZUGFeRDExportableProduct
-	{
-		protected internal string Unit, Name, Description, SellerAssignedId, BuyerAssignedId;
-		protected internal decimal VatPercent;
+public class Product : IZUGFeRDExportableProduct
+{
 //JAVA TO C# CONVERTER NOTE: Fields cannot have the same name as methods of the current type:
-		protected internal bool IsReverseChargeConflict = false;
+    protected internal bool IsIntraCommunitySupplyConflict;
+
 //JAVA TO C# CONVERTER NOTE: Fields cannot have the same name as methods of the current type:
-		protected internal bool IsIntraCommunitySupplyConflict = false;
+    protected internal bool IsReverseChargeConflict;
+    protected internal string Unit, Name, Description, SellerAssignedId, BuyerAssignedId;
+    protected internal decimal VatPercent;
 
-		/// <summary>
-		///*
-		/// default constructor </summary>
-		/// <param name="name"> product short name </param>
-		/// <param name="description"> product long name </param>
-		/// <param name="unit"> a two/three letter UN/ECE rec 20 unit code, e.g. "C62" for piece </param>
-		/// <param name="vatPercent"> product vat rate </param>
-		public Product(string name, string description, string unit, decimal vatPercent)
-		{
-			this.Unit = unit;
-			this.Name = name;
-			this.Description = description;
-			this.VatPercent = vatPercent;
-		}
-
-
-		/// <summary>
-		///*
-		/// empty constructor
-		/// just for jackson etc
-		/// </summary>
-		public Product()
-		{
-
-		}
+    /// <summary>
+    ///*
+    /// default constructor </summary>
+    /// <param name="name"> product short name </param>
+    /// <param name="description"> product long name </param>
+    /// <param name="unit"> a two/three letter UN/ECE rec 20 unit code, e.g. "C62" for piece </param>
+    /// <param name="vatPercent"> product vat rate </param>
+    public Product(string name, string description, string unit, decimal vatPercent)
+    {
+        Unit = unit;
+        Name = name;
+        Description = description;
+        VatPercent = vatPercent;
+    }
 
 
-		public virtual string GetSellerAssignedId()
-		{
-			return SellerAssignedId;
-		}
-
-		/// <summary>
-		///*
-		/// how the seller identifies this type of product </summary>
-		/// <param name="sellerAssignedId"> a unique string </param>
-		/// <returns> fluent setter </returns>
-		public virtual Product SetSellerAssignedId(string sellerAssignedId)
-		{
-			this.SellerAssignedId = sellerAssignedId;
-			return this;
-		}
-
-		public virtual string GetBuyerAssignedId()
-		{
-			return BuyerAssignedId;
-		}
-
-		/// <summary>
-		///*
-		/// if the buyer provided an ID how he refers to this product </summary>
-		/// <param name="buyerAssignedId"> a string the buyer provided </param>
-		/// <returns> fluent setter </returns>
-		public virtual Product SetBuyerAssignedId(string buyerAssignedId)
-		{
-			this.BuyerAssignedId = buyerAssignedId;
-			return this;
-		}
-
-		public  bool IsReverseCharge()
-		{
-			return IsReverseChargeConflict;
-		}
-
-		public  bool IsIntraCommunitySupply()
-		{
-			return IsIntraCommunitySupplyConflict;
-		}
-
-		/// <summary>
-		///*
-		/// sets reverse charge(=delivery to outside EU) </summary>
-		/// <returns> fluent setter </returns>
-		public virtual Product SetReverseCharge()
-		{
-			IsReverseChargeConflict = true;
-			SetVatPercent(decimal.Zero);
-			return this;
-		}
+    /// <summary>
+    ///*
+    /// empty constructor
+    /// just for jackson etc
+    /// </summary>
+    public Product()
+    {
+    }
 
 
-		/// <summary>
-		///*
-		/// sets intra community supply(=delivery outside the country inside the EU) </summary>
-		/// <returns> fluent setter </returns>
-		public virtual Product SetIntraCommunitySupply()
-		{
-			IsIntraCommunitySupplyConflict = true;
-			SetVatPercent(decimal.Zero);
-			return this;
-		}
+    public virtual string GetSellerAssignedId()
+    {
+        return SellerAssignedId;
+    }
 
-		public  string GetUnit()
-		{
-			return Unit;
-		}
+    public virtual string GetBuyerAssignedId()
+    {
+        return BuyerAssignedId;
+    }
 
-		/// <summary>
-		///*
-		/// sets a UN/ECE rec 20 or 21 code which unit the product ships in, e.g. C62=piece </summary>
-		/// <param name="unit"> 2-3 letter UN/ECE rec 20 or 21 </param>
-		/// <returns> fluent setter </returns>
-		public virtual Product SetUnit(string unit)
-		{
-			this.Unit = unit;
-			return this;
-		}
+    public string GetUnit()
+    {
+        return Unit;
+    }
 
-		public  string GetName()
-		{
-			return Name;
-		}
+    public string GetName()
+    {
+        return Name;
+    }
 
-		/// <summary>
-		/// name of the product </summary>
-		/// <param name="name"> short name </param>
-		/// <returns> fluent setter </returns>
-		public virtual Product SetName(string name)
-		{
-			this.Name = name;
-			return this;
-		}
+    public string GetDescription()
+    {
+        return Description;
+    }
 
-		public  string GetDescription()
-		{
-			return Description;
-		}
+    public decimal GetVatPercent()
+    {
+        return VatPercent;
+    }
 
-		/// <summary>
-		/// description of the product (required) </summary>
-		/// <param name="description"> long name </param>
-		/// <returns> fluent setter </returns>
-		public virtual Product SetDescription(string description)
-		{
-			this.Description = description;
-			return this;
-		}
+    public bool GetIntraCommunitySupply()
+    {
+        return false;
+    }
 
-		public  decimal GetVatPercent()
-		{
-			return VatPercent;
-		}
+    public bool GetReverseCharge()
+    {
+        return false;
+    }
 
-        public bool GetIntraCommunitySupply()
-        {
-            return false;
-        }
+    public string GetTaxCategoryCode()
+    {
+        if (IsIntraCommunitySupply())
+            return "K"; // "K"; // within europe
+        if (IsReverseCharge())
+            return "AE"; // "AE"; // to out of europe...
+        if (GetVatPercent().Equals(decimal.Zero))
+            return "Z"; // "Z"; // zero rated goods
+        // "S" - one of the "standard" rates (not
+        // neccessarily a rate, even a deducted VAT
+        // is standard calculation)
+        return "S";
+    }
 
-        public bool GetReverseCharge()
-        {
-            return false;
-        }
+    public string GetTaxExemptionReason()
+    {
+        if (IsIntraCommunitySupply())
+            return "Intra-community supply";
+        if (IsReverseCharge()) return "Reverse Charge";
+        return null;
+    }
 
-        public string GetTaxCategoryCode()
-        {
-			if (IsIntraCommunitySupply())
-			{
-				return "K"; // "K"; // within europe
-			}
-			else if (IsReverseCharge())
-			{
-				return "AE"; // "AE"; // to out of europe...
-			}
-			else if (GetVatPercent().Equals(decimal.Zero))
-			{
-				return "Z"; // "Z"; // zero rated goods
-			}
-			else
-			{
-                // "S" - one of the "standard" rates (not
-                // neccessarily a rate, even a deducted VAT
-                // is standard calculation)
-				return "S"; 
-            }
-        }
+    /// <summary>
+    ///*
+    /// how the seller identifies this type of product </summary>
+    /// <param name="sellerAssignedId"> a unique string </param>
+    /// <returns> fluent setter </returns>
+    public virtual Product SetSellerAssignedId(string sellerAssignedId)
+    {
+        SellerAssignedId = sellerAssignedId;
+        return this;
+    }
 
-        public string GetTaxExemptionReason()
-        {
-			if (IsIntraCommunitySupply())
-			{
-				return "Intra-community supply";
-			}
-			else if (IsReverseCharge())
-			{
-				return "Reverse Charge";
-			}
-			return null;
-        }
+    /// <summary>
+    ///*
+    /// if the buyer provided an ID how he refers to this product </summary>
+    /// <param name="buyerAssignedId"> a string the buyer provided </param>
+    /// <returns> fluent setter </returns>
+    public virtual Product SetBuyerAssignedId(string buyerAssignedId)
+    {
+        BuyerAssignedId = buyerAssignedId;
+        return this;
+    }
 
-        /// <summary>
-		///**
-		/// VAT rate of the product </summary>
-		/// <param name="vatPercent"> vat rate of the product </param>
-		/// <returns> fluent setter </returns>
-		public virtual Product SetVatPercent(decimal vatPercent)
-		{
-			this.VatPercent = vatPercent;
-			return this;
-		}
-	}
+    public bool IsReverseCharge()
+    {
+        return IsReverseChargeConflict;
+    }
+
+    public bool IsIntraCommunitySupply()
+    {
+        return IsIntraCommunitySupplyConflict;
+    }
+
+    /// <summary>
+    ///*
+    /// sets reverse charge(=delivery to outside EU) </summary>
+    /// <returns> fluent setter </returns>
+    public virtual Product SetReverseCharge()
+    {
+        IsReverseChargeConflict = true;
+        SetVatPercent(decimal.Zero);
+        return this;
+    }
+
+
+    /// <summary>
+    ///*
+    /// sets intra community supply(=delivery outside the country inside the EU) </summary>
+    /// <returns> fluent setter </returns>
+    public virtual Product SetIntraCommunitySupply()
+    {
+        IsIntraCommunitySupplyConflict = true;
+        SetVatPercent(decimal.Zero);
+        return this;
+    }
+
+    /// <summary>
+    ///*
+    /// sets a UN/ECE rec 20 or 21 code which unit the product ships in, e.g. C62=piece </summary>
+    /// <param name="unit"> 2-3 letter UN/ECE rec 20 or 21 </param>
+    /// <returns> fluent setter </returns>
+    public virtual Product SetUnit(string unit)
+    {
+        Unit = unit;
+        return this;
+    }
+
+    /// <summary>
+    /// name of the product </summary>
+    /// <param name="name"> short name </param>
+    /// <returns> fluent setter </returns>
+    public virtual Product SetName(string name)
+    {
+        Name = name;
+        return this;
+    }
+
+    /// <summary>
+    /// description of the product (required) </summary>
+    /// <param name="description"> long name </param>
+    /// <returns> fluent setter </returns>
+    public virtual Product SetDescription(string description)
+    {
+        Description = description;
+        return this;
+    }
+
+    /// <summary>
+    ///**
+    /// VAT rate of the product </summary>
+    /// <param name="vatPercent"> vat rate of the product </param>
+    /// <returns> fluent setter </returns>
+    public virtual Product SetVatPercent(decimal vatPercent)
+    {
+        VatPercent = vatPercent;
+        return this;
+    }
 }

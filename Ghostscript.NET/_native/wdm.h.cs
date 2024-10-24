@@ -24,17 +24,15 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Runtime.InteropServices;
 
-namespace Ghostscript.NET
-{
-    internal class Wdm
-    {
-        [DllImport("kernel32.dll", EntryPoint = "RtlMoveMemory")]
-        public static extern void MoveMemory(IntPtr destination, IntPtr source, uint length);
+namespace Ghostscript.NET;
 
-        [DllImport("kernel32.dll", EntryPoint = "CopyMemory")]
-        public static extern void CopyMemory(IntPtr destination, IntPtr source, uint count);
-    }
+internal class Wdm
+{
+    [DllImport("kernel32.dll", EntryPoint = "RtlMoveMemory")]
+    public static extern void MoveMemory(IntPtr destination, IntPtr source, uint length);
+
+    [DllImport("kernel32.dll", EntryPoint = "CopyMemory")]
+    public static extern void CopyMemory(IntPtr destination, IntPtr source, uint count);
 }

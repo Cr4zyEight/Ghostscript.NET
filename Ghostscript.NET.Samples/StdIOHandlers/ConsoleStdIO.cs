@@ -25,31 +25,29 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Ghostscript.NET.Samples
+namespace Ghostscript.NET.Samples;
+
+public class ConsoleStdIo : GhostscriptStdIo
 {
-    public class ConsoleStdIo : Ghostscript.NET.GhostscriptStdIo
+    public ConsoleStdIo(bool handleStdIn, bool handleStdOut, bool handleStdErr) : base(handleStdIn, handleStdOut, handleStdErr)
     {
-        public ConsoleStdIo(bool handleStdIn, bool handleStdOut, bool handleStdErr) : base(handleStdIn, handleStdOut, handleStdErr) { }
+    }
 
-        public override void StdIn(out string input, int count)
-        {
-            char[] userInput = new char[count];
-            Console.In.ReadBlock(userInput, 0, count);
-            input = new string(userInput);
-        }
+    public override void StdIn(out string input, int count)
+    {
+        char[] userInput = new char[count];
+        Console.In.ReadBlock(userInput, 0, count);
+        input = new string(userInput);
+    }
 
-        public override void StdOut(string output)
-        {
-            Console.Write(output);
-        }
+    public override void StdOut(string output)
+    {
+        Console.Write(output);
+    }
 
-        public override void StdError(string error)
-        {
-            Console.Write(error);
-        }
+    public override void StdError(string error)
+    {
+        Console.Write(error);
     }
 }

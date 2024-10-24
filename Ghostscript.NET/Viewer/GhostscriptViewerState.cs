@@ -24,34 +24,31 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET.Viewer;
 
-namespace Ghostscript.NET.Viewer
+public class GhostscriptViewerState
 {
-    public class GhostscriptViewerState
-    {
-        #region XDpi
+    #region XDpi
 
-        internal int XDpi { get; set; }
+    internal int XDpi { get; set; }
 
-        #endregion
+    #endregion
 
-        #region YDpi
+    #region YDpi
 
-        internal int YDpi { get; set; }
-        
-        #endregion
+    internal int YDpi { get; set; }
 
-        #region CurrentPage
+    #endregion
 
-        internal int CurrentPage { get; set; }
+    #region CurrentPage
 
-        #endregion
+    internal int CurrentPage { get; set; }
 
-        #region ProgressiveUpdate
+    #endregion
 
-        internal bool ProgressiveUpdate { get; set; }
+    #region ProgressiveUpdate
 
-        #endregion
-    }
+    internal bool ProgressiveUpdate { get; set; }
+
+    #endregion
 }

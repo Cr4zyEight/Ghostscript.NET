@@ -1,78 +1,69 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using Ghostscript.NET;
 using Ghostscript.NET.Viewer;
-using Ghostscript.NET.Interpreter;
 
-namespace Ghostscript.NET.DisplayTest
+namespace Ghostscript.NET.DisplayTest;
+
+public partial class FMain : Form
 {
-    public partial class FMain : Form
+    private readonly FPreview _preview = new();
+    private readonly StdIoHandler _stdioHandler;
+    private GhostscriptViewer _viewer;
+
+    public FMain()
     {
-        private GhostscriptViewer _viewer;
-        private FPreview _preview = new FPreview();
-        private StdIoHandler _stdioHandler;
+        InitializeComponent();
 
-        public FMain()
-        {
-            InitializeComponent();
+        _stdioHandler = new StdIoHandler(txtOutput);
+    }
 
-            _stdioHandler = new StdIoHandler(txtOutput);
-        }
+    private void FMain_Load(object sender, EventArgs e)
+    {
+        txtOutput.AppendText("Is64BitOperatingSystem: " + Environment.Is64BitOperatingSystem + "\r\n");
+        txtOutput.AppendText("Is64BitProcess: " + Environment.Is64BitProcess + "\r\n");
 
-        private void FMain_Load(object sender, EventArgs e)
-        {
-            txtOutput.AppendText("Is64BitOperatingSystem: " + System.Environment.Is64BitOperatingSystem.ToString() + "\r\n");
-            txtOutput.AppendText("Is64BitProcess: " + System.Environment.Is64BitProcess.ToString() + "\r\n");
+        _preview.Show();
+        Show();
 
-            _preview.Show();
-            this.Show();
+        GhostscriptVersionInfo gvi = GhostscriptVersionInfo.GetLastInstalledVersion();
 
-            GhostscriptVersionInfo gvi =  GhostscriptVersionInfo.GetLastInstalledVersion();
+        _viewer = new GhostscriptViewer();
 
-            _viewer = new GhostscriptViewer();
+        _viewer.AttachStdIo(_stdioHandler);
 
-            _viewer.AttachStdIo(_stdioHandler);
-            
-            _viewer.DisplaySize += new GhostscriptViewerViewEventHandler(_viewer_DisplaySize);
-            _viewer.DisplayUpdate += new GhostscriptViewerViewEventHandler(_viewer_DisplayUpdate);
-            _viewer.DisplayPage += new GhostscriptViewerViewEventHandler(_viewer_DisplayPage);
+        _viewer.DisplaySize += _viewer_DisplaySize;
+        _viewer.DisplayUpdate += _viewer_DisplayUpdate;
+        _viewer.DisplayPage += _viewer_DisplayPage;
 
-            _viewer.Open(gvi, true);
-        }
+        _viewer.Open(gvi, true);
+    }
 
-        void _viewer_DisplayPage(object sender, GhostscriptViewerViewEventArgs e)
-        {
-            _preview.pbDisplay.Invalidate();
-            _preview.pbDisplay.Update();            
-        }
+    private void _viewer_DisplayPage(object sender, GhostscriptViewerViewEventArgs e)
+    {
+        _preview.pbDisplay.Invalidate();
+        _preview.pbDisplay.Update();
+    }
 
-        void _viewer_DisplayUpdate(object sender, GhostscriptViewerViewEventArgs e)
-        {
-            _preview.pbDisplay.Invalidate();
-            _preview.pbDisplay.Update();
-        }
+    private void _viewer_DisplayUpdate(object sender, GhostscriptViewerViewEventArgs e)
+    {
+        _preview.pbDisplay.Invalidate();
+        _preview.pbDisplay.Update();
+    }
 
-        void _viewer_DisplaySize(object sender, GhostscriptViewerViewEventArgs e)
-        {
-            _preview.pbDisplay.Image = e.Image;
-        }
+    private void _viewer_DisplaySize(object sender, GhostscriptViewerViewEventArgs e)
+    {
+        _preview.pbDisplay.Image = e.Image;
+    }
 
-        private void btnRun_Click(object sender, EventArgs e)
-        {
-            _viewer.Interpreter.Run(txtPostscript.Text);
-            _preview.Activate();
-        }
+    private void btnRun_Click(object sender, EventArgs e)
+    {
+        _viewer.Interpreter.Run(txtPostscript.Text);
+        _preview.Activate();
+    }
 
-        private void FMain_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            _viewer.Dispose();
-            _viewer = null;
-        }
+    private void FMain_FormClosed(object sender, FormClosedEventArgs e)
+    {
+        _viewer.Dispose();
+        _viewer = null;
     }
 }

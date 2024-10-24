@@ -24,37 +24,35 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 using Ghostscript.NET.Processor;
 
-namespace Ghostscript.NET.Samples
+namespace Ghostscript.NET.Samples;
+
+public class SendToPrinterSample : ISample
 {
-    public class SendToPrinterSample : ISample
+    public void Start()
     {
-        public void Start()
+        // YOU NEED TO HAVE ADMINISTRATOR RIGHTS TO RUN THIS CODE
+
+        string printerName = "YourPrinterName";
+        string inputFile = @"E:\__test_data\test.pdf";
+
+        using (GhostscriptProcessor processor = new())
         {
-            // YOU NEED TO HAVE ADMINISTRATOR RIGHTS TO RUN THIS CODE
+            List<string> switches = new();
+            switches.Add("-empty");
+            switches.Add("-dPrinted");
+            switches.Add("-dBATCH");
+            switches.Add("-dNOPAUSE");
+            switches.Add("-dNOSAFER");
+            switches.Add("-dNumCopies=1");
+            switches.Add("-sDEVICE=mswinpr2");
+            switches.Add("-sOutputFile=%printer%" + printerName);
+            switches.Add("-f");
+            switches.Add(inputFile);
 
-            string printerName = "YourPrinterName";
-            string inputFile = @"E:\__test_data\test.pdf";
-
-            using (GhostscriptProcessor processor = new GhostscriptProcessor())
-            {
-                List<string> switches = new List<string>();
-                switches.Add("-empty");
-                switches.Add("-dPrinted");
-                switches.Add("-dBATCH");
-                switches.Add("-dNOPAUSE");
-                switches.Add("-dNOSAFER");
-                switches.Add("-dNumCopies=1");
-                switches.Add("-sDEVICE=mswinpr2");
-                switches.Add("-sOutputFile=%printer%" + printerName);
-                switches.Add("-f");
-                switches.Add(inputFile);
-
-                processor.StartProcessing(switches.ToArray(), null);
-            }
+            processor.StartProcessing(switches.ToArray(), null);
         }
     }
 }

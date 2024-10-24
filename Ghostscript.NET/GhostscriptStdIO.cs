@@ -24,208 +24,189 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Text;
 using System.Runtime.InteropServices;
+using System.Text;
 
-namespace Ghostscript.NET
+namespace Ghostscript.NET;
+
+/// <summary>
+/// Represents a base Ghostscript standard input output handler.
+/// </summary>
+public abstract class GhostscriptStdIo
 {
+    #region Private variables
+
+    private StringBuilder _input = new();
+
+    #endregion
+
+    #region Constructor
+
     /// <summary>
-    /// Represents a base Ghostscript standard input output handler.
+    /// Initializes a new instance of the Ghostscript.NET.GhostscriptStdIO class.
     /// </summary>
-    public abstract class GhostscriptStdIo
+    /// <param name="handleStdIn">Whether or not to handle Ghostscript standard input.</param>
+    /// <param name="handleStdOut">Whether or not to handle Ghostscript standard output.</param>
+    /// <param name="handleStdErr">Whether or not to handle Ghostscript standard errors.</param>
+    public GhostscriptStdIo(bool handleStdIn, bool handleStdOut, bool handleStdErr)
     {
+        // check if we need to handle standard input
+        if (handleStdIn)
+            // attach standard input handler
+            StdInCallback = gs_std_in;
 
-        #region Internal variables
+        // check if we need to handle standard output
+        if (handleStdOut)
+            // attach standard output handler
+            StdOutCallback = gs_std_out;
 
-        internal GsapiStdioCallback StdInCallback = null;
-        internal GsapiStdioCallback StdOutCallback = null;
-        internal GsapiStdioCallback StdErrCallback = null;
-
-        #endregion
-
-        #region Private variables
-
-        private StringBuilder _input = new StringBuilder();
-
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Initializes a new instance of the Ghostscript.NET.GhostscriptStdIO class.
-        /// </summary>
-        /// <param name="handleStdIn">Whether or not to handle Ghostscript standard input.</param>
-        /// <param name="handleStdOut">Whether or not to handle Ghostscript standard output.</param>
-        /// <param name="handleStdErr">Whether or not to handle Ghostscript standard errors.</param>
-        public GhostscriptStdIo(bool handleStdIn, bool handleStdOut, bool handleStdErr)
-        {
-            // check if we need to handle standard input
-            if (handleStdIn)
-            {
-                // attach standard input handler
-                StdInCallback = new GsapiStdioCallback(gs_std_in);
-            }
-
-            // check if we need to handle standard output
-            if (handleStdOut)
-            {
-                // attach standard output handler
-                StdOutCallback = new GsapiStdioCallback(gs_std_out);
-            }
-
-            // check if we need to handle errors
-            if (handleStdErr)
-            {
-                // attach error handler
-                StdErrCallback = new GsapiStdioCallback(gs_std_err);
-            }
-        }
-
-        #endregion
-
-        #region gs_std_in
-        
-        /// <summary>
-        /// Standard input handler.
-        /// </summary>
-        /// <param name="handle">Standard input handle.</param>
-        /// <param name="pointer">Pointer to a memroy block.</param>
-        /// <param name="count">Number of bytes that standard input expects.</param>
-        /// <returns>Number of bytes returned.</returns>
-        private int gs_std_in(IntPtr handle, IntPtr pointer, int count)
-        {
-            // check if we have anything in the local input cache
-            if (_input.Length == 0)
-            {
-                string input = string.Empty;
-
-                // ask handler owner for the input data
-                this.StdIn(out input, count);
-
-                // check if we have input
-                if (!string.IsNullOrEmpty(input))
-                {
-                    // add the input to the local cache
-                    _input.Append(input);
-                }
-                else
-                {
-                    // we don't have any input
-                    return 0;
-                }
-            }
-           
-            // check if the stdin expects more data than we have at the moment
-            if (count > _input.Length)
-            {
-                // locally set the count to a length of the data we have
-                count = _input.Length;
-            }
-
-            int position = 0;
-
-            // loop through data
-            while (position < count)
-            {
-                // get single character
-                char c = _input[position];
-
-                // write single character to the expected input memory block
-                Marshal.WriteByte(pointer, position, (byte)c);
-
-                position++;
-
-                // break if we got to the new line
-                if (c == '\n')
-                {
-                    break;
-                }
-            }
-
-            // remove written data out from the cached input
-            _input = _input.Remove(0, position);
-
-            // return number of bytes written
-            return position;
-        }
-
-        #endregion
-
-        #region gs_std_out
-
-        /// <summary>
-        /// Handles standard output.
-        /// </summary>
-        /// <param name="handle">Standard output handle.</param>
-        /// <param name="pointer">Pointer to a memroy block.</param>
-        /// <param name="count">Number of bytes that standard output writes.</param>
-        /// <returns>Number of bytes read.</returns>
-        private int gs_std_out(IntPtr handle, IntPtr pointer, int count)
-        {
-            // read out the standard output data
-            string output = Marshal.PtrToStringAnsi(pointer, count);
-
-            // replace line feeds with the standard windows new line
-            output = output.Replace("\n", "\r\n");
-
-            // send read out data to the handler owner
-            this.StdOut(output);
-
-            // return number of bytes read
-            return count;
-        }
-
-        #endregion
-
-        #region gs_std_err
-
-        /// <summary>
-        /// Handles errors.
-        /// </summary>
-        /// <param name="handle">Errors handle.</param>
-        /// <param name="pointer">Pointer to a memory block.</param>
-        /// <param name="count">Number of bytes standard error writes.</param>
-        /// <returns>Number of bytes read.</returns>
-        private int gs_std_err(IntPtr handle, IntPtr pointer, int count)
-        {
-            // read out the standard error data
-            string errors = Marshal.PtrToStringAnsi(pointer, count);
-
-            // replace line feeds with the standard windows new line
-            errors = errors.Replace("\n", "\r\n");
-
-            // send read out data to the handler owner
-            this.StdError(errors);
-
-            // return number of bytes read
-            return count;
-        }
-
-        #endregion
-
-        #region Abstract functions
-
-        /// <summary>
-        /// Abstract standard input method.
-        /// </summary>
-        /// <param name="input">Input data.</param>
-        /// <param name="count">Expected size of the input data.</param>
-        public abstract void StdIn(out string input, int count);
-
-        /// <summary>
-        /// Abstract standard output method.
-        /// </summary>
-        /// <param name="output">Output data.</param>
-        public abstract void StdOut(string output);
-
-        /// <summary>
-        /// Abstract standard error method.
-        /// </summary>
-        /// <param name="error">Error data.</param>
-        public abstract void StdError(string error);
-
-        #endregion
-
+        // check if we need to handle errors
+        if (handleStdErr)
+            // attach error handler
+            StdErrCallback = gs_std_err;
     }
+
+    #endregion
+
+    #region gs_std_in
+
+    /// <summary>
+    /// Standard input handler.
+    /// </summary>
+    /// <param name="handle">Standard input handle.</param>
+    /// <param name="pointer">Pointer to a memroy block.</param>
+    /// <param name="count">Number of bytes that standard input expects.</param>
+    /// <returns>Number of bytes returned.</returns>
+    private int gs_std_in(IntPtr handle, IntPtr pointer, int count)
+    {
+        // check if we have anything in the local input cache
+        if (_input.Length == 0)
+        {
+            string input = string.Empty;
+
+            // ask handler owner for the input data
+            StdIn(out input, count);
+
+            // check if we have input
+            if (!string.IsNullOrEmpty(input))
+                // add the input to the local cache
+                _input.Append(input);
+            else
+                // we don't have any input
+                return 0;
+        }
+
+        // check if the stdin expects more data than we have at the moment
+        if (count > _input.Length)
+            // locally set the count to a length of the data we have
+            count = _input.Length;
+
+        int position = 0;
+
+        // loop through data
+        while (position < count)
+        {
+            // get single character
+            char c = _input[position];
+
+            // write single character to the expected input memory block
+            Marshal.WriteByte(pointer, position, (byte)c);
+
+            position++;
+
+            // break if we got to the new line
+            if (c == '\n') break;
+        }
+
+        // remove written data out from the cached input
+        _input = _input.Remove(0, position);
+
+        // return number of bytes written
+        return position;
+    }
+
+    #endregion
+
+    #region gs_std_out
+
+    /// <summary>
+    /// Handles standard output.
+    /// </summary>
+    /// <param name="handle">Standard output handle.</param>
+    /// <param name="pointer">Pointer to a memroy block.</param>
+    /// <param name="count">Number of bytes that standard output writes.</param>
+    /// <returns>Number of bytes read.</returns>
+    private int gs_std_out(IntPtr handle, IntPtr pointer, int count)
+    {
+        // read out the standard output data
+        string output = Marshal.PtrToStringAnsi(pointer, count);
+
+        // replace line feeds with the standard windows new line
+        output = output.Replace("\n", "\r\n");
+
+        // send read out data to the handler owner
+        StdOut(output);
+
+        // return number of bytes read
+        return count;
+    }
+
+    #endregion
+
+    #region gs_std_err
+
+    /// <summary>
+    /// Handles errors.
+    /// </summary>
+    /// <param name="handle">Errors handle.</param>
+    /// <param name="pointer">Pointer to a memory block.</param>
+    /// <param name="count">Number of bytes standard error writes.</param>
+    /// <returns>Number of bytes read.</returns>
+    private int gs_std_err(IntPtr handle, IntPtr pointer, int count)
+    {
+        // read out the standard error data
+        string errors = Marshal.PtrToStringAnsi(pointer, count);
+
+        // replace line feeds with the standard windows new line
+        errors = errors.Replace("\n", "\r\n");
+
+        // send read out data to the handler owner
+        StdError(errors);
+
+        // return number of bytes read
+        return count;
+    }
+
+    #endregion
+
+    #region Internal variables
+
+    internal GsapiStdioCallback StdInCallback;
+    internal GsapiStdioCallback StdOutCallback;
+    internal GsapiStdioCallback StdErrCallback;
+
+    #endregion
+
+    #region Abstract functions
+
+    /// <summary>
+    /// Abstract standard input method.
+    /// </summary>
+    /// <param name="input">Input data.</param>
+    /// <param name="count">Expected size of the input data.</param>
+    public abstract void StdIn(out string input, int count);
+
+    /// <summary>
+    /// Abstract standard output method.
+    /// </summary>
+    /// <param name="output">Output data.</param>
+    public abstract void StdOut(string output);
+
+    /// <summary>
+    /// Abstract standard error method.
+    /// </summary>
+    /// <param name="error">Error data.</param>
+    public abstract void StdError(string error);
+
+    #endregion
 }

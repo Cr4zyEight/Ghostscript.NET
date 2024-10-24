@@ -24,85 +24,68 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET;
 
-namespace Ghostscript.NET
+/// <summary>
+/// Represents a GhostscriptSwitch attribute.
+/// </summary>
+public sealed class GhostscriptSwitchAttribute : Attribute
 {
-    /// <summary>
-    /// Represents a GhostscriptSwitch attribute.
-    /// </summary>
-    public sealed class GhostscriptSwitchAttribute : Attribute
-    {
+    #region Private variables
 
-        #region Private variables
+    #endregion
 
-        private string _name;
-
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Initializes a new instance of the Ghostscript.NET.GhostscriptSwitchAttribute class.
-        /// </summary>
-        /// <param name="name">The Switch name.</param>
-        public GhostscriptSwitchAttribute(string name)
-        {
-            _name = name;
-        }
-
-        #endregion
-
-        #region Name
-
-        /// <summary>
-        /// Gets the switch name.
-        /// </summary>
-        public string Name
-        {
-            get { return _name; }
-        }
-
-        #endregion
-
-    }
+    #region Constructor
 
     /// <summary>
-    /// Represents a GhostscriptSwitchValue attribute.
+    /// Initializes a new instance of the Ghostscript.NET.GhostscriptSwitchAttribute class.
     /// </summary>
-    public sealed class GhostscriptSwitchValueAttribute : Attribute
+    /// <param name="name">The Switch name.</param>
+    public GhostscriptSwitchAttribute(string name)
     {
-
-        #region Private variables
-
-        private string _value;
-
-        #endregion
-
-        #region Constructor
-
-        /// <summary>
-        /// Initializes a new instance of the Ghostscript.NET.GhostscriptSwitchValueAttribute class.
-        /// </summary>
-        /// <param name="value"></param>
-        public GhostscriptSwitchValueAttribute(string value)
-        {
-            _value = value;
-        }
-
-        #endregion
-
-        #region Value
-
-        /// <summary>
-        /// Gets the switch value.
-        /// </summary>
-        public string Value
-        {
-            get { return _value; }
-        }
-
-        #endregion
-
+        Name = name;
     }
+
+    #endregion
+
+    #region Name
+
+    /// <summary>
+    /// Gets the switch name.
+    /// </summary>
+    public string Name { get; }
+
+    #endregion
+}
+
+/// <summary>
+/// Represents a GhostscriptSwitchValue attribute.
+/// </summary>
+public sealed class GhostscriptSwitchValueAttribute : Attribute
+{
+    #region Private variables
+
+    #endregion
+
+    #region Constructor
+
+    /// <summary>
+    /// Initializes a new instance of the Ghostscript.NET.GhostscriptSwitchValueAttribute class.
+    /// </summary>
+    /// <param name="value"></param>
+    public GhostscriptSwitchValueAttribute(string value)
+    {
+        Value = value;
+    }
+
+    #endregion
+
+    #region Value
+
+    /// <summary>
+    /// Gets the switch value.
+    /// </summary>
+    public string Value { get; }
+
+    #endregion
 }

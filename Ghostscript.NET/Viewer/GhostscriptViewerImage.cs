@@ -24,167 +24,139 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace Ghostscript.NET.Viewer
+namespace Ghostscript.NET.Viewer;
+
+public class GhostscriptViewerImage : IDisposable
 {
-    public class GhostscriptViewerImage : IDisposable
+    #region Constructor
+
+    public GhostscriptViewerImage(int width, int height, int stride, PixelFormat format)
     {
+        Width = width;
+        Height = height;
+        _stride = stride;
 
-        #region Private variables
+        _rect = new Rectangle(0, 0, Width, Height);
 
-        private bool _disposed = false;
-        private int _width;
-        private int _height;
-        private Rectangle _rect;
-        private int _stride;
-        private Bitmap _bitmap;
-        private BitmapData _bitmapData;
-
-        #endregion
-
-        #region Constructor
-
-        public GhostscriptViewerImage(int width, int height, int stride, PixelFormat format)
-        {
-            _width = width;
-            _height = height;
-            _stride = stride;
-
-            _rect = new Rectangle(0, 0, _width, _height);
-
-            _bitmap = new Bitmap(width, height, format);
-        }
-
-        #endregion
-
-        #region Destructor
-
-        ~GhostscriptViewerImage()
-        {
-            Dispose(false);
-        }
-
-        #endregion
-
-        #region Dispose
-
-        #region Dispose
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
-
-        #region Dispose - disposing
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    if (_bitmapData != null)
-                    {
-                        this.Unlock();
-                    }
-
-                    _bitmap.Dispose();
-                    _bitmap = null;
-                }
-
-                _disposed = true;
-            }
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Create
-
-        public static GhostscriptViewerImage Create(int width, int height, int stride, PixelFormat format)
-        {
-            GhostscriptViewerImage gvi = new GhostscriptViewerImage(width, height, stride, format);
-            return gvi;
-        }
-
-        #endregion
-
-        #region Lock
-
-        internal void Lock()
-        {
-            if (_bitmapData == null)
-            {
-                _bitmapData = _bitmap.LockBits(_rect, ImageLockMode.WriteOnly, _bitmap.PixelFormat);
-            }
-        }
-
-        #endregion
-
-        #region Scan0
-
-        internal IntPtr Scan0
-        {
-            get { return _bitmapData.Scan0; }
-        }
-
-        #endregion
-
-        #region Stride
-
-        public int Stride
-        {
-            get { return _bitmapData.Stride; }
-        }
-
-        #endregion
-
-        #region Unlock
-
-        internal void Unlock()
-        {
-            if (_bitmapData != null)
-            {
-                _bitmap.UnlockBits(_bitmapData);
-                _bitmapData = null;
-            }
-        }
-
-        #endregion
-
-        #region Width
-
-        public int Width
-        {
-            get { return _width; }
-        }
-
-        #endregion
-
-        #region Height
-
-        public int Height
-        {
-            get { return _height; }
-        }
-
-        #endregion
-
-        #region Bitmap
-
-        public Bitmap @Bitmap
-        {
-            get { return _bitmap; }
-        }
-
-        #endregion
-
+        Bitmap = new Bitmap(width, height, format);
     }
+
+    #endregion
+
+    #region Scan0
+
+    internal IntPtr Scan0 => _bitmapData.Scan0;
+
+    #endregion
+
+    #region Stride
+
+    public int Stride => _bitmapData.Stride;
+
+    #endregion
+
+    #region Width
+
+    public int Width { get; }
+
+    #endregion
+
+    #region Height
+
+    public int Height { get; }
+
+    #endregion
+
+    #region Bitmap
+
+    public Bitmap Bitmap { get; private set; }
+
+    #endregion
+
+    #region Destructor
+
+    ~GhostscriptViewerImage()
+    {
+        Dispose(false);
+    }
+
+    #endregion
+
+    #region Create
+
+    public static GhostscriptViewerImage Create(int width, int height, int stride, PixelFormat format)
+    {
+        GhostscriptViewerImage gvi = new(width, height, stride, format);
+        return gvi;
+    }
+
+    #endregion
+
+    #region Lock
+
+    internal void Lock()
+    {
+        if (_bitmapData == null) _bitmapData = Bitmap.LockBits(_rect, ImageLockMode.WriteOnly, Bitmap.PixelFormat);
+    }
+
+    #endregion
+
+    #region Unlock
+
+    internal void Unlock()
+    {
+        if (_bitmapData != null)
+        {
+            Bitmap.UnlockBits(_bitmapData);
+            _bitmapData = null;
+        }
+    }
+
+    #endregion
+
+    #region Private variables
+
+    private bool _disposed;
+    private readonly Rectangle _rect;
+    private int _stride;
+    private BitmapData _bitmapData;
+
+    #endregion
+
+    #region Dispose
+
+    #region Dispose
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    #endregion
+
+    #region Dispose - disposing
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                if (_bitmapData != null) Unlock();
+
+                Bitmap.Dispose();
+                Bitmap = null;
+            }
+
+            _disposed = true;
+        }
+    }
+
+    #endregion
+
+    #endregion
 }

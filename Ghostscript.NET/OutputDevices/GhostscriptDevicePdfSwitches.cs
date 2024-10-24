@@ -24,30 +24,27 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET;
 
-namespace Ghostscript.NET
+public class GhostscriptDevicePdfSwitches
 {
-    public class GhostscriptDevicePdfSwitches
-    {
-        #region FirstPage
+    #region FirstPage
 
-        /// <summary>
-        /// Begins interpreting on the designated page of the document. Pages of all documents in PDF collections are numbered sequentionally.
-        /// </summary>
-        [GhostscriptSwitch("-dFirstPage={0}")]
-        public int? FirstPage { get; set; }
+    /// <summary>
+    /// Begins interpreting on the designated page of the document. Pages of all documents in PDF collections are numbered sequentionally.
+    /// </summary>
+    [GhostscriptSwitch("-dFirstPage={0}")]
+    public int? FirstPage { get; set; }
 
-        #endregion
+    #endregion
 
-        #region LastPage
+    #region LastPage
 
-        /// <summary>
-        /// Stops interpreting after the designated page of the document. Pages of all documents in PDF collections are numbered sequentionally.
-        /// </summary>
-        [GhostscriptSwitch("-dLastPage={0}")]
-        public int? LastPage { get; set; }
+    /// <summary>
+    /// Stops interpreting after the designated page of the document. Pages of all documents in PDF collections are numbered sequentionally.
+    /// </summary>
+    [GhostscriptSwitch("-dLastPage={0}")]
+    public int? LastPage { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

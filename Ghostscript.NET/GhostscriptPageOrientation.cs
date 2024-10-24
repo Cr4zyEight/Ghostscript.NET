@@ -24,15 +24,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET;
 
-namespace Ghostscript.NET
+public enum GhostscriptPageOrientation
 {
-    public enum GhostscriptPageOrientation : int
-    {
-        Portrait = 0,
-        Seascape = 1,
-        UpsideDown = 2,
-        Landscape = 3
-    }
+    Portrait = 0,
+    Seascape = 1,
+    UpsideDown = 2,
+    Landscape = 3
 }

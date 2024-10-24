@@ -24,37 +24,33 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using Ghostscript.NET.Interpreter;
 using Ghostscript.NET.Processor;
 using Ghostscript.NET.Rasterizer;
 using Ghostscript.NET.Viewer;
 
-namespace Ghostscript.NET.Samples
+namespace Ghostscript.NET.Samples;
+
+public class CustomGsdllLocationSample : ISample
 {
-    public class CustomGsdllLocationSample : ISample
+    public void Start()
     {
-        public void Start()
-        {
-            // For users who distribute their gsdll32.dll or gsdll64.dll with their application: Ghostscript.NET by default 
-            // peeks into the registry to collect all installed Ghostscript locations. If you want to use ghostscript dll from
-            // a custom location, it's recommended to do something like this:
+        // For users who distribute their gsdll32.dll or gsdll64.dll with their application: Ghostscript.NET by default 
+        // peeks into the registry to collect all installed Ghostscript locations. If you want to use ghostscript dll from
+        // a custom location, it's recommended to do something like this:
 
-            GhostscriptVersionInfo gvi = new GhostscriptVersionInfo(@"e:\dummyfolder\myapplication\gsdll32.dll");
+        GhostscriptVersionInfo gvi = new(@"e:\dummyfolder\myapplication\gsdll32.dll");
 
-            // and then pass that GhostscriptVersionInfo to the required constructor or method
+        // and then pass that GhostscriptVersionInfo to the required constructor or method
 
-            // sample #1
-            GhostscriptProcessor proc = new GhostscriptProcessor(gvi);
+        // sample #1
+        GhostscriptProcessor proc = new(gvi);
 
-            // sample #2
-            GhostscriptRasterizer rast = new GhostscriptRasterizer();
-            rast.Open("test.pdf", gvi, true);
+        // sample #2
+        GhostscriptRasterizer rast = new();
+        rast.Open("test.pdf", gvi, true);
 
-            // sample #3
-            GhostscriptViewer view = new GhostscriptViewer();
-            view.Open("test.pdf", gvi, true);
-        }
+        // sample #3
+        GhostscriptViewer view = new();
+        view.Open("test.pdf", gvi, true);
     }
 }

@@ -24,122 +24,118 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET;
 
-namespace Ghostscript.NET
+#region GhostscriptImageDeviceAlphaBits
+
+public enum GhostscriptImageDeviceAlphaBits
 {
+    /// <summary>
+    /// 1.
+    /// </summary>
+    [GhostscriptSwitchValue("1")]
+    V1,
 
-    #region GhostscriptImageDeviceAlphaBits
+    /// <summary>
+    /// 2.
+    /// </summary>
+    [GhostscriptSwitchValue("2")]
+    V2,
 
-    public enum GhostscriptImageDeviceAlphaBits
+    /// <summary>
+    /// 4.
+    /// </summary>
+    [GhostscriptSwitchValue("4")]
+    V4
+}
+
+#endregion
+
+#region GhostscriptImageDeviceResolution
+
+public class GhostscriptImageDeviceResolution
+{
+    #region Constructor
+
+    public GhostscriptImageDeviceResolution(int x, int y)
     {
-        /// <summary>
-        /// 1.
-        /// </summary>
-        [GhostscriptSwitchValue("1")]
-        V1,
-        /// <summary>
-        /// 2.
-        /// </summary>
-        [GhostscriptSwitchValue("2")]
-        V2,
-        /// <summary>
-        /// 4.
-        /// </summary>
-        [GhostscriptSwitchValue("4")]
-        V4
+        X = x;
+        Y = y;
     }
 
     #endregion
 
-    #region GhostscriptImageDeviceResolution
+    #region X
 
-    public class GhostscriptImageDeviceResolution
+    public int? X { get; set; }
+
+    #endregion
+
+    #region Y
+
+    public int? Y { get; set; }
+
+    #endregion
+}
+
+#endregion
+
+public class GhostscriptImageDevice : GhostscriptDevice
+{
+    #region Constructor
+
+    public GhostscriptImageDevice()
     {
-
-        #region Constructor
-
-        public GhostscriptImageDeviceResolution(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        #endregion
-
-        #region X
-
-        public int? X { get; set; }
-
-        #endregion
-
-        #region Y
-
-        public int? Y { get; set; }
-
-        #endregion
-
+        Other.Safer = GhostscriptOptionalSwitch.Include;
+        Interaction.Batch = GhostscriptOptionalSwitch.Include;
+        Interaction.NoPause = GhostscriptOptionalSwitch.Include;
     }
 
     #endregion
 
-    public class GhostscriptImageDevice : GhostscriptDevice
-    {
-        #region Constructor
+    #region Resolution
 
-        public GhostscriptImageDevice()
-        {
-            this.Other.Safer = GhostscriptOptionalSwitch.Include;
-            this.Interaction.Batch = GhostscriptOptionalSwitch.Include;
-            this.Interaction.NoPause = GhostscriptOptionalSwitch.Include;
-        }
+    /// <summary>
+    /// This option sets the resolution of the output file in dots per inch. The default value if you don't specify this options is usually 72 dpi.
+    /// </summary>
+    [GhostscriptSwitch("-r{0}")]
+    public int? Resolution { get; set; }
 
-        #endregion
+    #endregion
 
-        #region Resolution
+    #region ResolutionXY
 
-        /// <summary>
-        /// This option sets the resolution of the output file in dots per inch. The default value if you don't specify this options is usually 72 dpi.
-        /// </summary>
-        [GhostscriptSwitch("-r{0}")]
-        public int? Resolution { get; set; }
+    /// <summary>
+    /// This option sets the resolution of the output file in dots per inch. The default value if you don't specify this options is usually 72 dpi.
+    /// </summary>
+    [GhostscriptSwitch("-r{0}x{1}")]
+    public GhostscriptImageDeviceResolution ResolutionXy { get; set; }
 
-        #endregion
+    #endregion
 
-        #region ResolutionXY
+    #region TextAlphaBits
 
-        /// <summary>
-        /// This option sets the resolution of the output file in dots per inch. The default value if you don't specify this options is usually 72 dpi.
-        /// </summary>
-        [GhostscriptSwitch("-r{0}x{1}")]
-        public GhostscriptImageDeviceResolution ResolutionXy { get; set; }
+    /// <summary>
+    /// These option control the use of subsample antialiasing. 
+    /// Their use is highly recommended for producing high quality rasterizations of the input files. 
+    /// The size of the subsampling box n should be 4 for optimum output, but smaller values can be used for faster rendering. 
+    /// Antialiasing is enabled separately for text and graphics content.
+    /// </summary>
+    [GhostscriptSwitch("-dTextAlphaBits={0}")]
+    public GhostscriptImageDeviceAlphaBits? TextAlphaBits { get; set; }
 
-        #endregion
+    #endregion
 
-        #region TextAlphaBits
+    #region GraphicsAlphaBits
 
-        /// <summary>
-        /// These option control the use of subsample antialiasing. 
-        /// Their use is highly recommended for producing high quality rasterizations of the input files. 
-        /// The size of the subsampling box n should be 4 for optimum output, but smaller values can be used for faster rendering. 
-        /// Antialiasing is enabled separately for text and graphics content.
-        /// </summary>
-        [GhostscriptSwitch("-dTextAlphaBits={0}")]
-        public GhostscriptImageDeviceAlphaBits? TextAlphaBits { get; set; }
+    /// <summary>
+    /// These option control the use of subsample antialiasing. 
+    /// Their use is highly recommended for producing high quality rasterizations of the input files. 
+    /// The size of the subsampling box n should be 4 for optimum output, but smaller values can be used for faster rendering. 
+    /// Antialiasing is enabled separately for text and graphics content.
+    /// </summary>
+    [GhostscriptSwitch("-dGraphicsAlphaBits={0}")]
+    public GhostscriptImageDeviceAlphaBits? GraphicsAlphaBits { get; set; }
 
-        #endregion
-
-        #region GraphicsAlphaBits
-
-        /// <summary>
-        /// These option control the use of subsample antialiasing. 
-        /// Their use is highly recommended for producing high quality rasterizations of the input files. 
-        /// The size of the subsampling box n should be 4 for optimum output, but smaller values can be used for faster rendering. 
-        /// Antialiasing is enabled separately for text and graphics content.
-        /// </summary>
-        [GhostscriptSwitch("-dGraphicsAlphaBits={0}")]
-        public GhostscriptImageDeviceAlphaBits? GraphicsAlphaBits { get; set; }
-
-        #endregion
-    }
+    #endregion
 }

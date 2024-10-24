@@ -25,37 +25,33 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using Ghostscript.NET;
 
-namespace Ghostscript.NET.Viewer
+namespace Ghostscript.NET.Viewer;
+
+public class GhostscriptStdIoHandler : GhostscriptStdIo
 {
-    public class GhostscriptStdIoHandler : GhostscriptStdIo
+    private readonly StringBuilder _stdErr;
+    private readonly StringBuilder _stdOut;
+
+    public GhostscriptStdIoHandler(StringBuilder stdOut, StringBuilder stdErr) : base(false, true, true)
     {
-        private StringBuilder _stdOut;
-        private StringBuilder _stdErr;
+        _stdOut = stdOut;
+        _stdErr = stdErr;
+    }
 
-        public GhostscriptStdIoHandler(StringBuilder stdOut, StringBuilder stdErr) : base(false, true, true)
-        {
-            _stdOut = stdOut;
-            _stdErr = stdErr;
-        }
+    public override void StdIn(out string input, int count)
+    {
+        throw new NotImplementedException();
+    }
 
-        public override void StdIn(out string input, int count)
-        {
-            throw new NotImplementedException();
-        }
+    public override void StdOut(string output)
+    {
+        _stdOut.AppendLine(output);
+    }
 
-        public override void StdOut(string output)
-        {
-            _stdOut.AppendLine(output);
-        }
-
-        public override void StdError(string error)
-        {
-            _stdErr.AppendLine(error);
-        }
+    public override void StdError(string error)
+    {
+        _stdErr.AppendLine(error);
     }
 }

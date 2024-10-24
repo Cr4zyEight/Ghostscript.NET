@@ -27,61 +27,61 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Ghostscript.NET.Processor;
 
-namespace Ghostscript.NET.Samples
+namespace Ghostscript.NET.Samples;
+
+public class RunMultipleInstancesSample : ISample
 {
-    public class RunMultipleInstancesSample : ISample
+    private readonly GhostscriptVersionInfo _gsVerssionInfo = GhostscriptVersionInfo.GetLastInstalledVersion();
+
+    public void Start()
     {
-        private GhostscriptVersionInfo _gsVerssionInfo = GhostscriptVersionInfo.GetLastInstalledVersion();
+        ThreadPool.QueueUserWorkItem(Instance1);
+        ThreadPool.QueueUserWorkItem(Instance2);
+    }
 
-        public void Start()
-        {
-            ThreadPool.QueueUserWorkItem(new WaitCallback(Instance1));
-            ThreadPool.QueueUserWorkItem(new WaitCallback(Instance2));
-        }
+    private void Process(string input, string output, int startPage, int endPage)
+    {
+        // make sure that constructor 'fromMemory' option is set to true if 
+        // you want to run multiple instances of the Ghostscript
+        GhostscriptProcessor processor = new(_gsVerssionInfo, true);
+        processor.StartProcessing(CreateTestArgs(input, output, startPage, endPage), new ConsoleStdIo(true, true, true));
+    }
 
-        private void Process(string input, string output, int startPage, int endPage)
-        {
-            // make sure that constructor 'fromMemory' option is set to true if 
-            // you want to run multiple instances of the Ghostscript
-            Ghostscript.NET.Processor.GhostscriptProcessor processor = new Processor.GhostscriptProcessor(_gsVerssionInfo, true);
-            processor.StartProcessing(CreateTestArgs(input, output, startPage, endPage), new ConsoleStdIo(true, true, true));
-        }
+    private void Instance1(object target)
+    {
+        // export pdf pages to images
+        Process(@"E:\mc-1.pdf", @"E:\_pdf_out\a_test-%03d.png", 1, 100);
+    }
 
-        private void Instance1(object target)
-        {
-            // export pdf pages to images
-            Process(@"E:\mc-1.pdf", @"E:\_pdf_out\a_test-%03d.png", 1, 100);
-        }
+    private void Instance2(object target)
+    {
+        // export pdf pages to images
+        Process(@"E:\mc-2.pdf", @"E:\_pdf_out\b_test-%03d.png", 1, 100);
+    }
 
-        private void Instance2(object target)
-        {
-            // export pdf pages to images
-            Process(@"E:\mc-2.pdf", @"E:\_pdf_out\b_test-%03d.png", 1, 100);
-        }
+    private string[] CreateTestArgs(string inputPath, string outputPath, int pageFrom, int pageTo)
+    {
+        List<string> gsArgs = new();
 
-        private string[] CreateTestArgs(string inputPath, string outputPath, int pageFrom, int pageTo)
-        {
-            List<string> gsArgs = new List<string>();
+        gsArgs.Add("-q");
+        gsArgs.Add("-dSAFER");
+        gsArgs.Add("-dBATCH");
+        gsArgs.Add("-dNOPAUSE");
+        gsArgs.Add("-dNOPROMPT");
+        gsArgs.Add(@"-sFONTPATH=" + Environment.GetFolderPath(Environment.SpecialFolder.Fonts));
+        gsArgs.Add("-dFirstPage=" + pageFrom);
+        gsArgs.Add("-dLastPage=" + pageTo);
+        gsArgs.Add("-sDEVICE=png16m");
+        gsArgs.Add("-r72");
+        gsArgs.Add("-sPAPERSIZE=a4");
+        gsArgs.Add("-dNumRenderingThreads=" + Environment.ProcessorCount);
+        gsArgs.Add("-dTextAlphaBits=4");
+        gsArgs.Add("-dGraphicsAlphaBits=4");
+        gsArgs.Add(@"-sOutputFile=" + outputPath);
+        gsArgs.Add(@"-f" + inputPath);
 
-            gsArgs.Add("-q");
-            gsArgs.Add("-dSAFER");
-            gsArgs.Add("-dBATCH");
-            gsArgs.Add("-dNOPAUSE");
-            gsArgs.Add("-dNOPROMPT");
-            gsArgs.Add(@"-sFONTPATH=" + System.Environment.GetFolderPath(System.Environment.SpecialFolder.Fonts));
-            gsArgs.Add("-dFirstPage=" + pageFrom.ToString());
-            gsArgs.Add("-dLastPage=" + pageTo.ToString());
-            gsArgs.Add("-sDEVICE=png16m");
-            gsArgs.Add("-r72");
-            gsArgs.Add("-sPAPERSIZE=a4");
-            gsArgs.Add("-dNumRenderingThreads=" + Environment.ProcessorCount.ToString());
-            gsArgs.Add("-dTextAlphaBits=4");
-            gsArgs.Add("-dGraphicsAlphaBits=4");
-            gsArgs.Add(@"-sOutputFile=" + outputPath);
-            gsArgs.Add(@"-f" + inputPath);
-
-            return gsArgs.ToArray();
-        }
+        return gsArgs.ToArray();
     }
 }

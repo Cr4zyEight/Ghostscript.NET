@@ -28,48 +28,43 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-
-// required Ghostscript.NET namespaces
-using Ghostscript.NET;
 using Ghostscript.NET.Rasterizer;
+// required Ghostscript.NET namespaces
 
-namespace Ghostscript.NET.Samples
+namespace Ghostscript.NET.Samples;
+
+/// <summary>
+/// GhostscriptRasterizer allows you to rasterize pdf and postscript files into the 
+/// memory. If you want Ghostscript to store files on the disk use GhostscriptProcessor
+/// or one of the GhostscriptDevices (GhostscriptPngDevice, GhostscriptJpgDevice).
+/// </summary>
+public class RasterizerCropSample : ISample
 {
-
-    /// <summary>
-    /// GhostscriptRasterizer allows you to rasterize pdf and postscript files into the 
-    /// memory. If you want Ghostscript to store files on the disk use GhostscriptProcessor
-    /// or one of the GhostscriptDevices (GhostscriptPngDevice, GhostscriptJpgDevice).
-    /// </summary>
-    public class RasterizerCropSample : ISample
+    public void Start()
     {
-        public void Start()
+        int desiredDpi = 300;
+
+        string inputPdfPath = @"E:\__test_data\test2.pdf";
+        string outputPath = @"E:\__test_data\output\";
+
+        using (GhostscriptRasterizer rasterizer = new())
         {
-            int desiredDpi = 300;
+            rasterizer.CustomSwitches.Add("-dUseCropBox");
+            rasterizer.CustomSwitches.Add("-c");
+            rasterizer.CustomSwitches.Add("[/CropBox [24 72 559 794] /PAGES pdfmark");
+            rasterizer.CustomSwitches.Add("-f");
 
-            string inputPdfPath = @"E:\__test_data\test2.pdf";
-            string outputPath = @"E:\__test_data\output\";
+            rasterizer.Open(inputPdfPath);
 
-            using (GhostscriptRasterizer rasterizer = new GhostscriptRasterizer())
+            for (int pageNumber = 1; pageNumber <= rasterizer.PageCount; pageNumber++)
             {
-                rasterizer.CustomSwitches.Add("-dUseCropBox");
-                rasterizer.CustomSwitches.Add("-c");
-                rasterizer.CustomSwitches.Add("[/CropBox [24 72 559 794] /PAGES pdfmark");
-                rasterizer.CustomSwitches.Add("-f");
+                string pageFilePath = Path.Combine(outputPath, "Page-" + pageNumber + ".png");
 
-                rasterizer.Open(inputPdfPath);
+                Image img = rasterizer.GetPage(desiredDpi, pageNumber);
+                img.Save(pageFilePath, ImageFormat.Png);
 
-                for (int pageNumber = 1; pageNumber <= rasterizer.PageCount; pageNumber++)
-                {
-                    string pageFilePath = Path.Combine(outputPath, "Page-" + pageNumber.ToString() + ".png");
-
-                    Image img = rasterizer.GetPage(desiredDpi, pageNumber);
-                    img.Save(pageFilePath, ImageFormat.Png);
-
-                    Console.WriteLine(pageFilePath);
-                }
+                Console.WriteLine(pageFilePath);
             }
         }
     }
 }
-

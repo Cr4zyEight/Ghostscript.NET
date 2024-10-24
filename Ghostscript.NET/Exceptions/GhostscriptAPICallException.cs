@@ -24,14 +24,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace Ghostscript.NET;
 
-namespace Ghostscript.NET
+public class GhostscriptApiCallException : GhostscriptException
 {
-    public class GhostscriptApiCallException : GhostscriptException
+    public GhostscriptApiCallException(string function, int code)
+        : base(string.Format("An error occured when call to '{0}' is made: {1}", function, code))
     {
-        public GhostscriptApiCallException(string function, int code) 
-            : base(string.Format("An error occured when call to '{0}' is made: {1}", function, code))
-        { }
     }
 }
