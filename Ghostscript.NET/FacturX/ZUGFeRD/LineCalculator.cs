@@ -2,12 +2,12 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD;
 
 public class LineCalculator
 {
-    private decimal _allowance = decimal.Zero;
-    private decimal _charge = decimal.Zero;
     private readonly decimal _itemTotalNetAmount;
     private readonly decimal _itemTotalVatAmount;
     private readonly decimal _price;
     private readonly decimal _priceGross;
+    private decimal _allowance = decimal.Zero;
+    private decimal _charge = decimal.Zero;
 
     //JAVA TO C# CONVERTER WARNING: The following constructor is declared outside of its associated class:
     //ORIGINAL LINE: public LineCalculator(ZUGFeRDExportableItem currentItem)

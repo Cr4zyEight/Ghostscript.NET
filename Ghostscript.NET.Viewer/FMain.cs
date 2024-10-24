@@ -36,8 +36,8 @@ public partial class FMain : Form
     private readonly GhostscriptVersionInfo _gsVersion = GhostscriptVersionInfo.GetLastInstalledVersion();
     private readonly StringBuilder _stdErr = new();
     private readonly StringBuilder _stdOut = new();
-    private bool _supressPageNumberChangeEvent;
     private readonly GhostscriptViewer _viewer;
+    private bool _supressPageNumberChangeEvent;
 
     public FMain()
     {

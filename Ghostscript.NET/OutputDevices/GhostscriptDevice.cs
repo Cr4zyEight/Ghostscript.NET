@@ -55,10 +55,6 @@ public enum GhostscriptBooleanSwitch
 
 public class GhostscriptDevice
 {
-    #region Private variables
-
-    #endregion
-
     #region Constructor
 
     public GhostscriptDevice()
@@ -248,6 +244,10 @@ public class GhostscriptDevice
             processor.StartProcessing(GetSwitches(), stdIoCallback);
         }
     }
+
+    #endregion
+
+    #region Private variables
 
     #endregion
 }

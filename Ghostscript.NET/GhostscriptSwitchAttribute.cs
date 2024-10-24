@@ -31,10 +31,6 @@ namespace Ghostscript.NET;
 /// </summary>
 public sealed class GhostscriptSwitchAttribute : Attribute
 {
-    #region Private variables
-
-    #endregion
-
     #region Constructor
 
     /// <summary>
@@ -56,6 +52,10 @@ public sealed class GhostscriptSwitchAttribute : Attribute
     public string Name { get; }
 
     #endregion
+
+    #region Private variables
+
+    #endregion
 }
 
 /// <summary>
@@ -63,10 +63,6 @@ public sealed class GhostscriptSwitchAttribute : Attribute
 /// </summary>
 public sealed class GhostscriptSwitchValueAttribute : Attribute
 {
-    #region Private variables
-
-    #endregion
-
     #region Constructor
 
     /// <summary>
@@ -86,6 +82,10 @@ public sealed class GhostscriptSwitchValueAttribute : Attribute
     /// Gets the switch value.
     /// </summary>
     public string Value { get; }
+
+    #endregion
+
+    #region Private variables
 
     #endregion
 }

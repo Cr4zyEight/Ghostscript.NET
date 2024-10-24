@@ -29,6 +29,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using Ghostscript.NET.Rasterizer;
+
 // required Ghostscript.NET namespaces
 
 namespace Ghostscript.NET.Samples;

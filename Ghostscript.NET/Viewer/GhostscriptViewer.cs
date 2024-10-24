@@ -31,10 +31,6 @@ namespace Ghostscript.NET.Viewer;
 
 public class GhostscriptViewer : IDisposable
 {
-    #region Constructor
-
-    #endregion
-
     #region Internal properties
 
     #region ShowPageAfterOpen
@@ -528,6 +524,10 @@ public class GhostscriptViewer : IDisposable
         FormatHandler.CurrentPageNumber = state.CurrentPage;
         ProgressiveUpdate = state.ProgressiveUpdate;
     }
+
+    #endregion
+
+    #region Constructor
 
     #endregion
 

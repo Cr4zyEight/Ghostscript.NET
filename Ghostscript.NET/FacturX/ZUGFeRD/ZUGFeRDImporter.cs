@@ -19,16 +19,9 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD;
 /// @version 1.1.0
 /// @author jstaerk
 /// </summary>
-
 public class ZUGFeRDImporter
 {
-    /// <summary>
-    /// if metadata has been found
-    /// </summary>
-    //JAVA TO C# CONVERTER NOTE: Fields cannot have the same name as methods of the current type:
-    protected internal bool ContainsMetaConflict = false;
-
-    protected XmlDocument XmlDoc;
+    private readonly ILogger<ZUGFeRDImporter> _logger;
 
     /// <summary>
     /// map filenames of additional XML files to their contents
@@ -45,7 +38,13 @@ public class ZUGFeRDImporter
     /// </summary>
     private string _xmpString = null; // XMP metadata
 
-    private readonly ILogger<ZUGFeRDImporter> _logger;
+    /// <summary>
+    /// if metadata has been found
+    /// </summary>
+    //JAVA TO C# CONVERTER NOTE: Fields cannot have the same name as methods of the current type:
+    protected internal bool ContainsMetaConflict = false;
+
+    protected XmlDocument XmlDoc;
 
 
     protected internal ZUGFeRDImporter()
@@ -209,10 +208,7 @@ public class ZUGFeRDImporter
     public bool FromPdf(string pPdfFile)
     {
         PdfStream stream = GetStreamFromPdf(pPdfFile);
-        if (stream == null)
-        {
-            return false; // details in mPDFInfo
-        }
+        if (stream == null) return false; // details in mPDFInfo
 
         XmlDoc = new XmlDocument();
         // Dim encoding As New System.Text.UTF8Encoding(True) ' The boolean parameter controls BOM

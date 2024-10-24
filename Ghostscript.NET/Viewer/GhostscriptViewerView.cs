@@ -36,6 +36,12 @@ public delegate void GhostscriptViewerViewEventHandler(object sender, Ghostscrip
 
 public class GhostscriptViewerViewEventArgs : EventArgs
 {
+    #region Private variables
+
+    private readonly GhostscriptViewerImage _image;
+
+    #endregion
+
     #region Constructor
 
     internal GhostscriptViewerViewEventArgs(GhostscriptViewerImage image, Rectangle mediaBox)
@@ -55,12 +61,6 @@ public class GhostscriptViewerViewEventArgs : EventArgs
     #region MediaBox
 
     public RectangleF MediaBox { get; }
-
-    #endregion
-
-    #region Private variables
-
-    private readonly GhostscriptViewerImage _image;
 
     #endregion
 }

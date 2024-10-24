@@ -26,6 +26,7 @@
 
 using System.Drawing;
 using Ghostscript.NET.Viewer;
+
 // required Ghostscript.NET namespaces
 
 namespace Ghostscript.NET.Samples;

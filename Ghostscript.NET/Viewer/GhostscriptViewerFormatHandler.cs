@@ -28,6 +28,12 @@ namespace Ghostscript.NET.Viewer;
 
 internal abstract class GhostscriptViewerFormatHandler : IDisposable
 {
+    #region Private variables
+
+    private bool _disposed;
+
+    #endregion
+
     #region Constructor
 
     public GhostscriptViewerFormatHandler(GhostscriptViewer viewer)
@@ -133,12 +139,6 @@ internal abstract class GhostscriptViewerFormatHandler : IDisposable
     {
         return Viewer.Interpreter.Run(str);
     }
-
-    #endregion
-
-    #region Private variables
-
-    private bool _disposed;
 
     #endregion
 
