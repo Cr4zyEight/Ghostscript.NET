@@ -72,7 +72,7 @@ public class Item : IZUGFeRDExportableItem
 
     public string GetAdditionalReferencedDocumentId()
     {
-        throw null;
+        return null;
     }
 
     public IZUGFeRDExportableProduct GetProduct()

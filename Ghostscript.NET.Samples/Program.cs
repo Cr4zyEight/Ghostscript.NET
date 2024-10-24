@@ -36,6 +36,7 @@ if (!GhostscriptVersionInfo.IsGhostscriptInstalled) throw new Exception("You don
 
 List<ISample> samples = new()
 {
+    new FacturXWriteSample(),
     //new GetInkCoverageSample(),
     //new ProcessorSample1(),
     //new ProcessorSample2(),
@@ -48,7 +49,6 @@ List<ISample> samples = new()
     //new DeviceUsageSample(),
     //new PipedOutputSample(),
     //new SendToPrinterSample(),
-    new FacturXWriteSample()
 };
 
 foreach (ISample sample in samples)
