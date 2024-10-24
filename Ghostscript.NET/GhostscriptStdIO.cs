@@ -26,6 +26,7 @@
 
 using System.Runtime.InteropServices;
 using System.Text;
+using Ghostscript.NET.gs;
 
 namespace Ghostscript.NET;
 

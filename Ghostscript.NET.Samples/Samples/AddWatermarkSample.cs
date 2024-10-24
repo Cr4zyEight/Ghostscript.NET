@@ -26,9 +26,10 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using Ghostscript.NET.OutputDevices;
 using Ghostscript.NET.Processor;
 
-namespace Ghostscript.NET.Samples;
+namespace Ghostscript.NET.Samples.Samples;
 
 public class AddWatermarkSample : ISample
 {

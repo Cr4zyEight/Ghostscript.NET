@@ -26,7 +26,7 @@
 
 using System;
 
-namespace Ghostscript.NET.Samples;
+namespace Ghostscript.NET.Samples.StdIOHandlers;
 
 public class ConsoleStdIo : GhostscriptStdIo
 {

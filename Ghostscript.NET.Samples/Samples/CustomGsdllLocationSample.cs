@@ -28,7 +28,7 @@ using Ghostscript.NET.Processor;
 using Ghostscript.NET.Rasterizer;
 using Ghostscript.NET.Viewer;
 
-namespace Ghostscript.NET.Samples;
+namespace Ghostscript.NET.Samples.Samples;
 
 public class CustomGsdllLocationSample : ISample
 {

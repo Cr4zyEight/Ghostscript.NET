@@ -24,9 +24,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Microsoft.WinAny;
+using Ghostscript.NET.Microsoft.WinAny.Helper._native;
 
-namespace Ghostscript.NET;
+namespace Ghostscript.NET.Helpers;
 
 /// <summary>
 /// Class that helps us to get various information about native libraries.

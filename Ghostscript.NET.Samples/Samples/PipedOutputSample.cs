@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using Ghostscript.NET.Processor;
 
-namespace Ghostscript.NET.Samples;
+namespace Ghostscript.NET.Samples.Samples;
 
 /// <summary>
 /// Sample that demonstrates how to tell Ghostscript to write the output result to 

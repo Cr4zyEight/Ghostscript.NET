@@ -27,7 +27,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Ghostscript.NET.Samples;
+namespace Ghostscript.NET.Samples.Samples;
 
 public class GetInkCoverageSample : ISample
 {

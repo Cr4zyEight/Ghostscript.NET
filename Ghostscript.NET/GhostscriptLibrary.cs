@@ -25,7 +25,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Runtime.InteropServices;
-using Microsoft.WinAny.Interop;
+using Ghostscript.NET.Exceptions;
+using Ghostscript.NET.gs;
+using Ghostscript.NET.Helpers;
+using Ghostscript.NET.Microsoft.WinAny.Helper.Interop;
 
 namespace Ghostscript.NET;
 

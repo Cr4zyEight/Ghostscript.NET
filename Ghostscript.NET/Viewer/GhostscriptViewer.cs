@@ -25,7 +25,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Globalization;
+using Ghostscript.NET.gs;
+using Ghostscript.NET.Helpers;
 using Ghostscript.NET.Interpreter;
+using Ghostscript.NET.Viewer.FormatHandlers;
 
 namespace Ghostscript.NET.Viewer;
 

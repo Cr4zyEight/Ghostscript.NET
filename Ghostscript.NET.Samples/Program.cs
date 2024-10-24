@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using Ghostscript.NET;
 using Ghostscript.NET.Samples;
+using Ghostscript.NET.Samples.Samples;
 
 Console.WriteLine("Ghostscript.NET Samples");
 

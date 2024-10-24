@@ -28,8 +28,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Ghostscript.NET.Processor;
+using Ghostscript.NET.Samples.StdIOHandlers;
 
-namespace Ghostscript.NET.Samples;
+namespace Ghostscript.NET.Samples.Samples;
 
 public class RunMultipleInstancesSample : ISample
 {

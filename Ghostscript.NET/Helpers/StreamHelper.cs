@@ -26,7 +26,7 @@
 
 using System.Text;
 
-namespace Ghostscript.NET;
+namespace Ghostscript.NET.Helpers;
 
 internal class StreamHelper
 {

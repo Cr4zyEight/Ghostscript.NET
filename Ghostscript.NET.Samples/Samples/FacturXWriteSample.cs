@@ -29,7 +29,7 @@ using System.IO;
 using System.Text;
 using Ghostscript.NET.FacturX.ZUGFeRD;
 
-namespace Ghostscript.NET.Samples;
+namespace Ghostscript.NET.Samples.Samples;
 
 public class FacturXWriteSample : ISample
 {

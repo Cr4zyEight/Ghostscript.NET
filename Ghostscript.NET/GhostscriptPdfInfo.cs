@@ -26,6 +26,7 @@
 
 using System.Globalization;
 using System.Text;
+using Ghostscript.NET.Helpers;
 using Ghostscript.NET.Processor;
 
 namespace Ghostscript.NET;

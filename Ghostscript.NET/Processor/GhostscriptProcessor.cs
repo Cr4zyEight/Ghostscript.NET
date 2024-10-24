@@ -25,6 +25,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Text;
+using Ghostscript.NET.Exceptions;
+using Ghostscript.NET.gs;
+using Ghostscript.NET.OutputDevices;
 
 namespace Ghostscript.NET.Processor;
 

@@ -32,7 +32,7 @@ using Ghostscript.NET.Rasterizer;
 
 // required Ghostscript.NET namespaces
 
-namespace Ghostscript.NET.Samples;
+namespace Ghostscript.NET.Samples.Samples;
 
 /// <summary>
 /// GhostscriptRasterizer allows you to rasterize pdf and postscript files into the 

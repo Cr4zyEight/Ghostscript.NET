@@ -28,7 +28,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Ghostscript.NET;
+namespace Ghostscript.NET.gs;
 
 #region gsapi_revision_s
 

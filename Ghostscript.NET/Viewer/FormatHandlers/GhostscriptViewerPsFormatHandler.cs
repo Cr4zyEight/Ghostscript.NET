@@ -29,7 +29,7 @@
 using System.Globalization;
 using Ghostscript.NET.Viewer.DSC;
 
-namespace Ghostscript.NET.Viewer;
+namespace Ghostscript.NET.Viewer.FormatHandlers;
 
 internal class GhostscriptViewerPsFormatHandler : GhostscriptViewerFormatHandler
 {

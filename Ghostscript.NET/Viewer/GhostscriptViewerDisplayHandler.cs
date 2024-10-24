@@ -27,6 +27,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using Ghostscript.NET.Helpers;
 
 namespace Ghostscript.NET.Viewer;
 

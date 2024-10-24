@@ -26,7 +26,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Ghostscript.NET;
+namespace Ghostscript.NET.gs;
 
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 public delegate int DisplayOpenCallback(IntPtr handle, IntPtr device);

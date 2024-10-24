@@ -28,7 +28,7 @@ using System.Drawing;
 using System.Reflection;
 using Ghostscript.NET.Processor;
 
-namespace Ghostscript.NET;
+namespace Ghostscript.NET.OutputDevices;
 
 #region GhostscriptOptionalSwitch
 

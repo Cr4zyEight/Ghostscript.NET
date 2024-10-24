@@ -29,8 +29,11 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using Ghostscript.NET.Exceptions;
+using Ghostscript.NET.gs;
+using Ghostscript.NET.Helpers;
 
-namespace Ghostscript.NET.Viewer;
+namespace Ghostscript.NET.Viewer.FormatHandlers;
 
 internal class GhostscriptViewerPdfFormatHandler : GhostscriptViewerFormatHandler
 {

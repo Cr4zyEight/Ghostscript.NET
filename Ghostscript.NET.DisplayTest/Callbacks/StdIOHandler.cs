@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace Ghostscript.NET.DisplayTest;
+namespace Ghostscript.NET.DisplayTest.Callbacks;
 
 public class StdIoHandler : GhostscriptStdIo
 {

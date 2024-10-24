@@ -26,7 +26,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Ghostscript.NET;
+namespace Ghostscript.NET._native;
 
 internal class Wdm
 {

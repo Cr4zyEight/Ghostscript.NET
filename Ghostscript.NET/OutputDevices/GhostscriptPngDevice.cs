@@ -26,7 +26,7 @@
 
 using System.Drawing;
 
-namespace Ghostscript.NET;
+namespace Ghostscript.NET.OutputDevices;
 
 #region GhostscriptPngDeviceType
 

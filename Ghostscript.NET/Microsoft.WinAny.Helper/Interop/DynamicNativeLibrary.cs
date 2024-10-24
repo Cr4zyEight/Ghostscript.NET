@@ -34,8 +34,9 @@
 // Copyright (C) 2004-2012 Joachim Bauch (mail@joachim-bauch.de). 
 
 using System.Runtime.InteropServices;
+using Ghostscript.NET.Microsoft.WinAny.Helper._native;
 
-namespace Microsoft.WinAny.Interop;
+namespace Ghostscript.NET.Microsoft.WinAny.Helper.Interop;
 
 /// <summary>
 /// Class that helps you to load and use native/unmanaged dynamic-link libraries dinamically.

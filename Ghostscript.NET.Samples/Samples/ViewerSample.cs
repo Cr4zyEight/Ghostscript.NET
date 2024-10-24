@@ -29,7 +29,7 @@ using Ghostscript.NET.Viewer;
 
 // required Ghostscript.NET namespaces
 
-namespace Ghostscript.NET.Samples;
+namespace Ghostscript.NET.Samples.Samples;
 
 public class ViewerSample : ISample
 {

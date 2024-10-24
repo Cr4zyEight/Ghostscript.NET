@@ -26,7 +26,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Microsoft.WinAny;
+namespace Ghostscript.NET.Microsoft.WinAny.Helper._native;
 
 internal static unsafe class WinBase
 {

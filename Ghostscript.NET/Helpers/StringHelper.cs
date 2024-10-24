@@ -27,7 +27,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Ghostscript.NET;
+namespace Ghostscript.NET.Helpers;
 
 public class StringHelper
 {

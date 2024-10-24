@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.IO;
 using Ghostscript.NET.Processor;
 
-namespace Ghostscript.NET.Samples;
+namespace Ghostscript.NET.Samples.Samples;
 
 public class ProcessorSample1 : ISample
 {
