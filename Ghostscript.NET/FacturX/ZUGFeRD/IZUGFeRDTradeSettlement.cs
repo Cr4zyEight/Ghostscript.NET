@@ -1,3 +1,5 @@
+using System.Xml.Linq;
+
 namespace Ghostscript.NET.FacturX.ZUGFeRD;
 
 public interface IZUGFeRDTradeSettlement
@@ -6,12 +8,12 @@ public interface IZUGFeRDTradeSettlement
     ///*
     /// </summary>
     /// <returns> zf2 xml for applicableHeaderTradeSettlement </returns>
-    string GetSettlementXml();
+    XElement GetSettlementXml();
 
 
     /// <summary>
     ///*
     /// </summary>
     /// <returns> zf2 xml for applicableHeaderTradePayment </returns>
-    string GetPaymentXml();
+    XElement GetPaymentXml();
 }

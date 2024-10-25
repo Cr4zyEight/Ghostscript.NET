@@ -1,3 +1,5 @@
+using System.Xml.Linq;
+
 namespace Ghostscript.NET.FacturX.ZUGFeRD;
 
 /// <summary>
@@ -49,7 +51,7 @@ public interface IZUGFeRDTradeSettlementPayment : IZUGFeRDTradeSettlement
     string GetAccountName();
 
 
-    public string GetSettlementXml();
+    public XElement GetSettlementXml();
 
 
     /* I'd love to implement getPaymentXML() and put <ram:DueDateDateTime> there because this is where it belongs

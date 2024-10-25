@@ -1,9 +1,11 @@
+using System.Xml.Linq;
+
 namespace Ghostscript.NET.FacturX.ZUGFeRD;
 
 /// <summary>
 /// provides e.g. the IBAN to transfer money to :-)
 /// </summary>
-public class BankDetails : IZUGFeRDTradeSettlementPayment
+public class BankDetails : ZugFeRdXmlWriter, IZUGFeRDTradeSettlementPayment
 {
     protected internal string Iban, Bic, AccountName;
 
@@ -40,18 +42,33 @@ public class BankDetails : IZUGFeRDTradeSettlementPayment
         return AccountName;
     }
 
-    public string GetSettlementXml()
+    public XElement GetSettlementXml()
     {
-        string accountNameStr = "";
-        if (GetAccountName() != null) accountNameStr = "<ram:AccountName>" + XmlTools.EncodeXml(GetAccountName()) + "</ram:AccountName>\n";
+        XElement settlementPaymentMeans = new XElement($"{RamNamespace.Prefix}:SpecifiedTradeSettlementPaymentMeans",
+            new XElement($"{RamNamespace.Prefix}:TypeCode", "58"),
+            new XElement($"{RamNamespace.Prefix}:Information", "SEPA credit transfer"),
+            new XElement($"{RamNamespace.Prefix}:PayeePartyCreditorFinancialAccount",
+                new XElement($"{RamNamespace.Prefix}:IBANID", XmlTools.EncodeXml(GetOwnIban()))
+            )
+        );
 
-        string xml = "			<ram:SpecifiedTradeSettlementPaymentMeans>\n" + "				<ram:TypeCode>58</ram:TypeCode>\n" + "				<ram:Information>SEPA credit transfer</ram:Information>\n" + "				<ram:PayeePartyCreditorFinancialAccount>\n" + "					<ram:IBANID>" + XmlTools.EncodeXml(GetOwnIban()) + "</ram:IBANID>\n";
-        xml += accountNameStr;
-        xml += "				</ram:PayeePartyCreditorFinancialAccount>\n" + "				<ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "					<ram:BICID>" + XmlTools.EncodeXml(GetOwnBic()) + "</ram:BICID>\n" + "				</ram:PayeeSpecifiedCreditorFinancialInstitution>\n" + "			</ram:SpecifiedTradeSettlementPaymentMeans>\n";
-        return xml;
+        // Conditionally add AccountName if it exists
+        if (GetAccountName() != null)
+        {
+            settlementPaymentMeans.Element($"{RamNamespace.Prefix}:PayeePartyCreditorFinancialAccount")?
+                .Add(new XElement($"{RamNamespace.Prefix}:AccountName", XmlTools.EncodeXml(GetAccountName())));
+        }
+
+        // Add BICID element for financial institution details
+        settlementPaymentMeans.Add(new XElement($"{RamNamespace.Prefix}:PayeeSpecifiedCreditorFinancialInstitution",
+            new XElement($"{RamNamespace.Prefix}:BICID", XmlTools.EncodeXml(GetOwnBic()))
+        ));
+
+        return settlementPaymentMeans;
     }
 
-    public string GetPaymentXml()
+
+    public XElement GetPaymentXml()
     {
         return null;
     }

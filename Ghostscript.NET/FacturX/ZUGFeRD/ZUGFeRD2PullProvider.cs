@@ -1,403 +1,424 @@
+using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Xml.Linq;
 
-namespace Ghostscript.NET.FacturX.ZUGFeRD;
-
-public class ZUGFeRD2PullProvider
+namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
-    private string _paymentTermsDescription;
-    protected internal TransactionCalculator Calc;
-    protected internal Profile Profile = Profiles.GetByName("EN16931");
-    protected internal IExportableTransaction Trans;
-    protected internal byte[] ZugferdData;
-
-    //// MAIN CLASS
-    protected internal string ZugferdDateFormatting = "yyyyMMdd";
-
-
-    /// <summary>
-    /// enables the flag to indicate a test invoice in the XML structure
-    /// </summary>
-    public void SetTest()
+    public class ZUGFeRD2PullProvider : ZugFeRdXmlWriter
     {
-    }
+        private const string germanDateFormat = "dd.MM.yyyy";
+        private const string invoiceDateFormat = "yyyyMMdd";
+        private string _paymentTermsDescription;
+        protected internal TransactionCalculator Calc;
+        protected internal Profile Profile = Profiles.GetByName("EN16931");
+        protected internal IExportableTransaction Trans;
+        protected internal byte[] ZugferdData;
 
-    private string VatFormat(decimal value)
-    {
-        return XmlTools.ScaleDecimal(value, 2);
-    }
-
-    private string CurrencyFormat(decimal value)
-    {
-        return XmlTools.ScaleDecimal(value, 2);
-    }
-
-    private string PriceFormat(decimal value)
-    {
-        return XmlTools.ScaleDecimal(value, 4);
-    }
-
-    private string QuantityFormat(decimal value)
-    {
-        return XmlTools.ScaleDecimal(value, 4);
-    }
-
-    public byte[] GetXml()
-    {
-        return ZugferdData;
-    }
-
-
-    public Profile GetProfile()
-    {
-        return Profile;
-    }
-
-    // @todo check if the two boolean args can be refactored
-
-    /// <summary>
-    ///*
-    /// returns the UN/CEFACT CII XML for companies(tradeparties), which is actually
-    /// the same for ZF1 (v 2013b) and ZF2 (v 2016b) </summary>
-    /// <param name="party"> </param>
-    /// <param name="isSender"> some attributes are allowed only for senders in certain profiles </param>
-    /// <param name="isShipToTradeParty"> some attributes are allowed only for senders or recipients
-    /// @return </param>
-    protected internal virtual string GetTradePartyAsXml(IZUGFeRDExportableTradeParty party, bool isSender, bool isShipToTradeParty)
-    {
-        string xml = "";
-        // According EN16931 either GlobalID or seller assigned ID might be present for BuyerTradeParty
-        // and ShipToTradeParty, but not both. Prefer seller assigned ID for now.
-        if (party.GetId() != null)
-            xml += "	<ram:ID>" + XmlTools.EncodeXml(party.GetId()) + "</ram:ID>\n";
-        else if (party.GetGlobalIdScheme() != null && party.GetGlobalId() != null) xml = xml + "           <ram:GlobalID schemeID=\"" + XmlTools.EncodeXml(party.GetGlobalIdScheme()) + "\">" + XmlTools.EncodeXml(party.GetGlobalId()) + "</ram:GlobalID>\n";
-        xml += "	<ram:Name>" + XmlTools.EncodeXml(party.GetName()) + "</ram:Name>\n"; //$NON-NLS-2$
-
-        if (party.GetContact() != null && (isSender || Profile == Profiles.GetByName("Extended")))
+        /// <summary>
+        /// Enables the flag to indicate a test invoice in the XML structure
+        /// </summary>
+        public void SetTest()
         {
-            xml = xml + "<ram:DefinedTradeContact>\n" + "     <ram:PersonName>" + XmlTools.EncodeXml(party.GetContact().GetName()) + "</ram:PersonName>\n";
-            if (party.GetContact().GetPhone() != null) xml = xml + "     <ram:TelephoneUniversalCommunication>\n" + "        <ram:CompleteNumber>" + XmlTools.EncodeXml(party.GetContact().GetPhone()) + "</ram:CompleteNumber>\n" + "     </ram:TelephoneUniversalCommunication>\n";
-
-            if (party.GetContact().GetFax() != null && Profile == Profiles.GetByName("Extended")) xml = xml + "     <ram:FaxUniversalCommunication>\n" + "        <ram:CompleteNumber>" + XmlTools.EncodeXml(party.GetContact().GetFax()) + "</ram:CompleteNumber>\n" + "     </ram:FaxUniversalCommunication>\n";
-            if (party.GetContact().GetEMail() != null) xml = xml + "     <ram:EmailURIUniversalCommunication>\n" + "        <ram:URIID>" + XmlTools.EncodeXml(party.GetContact().GetEMail()) + "</ram:URIID>\n" + "     </ram:EmailURIUniversalCommunication>\n";
-
-            xml = xml + "  </ram:DefinedTradeContact>";
         }
 
-        xml += "				<ram:PostalTradeAddress>\n" + "					<ram:PostcodeCode>" + XmlTools.EncodeXml(party.GetZip()) + "</ram:PostcodeCode>\n" + "					<ram:LineOne>" + XmlTools.EncodeXml(party.GetStreet()) + "</ram:LineOne>\n";
-        if (party.GetAdditionalAddress() != null) xml += "				<ram:LineTwo>" + XmlTools.EncodeXml(party.GetAdditionalAddress()) + "</ram:LineTwo>\n";
-        xml += "					<ram:CityName>" + XmlTools.EncodeXml(party.GetLocation()) + "</ram:CityName>\n" + "					<ram:CountryID>" + XmlTools.EncodeXml(party.GetCountry()) + "</ram:CountryID>\n" + "				</ram:PostalTradeAddress>\n";
-        if (party.GetVatid() != null && !isShipToTradeParty) xml += "				<ram:SpecifiedTaxRegistration>\n" + "					<ram:ID schemeID=\"VA\">" + XmlTools.EncodeXml(party.GetVatid()) + "</ram:ID>\n" + "				</ram:SpecifiedTaxRegistration>\n";
-        if (party.GetTaxId() != null && !isShipToTradeParty) xml += "				<ram:SpecifiedTaxRegistration>\n" + "					<ram:ID schemeID=\"FC\">" + XmlTools.EncodeXml(party.GetTaxId()) + "</ram:ID>\n" + "				</ram:SpecifiedTaxRegistration>\n";
-        return xml;
-    }
+        /// <summary>
+        /// Formats VAT value to a 2-decimal string
+        /// </summary>
+        private string VatFormat(decimal value) => XmlTools.ScaleDecimal(value, 2);
 
+        /// <summary>
+        /// Formats currency value to a 2-decimal string
+        /// </summary>
+        private string CurrencyFormat(decimal value) => XmlTools.ScaleDecimal(value, 2);
 
-    /// <summary>
-    ///*
-    /// returns the XML for a charge or allowance on item level </summary>
-    /// <param name="allowance"> </param>
-    /// <param name="item">
-    /// @return </param>
-    /*	protected internal virtual string getAllowanceChargeStr(IZUGFeRDAllowanceCharge allowance, IAbsoluteValueProvider item)
+        /// <summary>
+        /// Formats price value to a 4-decimal string
+        /// </summary>
+        private string PriceFormat(decimal value) => XmlTools.ScaleDecimal(value, 4);
+
+        /// <summary>
+        /// Formats quantity value to a 4-decimal string
+        /// </summary>
+        private string QuantityFormat(decimal value) => XmlTools.ScaleDecimal(value, 4);
+
+        /// <summary>
+        /// Retrieves the generated XML data as byte array
+        /// </summary>
+        public byte[] GetXml() => ZugferdData;
+
+        /// <summary>
+        /// Retrieves the current profile
+        /// </summary>
+        public Profile GetProfile() => Profile;
+
+        /// <summary>
+        /// Sets the current profile
+        /// </summary>
+        /// <param name="profile">The p.</param>
+        public void SetProfile(Profile profile) => Profile = profile;
+
+        /// <summary>
+        /// Generates the XML structure for the invoice document
+        /// </summary>
+        /// <param name="trans">The transaction data</param>
+        public void GenerateXml(IExportableTransaction trans)
         {
-            string percentage = "";
-            string chargeIndicator = "false";
-            if ((allowance.getPercent() != null) && (profile == Profiles.getByName("Extended")))
+            Trans = trans;
+            Calc = new TransactionCalculator(trans);
+            _paymentTermsDescription = trans.GetPaymentTermDescription() ?? $"Zahlbar ohne Abzug bis {((DateTime)trans.GetDueDate()).ToString(germanDateFormat)}";
+
+            XElement xml = new XElement($"{RsmNamespace.Prefix}:CrossIndustryInvoice",
+                new XAttribute(XNamespace.Xmlns + XsiNamespace.Prefix, XsiNamespace.Namespace),
+                new XAttribute(XNamespace.Xmlns + RsmNamespace.Prefix, RsmNamespace.Namespace),
+                new XAttribute(XNamespace.Xmlns + RamNamespace.Prefix, RamNamespace.Namespace),
+                new XAttribute(XNamespace.Xmlns + UdtNamespace.Prefix, UdtNamespace.Namespace),
+
+                new XElement($"{RsmNamespace.Prefix}:ExchangedDocumentContext",
+                    new XElement($"{RamNamespace.Prefix}:GuidelineSpecifiedDocumentContextParameter",
+                        new XElement($"{RamNamespace.Prefix}:ID", GetProfile().GetId()))),
+                new XElement($"{RsmNamespace.Prefix}:ExchangedDocument",
+                    new XElement($"{RamNamespace.Prefix}:ID", XmlTools.EncodeXml(trans.GetNumber())),
+                    new XElement($"{RamNamespace.Prefix}:TypeCode", "380"),
+                    new XElement($"{RamNamespace.Prefix}:IssueDateTime",
+                        new XElement($"{UdtNamespace.Prefix}:DateTimeString", ((DateTime)trans.GetIssueDate()).ToString(invoiceDateFormat))),
+                    BuildNotesSection(trans),
+                    BuildRebateAgreement(trans),
+                    BuildSubjectNoteSection(trans)),
+                new XElement($"{RsmNamespace.Prefix}:SupplyChainTradeTransaction",
+                    BuildTradeLineItems(trans),
+                    BuildApplicableHeaderTradeAgreement(trans),
+                    BuildApplicableHeaderTradeDelivery(trans),
+                    BuildApplicableHeaderTradeSettlement(trans))
+            );
+
+            UTF8Encoding encoding = new UTF8Encoding();
+            byte[] zugferdRaw = encoding.GetBytes(xml.ToString());
+            ZugferdData = XmlTools.RemoveBom(zugferdRaw);
+        }
+
+        /// <summary>
+        /// Builds the notes section for the XML
+        /// </summary>
+        private XElement BuildNotesSection(IExportableTransaction trans)
+        {
+            XElement notesSection = new XElement("Notes");
+            if (trans.GetNotes() != null)
             {
-                percentage = "<ram:CalculationPercent>" + vatFormat(allowance.getPercent()) + "</ram:CalculationPercent>";
-                percentage += "<ram:BasisAmount>" + item.getValue() + "</ram:BasisAmount>";
-            }
-            if (allowance.isCharge())
-            {
-                chargeIndicator = "true";
-            }
-
-            string reason = "";
-            if ((allowance.getReason() != null) && (profile == Profiles.getByName("Extended")))
-            {
-                // only in extended profile
-                reason = "<ram:Reason>" + XMLTools.encodeXML(allowance.getReason()) + "</ram:Reason>";
-            }
-            string allowanceChargeStr = "<ram:AppliedTradeAllowanceCharge><ram:ChargeIndicator><udt:Indicator>" + chargeIndicator + "</udt:Indicator></ram:ChargeIndicator>" + percentage + "<ram:ActualAmount>" + priceFormat(allowance.getTotalAmount(item)) + "</ram:ActualAmount>" + reason + "</ram:AppliedTradeAllowanceCharge>";
-            return allowanceChargeStr;
-        }*/
-    public void GenerateXml(IExportableTransaction trans)
-    {
-        Trans = trans;
-        Calc = new TransactionCalculator(trans);
-
-        bool hasDueDate = false;
-        string germanDateFormatting = "dd.MM.yyyy";
-
-        string exemptionReason = "";
-
-        if (trans.GetPaymentTermDescription() != null) _paymentTermsDescription = trans.GetPaymentTermDescription();
-
-        if (ReferenceEquals(_paymentTermsDescription, null) /*&& (trans.getDocumentCode() != org.mustangproject.ZUGFeRD.model.DocumentCodeTypeConstants.CORRECTEDINVOICE)*/) _paymentTermsDescription = "Zahlbar ohne Abzug bis " + ((DateTime)trans.GetDueDate()).ToString(germanDateFormatting);
-
-        string senderReg = "";
-        /*		if (trans.getOwnOrganisationFullPlaintextInfo() != null)
+                foreach (string note in trans.GetNotes())
                 {
-                    senderReg = "" + "<ram:IncludedNote>\n" + "		<ram:Content>\n" + XMLTools.encodeXML(trans.getOwnOrganisationFullPlaintextInfo()) + "		</ram:Content>\n" + "<ram:SubjectCode>REG</ram:SubjectCode>\n" + "</ram:IncludedNote>\n";
-
+                    notesSection.Add(new XElement($"{RamNamespace.Prefix}:IncludedNote",
+                        new XElement($"{RamNamespace.Prefix}:Content", XmlTools.EncodeXml(note))
+                    ));
                 }
-        */
-        string rebateAgreement = "";
-        if (trans.RebateAgreementExists()) rebateAgreement = "<ram:IncludedNote>\n" + "		<ram:Content>" + "Es bestehen Rabatt- und Bonusvereinbarungen.</ram:Content>\n" + "<ram:SubjectCode>AAK</ram:SubjectCode>\n" + "</ram:IncludedNote>\n";
+            }
+            return notesSection;
+        }
 
-        string subjectNote = "";
-        if (trans.GetSubjectNote() != null) subjectNote = "<ram:IncludedNote>\n" + "		<ram:Content>" + XmlTools.EncodeXml(trans.GetSubjectNote()) + "</ram:Content>\n" + "</ram:IncludedNote>\n";
-
-        string typecode = "380";
-        /*		if (trans.getDocumentCode() != null)
-                {
-                    typecode = trans.getDocumentCode();
-                }*/
-        string notes = "";
-        if (trans.GetNotes() != null)
-            foreach (string currentNote in trans.GetNotes())
-                notes = notes + "<ram:IncludedNote><ram:Content>" + XmlTools.EncodeXml(currentNote) + "</ram:Content></ram:IncludedNote>";
-        string xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<rsm:CrossIndustryInvoice xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:rsm=\"urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100\"" + " xmlns:ram=\"urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100\"" + " xmlns:udt=\"urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100\">\n" + "	<rsm:ExchangedDocumentContext>\n" + "		<ram:GuidelineSpecifiedDocumentContextParameter>\n" + "			<ram:ID>" + GetProfile().GetId() + "</ram:ID>\n" + "		</ram:GuidelineSpecifiedDocumentContextParameter>\n" + "	</rsm:ExchangedDocumentContext>\n" + "	<rsm:ExchangedDocument>\n" + "		<ram:ID>" + XmlTools.EncodeXml(trans.GetNumber()) + "</ram:ID>\n" + "		<ram:TypeCode>" + typecode + "</ram:TypeCode>\n" + "		<ram:IssueDateTime><udt:DateTimeString format=\"102\">" + ((DateTime)trans.GetIssueDate()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:IssueDateTime>\n" + notes + subjectNote + rebateAgreement + senderReg + "	</rsm:ExchangedDocument>\n" + "	<rsm:SupplyChainTradeTransaction>\n";
-        int lineId = 0;
-        foreach (IZUGFeRDExportableItem currentItem in trans.GetZfItems())
+        /// <summary>
+        /// Builds the rebate agreement section for the XML
+        /// </summary>
+        private XElement BuildRebateAgreement(IExportableTransaction trans)
         {
-            lineId++;
-            if (currentItem.GetProduct().GetTaxExemptionReason() != null) exemptionReason = "<ram:ExemptionReason>" + XmlTools.EncodeXml(currentItem.GetProduct().GetTaxExemptionReason()) + "</ram:ExemptionReason>";
-            notes = "";
-            if (currentItem.GetNotes() != null)
-                foreach (string currentNote in currentItem.GetNotes())
-                    notes = notes + "<ram:IncludedNote><ram:Content>" + XmlTools.EncodeXml(currentNote) + "</ram:Content></ram:IncludedNote>";
-            LineCalculator lc = new(currentItem);
-            xml = xml + "		<ram:IncludedSupplyChainTradeLineItem>\n" + "			<ram:AssociatedDocumentLineDocument>\n" + "				<ram:LineID>" + lineId + "</ram:LineID>\n" + notes + "			</ram:AssociatedDocumentLineDocument>\n" + "			<ram:SpecifiedTradeProduct>\n";
-            // + " <GlobalID schemeID=\"0160\">4012345001235</GlobalID>\n"
-            if (currentItem.GetProduct().GetSellerAssignedId() != null) xml = xml + "				<ram:SellerAssignedID>" + XmlTools.EncodeXml(currentItem.GetProduct().GetSellerAssignedId()) + "</ram:SellerAssignedID>\n";
-            if (currentItem.GetProduct().GetBuyerAssignedId() != null) xml = xml + "				<ram:BuyerAssignedID>" + XmlTools.EncodeXml(currentItem.GetProduct().GetBuyerAssignedId()) + "</ram:BuyerAssignedID>\n";
-            string allowanceChargeStr = "";
-            /*			if (currentItem.getItemAllowances() != null && currentItem.getItemAllowances().length > 0)
-                        {
-                            foreach (IZUGFeRDAllowanceCharge allowance in currentItem.getItemAllowances())
-                            {
-                                allowanceChargeStr += getAllowanceChargeStr(allowance, currentItem);
-                            }
-                        }
-                        if (currentItem.getItemCharges() != null && currentItem.getItemCharges().length > 0)
-                        {
-                            foreach (IZUGFeRDAllowanceCharge charge in currentItem.getItemCharges())
-                            {
-                                allowanceChargeStr += getAllowanceChargeStr(charge, currentItem);
+            return trans.RebateAgreementExists()
+                ? new XElement($"{RamNamespace.Prefix}:IncludedNote",
+                    new XElement($"{RamNamespace.Prefix}:Content", "Es bestehen Rabatt- und Bonusvereinbarungen."),
+                    new XElement($"{RamNamespace.Prefix}:SubjectCode", "AAK"))
+                : null;
+        }
 
-                            }
-                        }
-            */
+        /// <summary>
+        /// Builds the subject note section for the XML
+        /// </summary>
+        private XElement BuildSubjectNoteSection(IExportableTransaction trans)
+        {
+            return trans.GetSubjectNote() != null
+                ? new XElement($"{RamNamespace.Prefix}:IncludedNote",
+                    new XElement($"{RamNamespace.Prefix}:Content", XmlTools.EncodeXml(trans.GetSubjectNote())))
+                : null;
+        }
 
-            xml = xml + "					<ram:Name>" + XmlTools.EncodeXml(currentItem.GetProduct().GetName()) + "</ram:Name>\n" + "				<ram:Description>" + XmlTools.EncodeXml(currentItem.GetProduct().GetDescription()) + "</ram:Description>\n" + "			</ram:SpecifiedTradeProduct>\n" + "			<ram:SpecifiedLineTradeAgreement>\n" + "				<ram:GrossPriceProductTradePrice>\n" + "					<ram:ChargeAmount>" + PriceFormat(lc.GetPriceGross()) + "</ram:ChargeAmount>\n" + "<ram:BasisQuantity unitCode=\"" + XmlTools.EncodeXml(currentItem.GetProduct().GetUnit()) + "\">" + QuantityFormat(currentItem.GetBasisQuantity()) + "</ram:BasisQuantity>\n" + allowanceChargeStr + "				</ram:GrossPriceProductTradePrice>\n" + "				<ram:NetPriceProductTradePrice>\n" + "					<ram:ChargeAmount>" + PriceFormat(lc.GetPrice()) + "</ram:ChargeAmount>\n" + "					<ram:BasisQuantity unitCode=\"" + XmlTools.EncodeXml(currentItem.GetProduct().GetUnit()) + "\">" + QuantityFormat(currentItem.GetBasisQuantity()) + "</ram:BasisQuantity>\n" + "				</ram:NetPriceProductTradePrice>\n" + "			</ram:SpecifiedLineTradeAgreement>\n" + "			<ram:SpecifiedLineTradeDelivery>\n" + "				<ram:BilledQuantity unitCode=\"" + XmlTools.EncodeXml(currentItem.GetProduct().GetUnit()) + "\">" + QuantityFormat(currentItem.GetQuantity()) + "</ram:BilledQuantity>\n" + "			</ram:SpecifiedLineTradeDelivery>\n" + "			<ram:SpecifiedLineTradeSettlement>\n" + "				<ram:ApplicableTradeTax>\n" + "					<ram:TypeCode>VAT</ram:TypeCode>\n" + exemptionReason + "					<ram:CategoryCode>" + currentItem.GetProduct().GetTaxCategoryCode() + "</ram:CategoryCode>\n" + "					<ram:RateApplicablePercent>" + VatFormat(currentItem.GetProduct().GetVatPercent()) + "</ram:RateApplicablePercent>\n" + "				</ram:ApplicableTradeTax>\n";
-            if (currentItem.GetDetailedDeliveryPeriodFrom() != null || currentItem.GetDetailedDeliveryPeriodTo() != null)
+        /// <summary>
+        /// Builds the trade line items section for the XML
+        /// </summary>
+        private XElement BuildTradeLineItems(IExportableTransaction trans)
+        {
+            List<XElement> lineItems = new List<XElement>();
+            int lineId = 0;
+            foreach (IZUGFeRDExportableItem item in trans.GetZfItems())
             {
-                xml = xml + "<ram:BillingSpecifiedPeriod>";
-                if (currentItem.GetDetailedDeliveryPeriodFrom() != null) xml = xml + "<ram:StartDateTime><udt:DateTimeString format='102'>" + ((DateTime)currentItem.GetDetailedDeliveryPeriodFrom()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:StartDateTime>";
-                if (currentItem.GetDetailedDeliveryPeriodTo() != null) xml = xml + "<ram:EndDateTime><udt:DateTimeString format='102'>" + ((DateTime)currentItem.GetDetailedDeliveryPeriodTo()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:EndDateTime>";
-                xml = xml + "</ram:BillingSpecifiedPeriod>";
+                lineId++;
+                XElement lineItem = new XElement($"{RamNamespace.Prefix}:IncludedSupplyChainTradeLineItem",
+                    new XElement($"{RamNamespace.Prefix}:AssociatedDocumentLineDocument",
+                        new XElement($"{RamNamespace.Prefix}:LineID", lineId)
+                    ),
+                    new XElement($"{RamNamespace.Prefix}:SpecifiedTradeProduct",
+                        new XElement($"{RamNamespace.Prefix}:Name", XmlTools.EncodeXml(item.GetProduct().GetName())),
+                        new XElement($"{RamNamespace.Prefix}:Description", XmlTools.EncodeXml(item.GetProduct().GetDescription()))
+                    ),
+                    BuildPriceDetails(item),
+                    BuildDeliveryDetails(item),
+                    BuildSettlementDetails(item)
+                );
+
+                lineItems.Add(lineItem);
             }
 
-            xml = xml + "				<ram:SpecifiedTradeSettlementLineMonetarySummation>\n" + "					<ram:LineTotalAmount>" + CurrencyFormat(lc.GetItemTotalNetAmount()) + "</ram:LineTotalAmount>\n" + "				</ram:SpecifiedTradeSettlementLineMonetarySummation>\n";
-            if (currentItem.GetAdditionalReferencedDocumentId() != null) xml = xml + "			<ram:AdditionalReferencedDocument><ram:IssuerAssignedID>" + currentItem.GetAdditionalReferencedDocumentId() + "</ram:IssuerAssignedID><ram:TypeCode>130</ram:TypeCode></ram:AdditionalReferencedDocument>\n";
-            xml = xml + "			</ram:SpecifiedLineTradeSettlement>\n" + "		</ram:IncludedSupplyChainTradeLineItem>\n";
+            return new XElement("TradeLineItems", lineItems);
         }
 
-        xml = xml + "		<ram:ApplicableHeaderTradeAgreement>\n";
-        if (trans.GetReferenceNumber() != null) xml = xml + "			<ram:BuyerReference>" + XmlTools.EncodeXml(trans.GetReferenceNumber()) + "</ram:BuyerReference>\n";
-        xml = xml + "			<ram:SellerTradeParty>\n" + GetTradePartyAsXml(trans.GetSender(), true, false) + "			</ram:SellerTradeParty>\n" + "			<ram:BuyerTradeParty>\n";
-        // + " <ID>GE2020211</ID>\n"
-        // + " <GlobalID schemeID=\"0088\">4000001987658</GlobalID>\n"
-
-        xml += GetTradePartyAsXml(trans.GetRecipient(), false, false);
-        xml += "			</ram:BuyerTradeParty>\n";
-
-        if (trans.GetBuyerOrderReferencedDocumentId() != null) xml = xml + "   <ram:BuyerOrderReferencedDocument>\n" + "       <ram:IssuerAssignedID>" + XmlTools.EncodeXml(trans.GetBuyerOrderReferencedDocumentId()) + "</ram:IssuerAssignedID>\n" + "   </ram:BuyerOrderReferencedDocument>\n";
-        if (trans.GetContractReferencedDocument() != null) xml = xml + "   <ram:ContractReferencedDocument>\n" + "       <ram:IssuerAssignedID>" + XmlTools.EncodeXml(trans.GetContractReferencedDocument()) + "</ram:IssuerAssignedID>\n" + "    </ram:ContractReferencedDocument>\n";
-
-        // Additional Documents of XRechnung (Rechnungsbegruendende Unterlagen - BG-24 XRechnung)
-        /*		if (trans.getAdditionalReferencedDocuments() != null)
-                {
-                    foreach (FileAttachment f in trans.getAdditionalReferencedDocuments())
-                    {
-        //JAVA TO C# CONVERTER WARNING: The original Java variable was marked 'final':
-        //ORIGINAL LINE: final string documentContent = new string(Base64.getEncoder().encodeToString(f.getData()));
-                        string documentContent = new string(Convert.ToBase64String(f.getData()));
-                        xml = xml + "  <ram:AdditionalReferencedDocument>\n" + "    <ram:IssuerAssignedID>" + f.getFilename() + "</ram:IssuerAssignedID>\n" + "    <ram:TypeCode>916</ram:TypeCode>\n" + "    <ram:Name>" + f.getDescription() + "</ram:Name>\n" + "    <ram:AttachmentBinaryObject mimeCode=\"" + f.getMimetype() + "\"\n" + "      filename=\"" + f.getFilename() + "\">" + documentContent + "</ram:AttachmentBinaryObject>\n" + "  </ram:AdditionalReferencedDocument>\n";
-                    }
-                }
-        */
-        xml = xml + "		</ram:ApplicableHeaderTradeAgreement>\n" + "		<ram:ApplicableHeaderTradeDelivery>\n";
-        if (Trans.GetDeliveryAddress() != null) xml += "<ram:ShipToTradeParty>" + GetTradePartyAsXml(Trans.GetDeliveryAddress(), false, true) + "</ram:ShipToTradeParty>";
-
-        xml += "			<ram:ActualDeliverySupplyChainEvent>\n" + "				<ram:OccurrenceDateTime>";
-
-        if (trans.GetDeliveryDate() != null)
-            xml += "<udt:DateTimeString format=\"102\">" + ((DateTime)trans.GetDeliveryDate()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString>";
-        else
-            throw new InvalidOperationException("No delivery date provided");
-        xml += "</ram:OccurrenceDateTime>\n";
-        xml += "			</ram:ActualDeliverySupplyChainEvent>\n" + "		</ram:ApplicableHeaderTradeDelivery>\n" + "		<ram:ApplicableHeaderTradeSettlement>\n" + "			<ram:PaymentReference>" + XmlTools.EncodeXml(trans.GetNumber()) + "</ram:PaymentReference>\n" + "			<ram:InvoiceCurrencyCode>" + trans.GetCurrency() + "</ram:InvoiceCurrencyCode>\n";
-
-        if (trans.GetTradeSettlementPayment() != null)
-            foreach (IZUGFeRDTradeSettlementPayment payment in trans.GetTradeSettlementPayment())
-                if (payment != null)
-                {
-                    hasDueDate = true;
-                    xml += payment.GetSettlementXml();
-                }
-
-        if (trans.GetTradeSettlement() != null)
-            foreach (IZUGFeRDTradeSettlement payment in trans.GetTradeSettlement())
-                if (payment != null)
-                {
-                    if (payment is IZUGFeRDTradeSettlementPayment) hasDueDate = true;
-                    xml += payment.GetSettlementXml();
-                }
-
-        /*		if (trans.getDocumentCode() == DocumentCodeTypeConstants.CORRECTEDINVOICE)
-                {
-                    hasDueDate = false;
-                }
-        */
-        Dictionary<decimal, VatAmount> vatPercentAmountMap = Calc.GetVatPercentAmountMap();
-        foreach (decimal currentTaxPercent in vatPercentAmountMap.Keys)
+        /// <summary>
+        /// Builds the price details for a trade item
+        /// </summary>
+        private XElement BuildPriceDetails(IZUGFeRDExportableItem item)
         {
-            VatAmount amount = vatPercentAmountMap[currentTaxPercent];
-            if (amount != null) xml += "			<ram:ApplicableTradeTax>\n" + "				<ram:CalculatedAmount>" + CurrencyFormat(amount.GetCalculated()) + "</ram:CalculatedAmount>\n" + "				<ram:TypeCode>VAT</ram:TypeCode>\n" + exemptionReason + "				<ram:BasisAmount>" + CurrencyFormat(amount.GetBasis()) + "</ram:BasisAmount>\n" + "				<ram:CategoryCode>" + amount.GetCategoryCode() + "</ram:CategoryCode>\n" + "				<ram:RateApplicablePercent>" + VatFormat(currentTaxPercent) + "</ram:RateApplicablePercent>\n" + "			</ram:ApplicableTradeTax>\n"; //$NON-NLS-2$
+            LineCalculator lc = new LineCalculator(item);
+            return new XElement($"{RamNamespace.Prefix}:SpecifiedLineTradeAgreement",
+                new XElement($"{RamNamespace.Prefix}:GrossPriceProductTradePrice",
+                    new XElement($"{RamNamespace.Prefix}:ChargeAmount", PriceFormat(lc.GetPriceGross())),
+                    new XElement($"{RamNamespace.Prefix}:BasisQuantity", QuantityFormat(item.GetBasisQuantity()), new XAttribute("unitCode", XmlTools.EncodeXml(item.GetProduct().GetUnit())))
+                ),
+                new XElement($"{RamNamespace.Prefix}:NetPriceProductTradePrice",
+                    new XElement($"{RamNamespace.Prefix}:ChargeAmount", PriceFormat(lc.GetPrice())),
+                    new XElement($"{RamNamespace.Prefix}:BasisQuantity", QuantityFormat(item.GetBasisQuantity()), new XAttribute("unitCode", XmlTools.EncodeXml(item.GetProduct().GetUnit())))
+                )
+            );
         }
 
-        if (trans.GetDetailedDeliveryPeriodFrom() != null || trans.GetDetailedDeliveryPeriodTo() != null)
+        /// <summary>
+        /// Builds the delivery details for a trade item
+        /// </summary>
+        private XElement BuildDeliveryDetails(IZUGFeRDExportableItem item)
         {
-            xml = xml + "<ram:BillingSpecifiedPeriod>";
-            if (trans.GetDetailedDeliveryPeriodFrom() != null) xml = xml + "<ram:StartDateTime><udt:DateTimeString format='102'>" + ((DateTime)trans.GetDetailedDeliveryPeriodFrom()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:StartDateTime>";
-            if (trans.GetDetailedDeliveryPeriodTo() != null) xml = xml + "<ram:EndDateTime><udt:DateTimeString format='102'>" + ((DateTime)trans.GetDetailedDeliveryPeriodTo()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:EndDateTime>";
-            xml = xml + "</ram:BillingSpecifiedPeriod>";
+            return new XElement($"{RamNamespace.Prefix}:SpecifiedLineTradeDelivery",
+                new XElement($"{RamNamespace.Prefix}:BilledQuantity", QuantityFormat(item.GetQuantity()), new XAttribute("unitCode", XmlTools.EncodeXml(item.GetProduct().GetUnit())))
+            );
         }
-        /*
-                if ((trans.getZFCharges() != null) && (trans.getZFCharges().length > 0))
+
+        /// <summary>
+        /// Builds the settlement details for a trade item
+        /// </summary>
+        private XElement BuildSettlementDetails(IZUGFeRDExportableItem item)
+        {
+            return new XElement($"{RamNamespace.Prefix}:SpecifiedLineTradeSettlement",
+                new XElement($"{RamNamespace.Prefix}:ApplicableTradeTax",
+                    new XElement($"{RamNamespace.Prefix}:TypeCode", "VAT"),
+                    new XElement($"{RamNamespace.Prefix}:CategoryCode", item.GetProduct().GetTaxCategoryCode()),
+                    new XElement($"{RamNamespace.Prefix}:RateApplicablePercent", VatFormat(item.GetProduct().GetVatPercent()))
+                ),
+                new XElement($"{RamNamespace.Prefix}:SpecifiedTradeSettlementLineMonetarySummation",
+                    new XElement($"{RamNamespace.Prefix}:LineTotalAmount", CurrencyFormat(new LineCalculator(item).GetItemTotalNetAmount()))
+                )
+            );
+        }
+
+        /// <summary>
+        /// Builds the applicable header trade agreement for the transaction
+        /// </summary>
+        private XElement BuildApplicableHeaderTradeAgreement(IExportableTransaction trans)
+        {
+            return new XElement($"{RamNamespace.Prefix}:ApplicableHeaderTradeAgreement",
+                new XElement($"{RamNamespace.Prefix}:SellerTradeParty",
+                    GetTradePartyAsXml(trans.GetSender(), true, false)),
+                new XElement($"{RamNamespace.Prefix}:BuyerTradeParty",
+                    GetTradePartyAsXml(trans.GetRecipient(), false, false)),
+                trans.GetReferenceNumber() != null
+                    ? new XElement($"{RamNamespace.Prefix}:BuyerReference", XmlTools.EncodeXml(trans.GetReferenceNumber()))
+                    : null,
+                trans.GetBuyerOrderReferencedDocumentId() != null
+                    ? new XElement($"{RamNamespace.Prefix}:BuyerOrderReferencedDocument",
+                        new XElement($"{RamNamespace.Prefix}:IssuerAssignedID", XmlTools.EncodeXml(trans.GetBuyerOrderReferencedDocumentId())))
+                    : null,
+                trans.GetContractReferencedDocument() != null
+                    ? new XElement($"{RamNamespace.Prefix}:ContractReferencedDocument",
+                        new XElement($"{RamNamespace.Prefix}:IssuerAssignedID", XmlTools.EncodeXml(trans.GetContractReferencedDocument())))
+                    : null
+            );
+        }
+
+        /// <summary>
+        /// Builds the applicable header trade delivery section for the transaction
+        /// </summary>
+        private XElement BuildApplicableHeaderTradeDelivery(IExportableTransaction trans)
+        {
+            return new XElement($"{RamNamespace.Prefix}:ApplicableHeaderTradeDelivery",
+                trans.GetDeliveryAddress() != null
+                    ? new XElement($"{RamNamespace.Prefix}:ShipToTradeParty",
+                        GetTradePartyAsXml(trans.GetDeliveryAddress(), false, true))
+                    : null,
+                new XElement($"{RamNamespace.Prefix}:ActualDeliverySupplyChainEvent",
+                    new XElement($"{RamNamespace.Prefix}:OccurrenceDateTime",
+                        new XElement($"{UdtNamespace.Prefix}:DateTimeString",
+                            new XAttribute("format", "102"),
+                            trans.GetDeliveryDate()?.ToString(invoiceDateFormat) ?? throw new InvalidOperationException("No delivery date provided")
+                        )
+                    )
+                )
+            );
+        }
+
+        /// <summary>
+        /// Builds the applicable header trade settlement for the transaction
+        /// </summary>
+        private XElement BuildApplicableHeaderTradeSettlement(IExportableTransaction trans)
+        {
+            List<XElement> settlementElements = new List<XElement>();
+
+            if (trans.GetTradeSettlementPayment() != null)
+            {
+                foreach (IZUGFeRDTradeSettlementPayment payment in trans.GetTradeSettlementPayment())
                 {
+                    settlementElements.Add(payment.GetSettlementXml());
+                }
+            }
 
-                    foreach (decimal currentTaxPercent in VATPercentAmountMap.Keys)
-                    {
-                        if (calc.getChargesForPercent(currentTaxPercent).compareTo(decimal.Zero) != 0)
-                        {
+            XElement paymentTerms = trans.GetPaymentTerms() == null
+                ? new XElement($"{RamNamespace.Prefix}:SpecifiedTradePaymentTerms",
+                    new XElement($"{RamNamespace.Prefix}:Description", _paymentTermsDescription),
+                    trans.GetDueDate() != null
+                        ? new XElement($"{RamNamespace.Prefix}:DueDateDateTime",
+                            new XElement($"{UdtNamespace.Prefix}:DateTimeString",
+                                new XAttribute("format", "102"),
+                                ((DateTime)trans.GetDueDate()).ToString(invoiceDateFormat)))
+                        : null
+                )
+                : BuildPaymentTermsXml();
 
+            return new XElement($"{RamNamespace.Prefix}:ApplicableHeaderTradeSettlement",
+                new XElement($"{RamNamespace.Prefix}:PaymentReference", XmlTools.EncodeXml(trans.GetNumber())),
+                new XElement($"{RamNamespace.Prefix}:InvoiceCurrencyCode", trans.GetCurrency()),
+                settlementElements,
+                paymentTerms,
+                BuildVatSummary(trans)
+            );
+        }
 
-                            xml = xml + "	 <ram:SpecifiedTradeAllowanceCharge>\n" + "        <ram:ChargeIndicator>\n" + "          <udt:Indicator>true</udt:Indicator>\n" + "        </ram:ChargeIndicator>\n" + "        <ram:ActualAmount>" + currencyFormat(calc.getChargesForPercent(currentTaxPercent)) + "</ram:ActualAmount>\n" + "        <ram:Reason>" + XMLTools.encodeXML(calc.getChargeReasonForPercent(currentTaxPercent)) + "</ram:Reason>\n" + "        <ram:CategoryTradeTax>\n" + "          <ram:TypeCode>VAT</ram:TypeCode>\n" + "          <ram:CategoryCode>" + VATPercentAmountMap[currentTaxPercent].getCategoryCode() + "</ram:CategoryCode>\n" + "          <ram:RateApplicablePercent>" + vatFormat(currentTaxPercent) + "</ram:RateApplicablePercent>\n" + "        </ram:CategoryTradeTax>\n" + "      </ram:SpecifiedTradeAllowanceCharge>	\n";
+        /// <summary>
+        /// Builds the VAT summary section
+        /// </summary>
+        private XElement BuildVatSummary(IExportableTransaction trans)
+        {
+            Dictionary<decimal, VatAmount> vatPercentAmountMap = Calc.GetVatPercentAmountMap();
+            List<XElement> vatSummaryElements = new List<XElement>();
 
-                        }
-                    }
+            foreach (decimal taxPercent in vatPercentAmountMap.Keys)
+            {
+                VatAmount amount = vatPercentAmountMap[taxPercent];
+                if (amount != null)
+                {
+                    vatSummaryElements.Add(new XElement($"{RamNamespace.Prefix}:ApplicableTradeTax",
+                        new XElement($"{RamNamespace.Prefix}:CalculatedAmount", CurrencyFormat(amount.GetCalculated())),
+                        new XElement($"{RamNamespace.Prefix}:TypeCode", "VAT"),
+                        new XElement($"{RamNamespace.Prefix}:BasisAmount", CurrencyFormat(amount.GetBasis())),
+                        new XElement($"{RamNamespace.Prefix}:CategoryCode", amount.GetCategoryCode()),
+                        new XElement($"{RamNamespace.Prefix}:RateApplicablePercent", VatFormat(taxPercent))
+                    ));
+                }
+            }
 
+            return new XElement($"{RamNamespace.Prefix}:ApplicableTradeTaxes", vatSummaryElements);
+        }
+
+        /// <summary>
+        /// Builds the payment terms XML
+        /// </summary>
+        private XElement BuildPaymentTermsXml()
+        {
+            IZUGFeRDPaymentTerms paymentTerms = Trans.GetPaymentTerms();
+            DateTime? dueDate = paymentTerms.GetDueDate();
+
+            XElement paymentTermsElement = new XElement($"{RamNamespace.Prefix}:SpecifiedTradePaymentTerms",
+                new XElement($"{RamNamespace.Prefix}:Description", paymentTerms.GetDescription())
+            );
+
+            if (dueDate.HasValue)
+            {
+                paymentTermsElement.Add(
+                    new XElement($"{RamNamespace.Prefix}:DueDateDateTime",
+                        new XElement($"{UdtNamespace.Prefix}:DateTimeString", new XAttribute("format", "102"), dueDate.Value.ToString(invoiceDateFormat))
+                    )
+                );
+            }
+
+            return paymentTermsElement;
+        }
+
+        /// <summary>
+        /// Builds the XML representation for a trade party
+        /// </summary>
+        private XElement GetTradePartyAsXml(IZUGFeRDExportableTradeParty party, bool isSender, bool isShipToTradeParty)
+        {
+            XElement tradePartyElement = new XElement($"{RamNamespace.Prefix}:TradeParty");
+
+            if (party.GetId() != null)
+            {
+                tradePartyElement.Add(new XElement($"{RamNamespace.Prefix}:ID", XmlTools.EncodeXml(party.GetId())));
+            }
+            else if (party.GetGlobalIdScheme() != null && party.GetGlobalId() != null)
+            {
+                tradePartyElement.Add(new XElement($"{RamNamespace.Prefix}:GlobalID",
+                    new XAttribute("schemeID", XmlTools.EncodeXml(party.GetGlobalIdScheme())),
+                    XmlTools.EncodeXml(party.GetGlobalId())
+                ));
+            }
+
+            tradePartyElement.Add(new XElement($"{RamNamespace.Prefix}:Name", XmlTools.EncodeXml(party.GetName())));
+
+            if (party.GetContact() != null && (isSender || Profile == Profiles.GetByName("Extended")))
+            {
+                XElement contactElement = new XElement($"{RamNamespace.Prefix}:DefinedTradeContact",
+                    new XElement($"{RamNamespace.Prefix}:PersonName", XmlTools.EncodeXml(party.GetContact().GetName())));
+
+                if (party.GetContact().GetPhone() != null)
+                {
+                    contactElement.Add(new XElement($"{RamNamespace.Prefix}:TelephoneUniversalCommunication",
+                        new XElement($"{RamNamespace.Prefix}:CompleteNumber", XmlTools.EncodeXml(party.GetContact().GetPhone()))));
                 }
 
-                if ((trans.getZFAllowances() != null) && (trans.getZFAllowances().length > 0))
+                if (party.GetContact().GetFax() != null && Profile == Profiles.GetByName("Extended"))
                 {
-                    foreach (decimal currentTaxPercent in VATPercentAmountMap.Keys)
-                    {
-                        if (calc.getAllowancesForPercent(currentTaxPercent).compareTo(decimal.Zero) != 0)
-                        {
-                            xml = xml + "	 <ram:SpecifiedTradeAllowanceCharge>\n" + "        <ram:ChargeIndicator>\n" + "          <udt:Indicator>false</udt:Indicator>\n" + "        </ram:ChargeIndicator>\n" + "        <ram:ActualAmount>" + currencyFormat(calc.getAllowancesForPercent(currentTaxPercent)) + "</ram:ActualAmount>\n" + "        <ram:Reason>" + XMLTools.encodeXML(calc.getAllowanceReasonForPercent(currentTaxPercent)) + "</ram:Reason>\n" + "        <ram:CategoryTradeTax>\n" + "          <ram:TypeCode>VAT</ram:TypeCode>\n" + "          <ram:CategoryCode>" + VATPercentAmountMap[currentTaxPercent].getCategoryCode() + "</ram:CategoryCode>\n" + "          <ram:RateApplicablePercent>" + vatFormat(currentTaxPercent) + "</ram:RateApplicablePercent>\n" + "        </ram:CategoryTradeTax>\n" + "      </ram:SpecifiedTradeAllowanceCharge>	\n";
-                        }
-                    }
+                    contactElement.Add(new XElement($"{RamNamespace.Prefix}:FaxUniversalCommunication",
+                        new XElement($"{RamNamespace.Prefix}:CompleteNumber", XmlTools.EncodeXml(party.GetContact().GetFax()))));
                 }
-        */
 
-        if (trans.GetPaymentTerms() == null)
-        {
-            xml = xml + "			<ram:SpecifiedTradePaymentTerms>\n" + "				<ram:Description>" + _paymentTermsDescription + "</ram:Description>\n";
-
-            /*			if (trans.getTradeSettlement() != null)
-                        {
-                            foreach (IZUGFeRDTradeSettlement payment in trans.getTradeSettlement())
-                            {
-                                if ((payment != null) && (payment is IZUGFeRDTradeSettlementDebit))
-                                {
-                                    xml += payment.getPaymentXML();
-                                }
-                            }
-                        }
-            */
-            if (hasDueDate && trans.GetDueDate() != null) xml = xml + "				<ram:DueDateDateTime><udt:DateTimeString format=\"102\">" + ((DateTime)trans.GetDueDate()).ToString(ZugferdDateFormatting) + "</udt:DateTimeString></ram:DueDateDateTime>\n"; // 20130704
-            xml = xml + "			</ram:SpecifiedTradePaymentTerms>\n";
-        }
-        else
-        {
-            xml = xml + BuildPaymentTermsXml();
-        }
-
-
-        //string allowanceTotalLine = "<ram:AllowanceTotalAmount>" + currencyFormat(calc.getAllowancesForPercent(null)) + "</ram:AllowanceTotalAmount>";
-
-        //string chargesTotalLine = "<ram:ChargeTotalAmount>" + currencyFormat(calc.getChargesForPercent(null)) + "</ram:ChargeTotalAmount>";
-        string chargesTotalLine = "";
-        string allowanceTotalLine = "";
-        xml = xml + "<ram:SpecifiedTradeSettlementHeaderMonetarySummation>\n" + "<ram:LineTotalAmount>" + CurrencyFormat(Calc.GetTotal()) + "</ram:LineTotalAmount>\n" + chargesTotalLine + allowanceTotalLine + "<ram:TaxBasisTotalAmount>" + CurrencyFormat(Calc.GetTaxBasis()) + "</ram:TaxBasisTotalAmount>\n" + "				<ram:TaxTotalAmount currencyID=\"" + trans.GetCurrency() + "\">" + CurrencyFormat(Calc.GetGrandTotal() - Calc.GetTaxBasis()) + "</ram:TaxTotalAmount>\n" + "				<ram:GrandTotalAmount>" + CurrencyFormat(Calc.GetGrandTotal()) + "</ram:GrandTotalAmount>\n" + "             <ram:TotalPrepaidAmount>" + CurrencyFormat(Calc.GetTotalPrepaid()) + "</ram:TotalPrepaidAmount>\n" + "				<ram:DuePayableAmount>" + CurrencyFormat(Calc.GetGrandTotal() - Calc.GetTotalPrepaid()) + "</ram:DuePayableAmount>\n" + "			</ram:SpecifiedTradeSettlementHeaderMonetarySummation>\n" + "		</ram:ApplicableHeaderTradeSettlement>\n";
-        // + " <IncludedSupplyChainTradeLineItem>\n"
-        // + " <AssociatedDocumentLineDocument>\n"
-        // + " <IncludedNote>\n"
-        // + " <Content>Wir erlauben uns Ihnen folgende Positionen aus der Lieferung Nr.
-        // 2013-51112 in Rechnung zu stellen:</Content>\n"
-        // + " </IncludedNote>\n"
-        // + " </AssociatedDocumentLineDocument>\n"
-        // + " </IncludedSupplyChainTradeLineItem>\n";
-
-        xml = xml + "	</rsm:SupplyChainTradeTransaction>\n" + "</rsm:CrossIndustryInvoice>";
-
-        UTF8Encoding encoding = new();
-
-        byte[] zugferdRaw;
-        zugferdRaw = encoding.GetBytes(xml);
-        ;
-
-        ZugferdData = XmlTools.RemoveBom(zugferdRaw);
-    }
-
-    public void SetProfile(Profile p)
-    {
-        Profile = p;
-    }
-
-    private string BuildPaymentTermsXml()
-    {
-        string paymentTermsXml = "<ram:SpecifiedTradePaymentTerms>";
-
-        IZUGFeRDPaymentTerms paymentTerms = Trans.GetPaymentTerms();
-        //IZUGFeRDPaymentDiscountTerms discountTerms = paymentTerms.getDiscountTerms();
-        DateTime dueDate = paymentTerms.GetDueDate();
-        if (dueDate != null /*&& discountTerms != null && discountTerms.getBaseDate() != null*/) throw new InvalidOperationException("if paymentTerms.dueDate is specified, paymentTerms.discountTerms.baseDate has not to be specified");
-        paymentTermsXml += "<ram:Description>" + paymentTerms.GetDescription() + "</ram:Description>";
-        if (dueDate != null)
-        {
-            paymentTermsXml += "<ram:DueDateDateTime>";
-            paymentTermsXml += "<udt:DateTimeString format=\"102\">" + dueDate.ToString(ZugferdDateFormatting) + "</udt:DateTimeString>";
-            paymentTermsXml += "</ram:DueDateDateTime>";
-        }
-
-        /*
-                if (discountTerms != null)
+                if (party.GetContact().GetEMail() != null)
                 {
-                    paymentTermsXml += "<ram:ApplicableTradePaymentDiscountTerms>";
-                    string currency = trans.getCurrency();
-                    string basisAmount = currencyFormat(calc.getGrandTotal());
-                    paymentTermsXml += "<ram:BasisAmount currencyID=\"" + currency + "\">" + basisAmount + "</ram:BasisAmount>";
-                    paymentTermsXml += "<ram:CalculationPercent>" + discountTerms.getCalculationPercentage().ToString() + "</ram:CalculationPercent>";
-
-                    if (discountTerms.getBaseDate() != null)
-                    {
-                        DateTime baseDate = discountTerms.getBaseDate();
-                        paymentTermsXml += "<ram:BasisDateTime>";
-                        paymentTermsXml += "<udt:DateTimeString format=\"102\">" + zugferdDateFormat.format(baseDate) + "</udt:DateTimeString>";
-                        paymentTermsXml += "</ram:BasisDateTime>";
-
-                        paymentTermsXml += "<ram:BasisPeriodMeasure unitCode=\"" + discountTerms.getBasePeriodUnitCode() + "\">" + discountTerms.getBasePeriodMeasure() + "</ram:BasisPeriodMeasure>";
-                    }
-
-                    paymentTermsXml += "</ram:ApplicableTradePaymentDiscountTerms>";
+                    contactElement.Add(new XElement($"{RamNamespace.Prefix}:EmailURIUniversalCommunication",
+                        new XElement($"{RamNamespace.Prefix}:URIID", XmlTools.EncodeXml(party.GetContact().GetEMail()))));
                 }
-        */
-        paymentTermsXml += "</ram:SpecifiedTradePaymentTerms>";
-        return paymentTermsXml;
+
+                tradePartyElement.Add(contactElement);
+            }
+
+            XElement postalAddress = new XElement($"{RamNamespace.Prefix}:PostalTradeAddress",
+                new XElement($"{RamNamespace.Prefix}:PostcodeCode", XmlTools.EncodeXml(party.GetZip())),
+                new XElement($"{RamNamespace.Prefix}:LineOne", XmlTools.EncodeXml(party.GetStreet())));
+
+            if (party.GetAdditionalAddress() != null)
+            {
+                postalAddress.Add(new XElement($"{RamNamespace.Prefix}:LineTwo", XmlTools.EncodeXml(party.GetAdditionalAddress())));
+            }
+
+            postalAddress.Add(
+                new XElement($"{RamNamespace.Prefix}:CityName", XmlTools.EncodeXml(party.GetLocation())),
+                new XElement($"{RamNamespace.Prefix}:CountryID", XmlTools.EncodeXml(party.GetCountry()))
+            );
+
+            tradePartyElement.Add(postalAddress);
+
+            if (party.GetVatid() != null && !isShipToTradeParty)
+            {
+                tradePartyElement.Add(new XElement($"{RamNamespace.Prefix}:SpecifiedTaxRegistration",
+                    new XElement($"{RamNamespace.Prefix}:ID", new XAttribute("schemeID", "VA"), XmlTools.EncodeXml(party.GetVatid()))));
+            }
+
+            if (party.GetTaxId() != null && !isShipToTradeParty)
+            {
+                tradePartyElement.Add(new XElement($"{RamNamespace.Prefix}:SpecifiedTaxRegistration",
+                    new XElement($"{RamNamespace.Prefix}:ID", new XAttribute("schemeID", "FC"), XmlTools.EncodeXml(party.GetTaxId()))));
+            }
+
+            return tradePartyElement;
+        }
     }
 }
