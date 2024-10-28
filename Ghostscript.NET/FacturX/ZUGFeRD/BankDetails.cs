@@ -44,24 +44,24 @@ public class BankDetails : ZugFeRdXmlWriter, IZUGFeRDTradeSettlementPayment
 
     public XElement GetSettlementXml()
     {
-        XElement settlementPaymentMeans = new XElement($"{RamNamespace.Prefix}:SpecifiedTradeSettlementPaymentMeans",
-            new XElement($"{RamNamespace.Prefix}:TypeCode", "58"),
-            new XElement($"{RamNamespace.Prefix}:Information", "SEPA credit transfer"),
-            new XElement($"{RamNamespace.Prefix}:PayeePartyCreditorFinancialAccount",
-                new XElement($"{RamNamespace.Prefix}:IBANID", XmlTools.EncodeXml(GetOwnIban()))
+        XElement settlementPaymentMeans = new XElement(RamNamespace.Namespace + "SpecifiedTradeSettlementPaymentMeans",
+            new XElement(RamNamespace.Namespace + "TypeCode", "58"),
+            new XElement(RamNamespace.Namespace + "Information", "SEPA credit transfer"),
+            new XElement(RamNamespace.Namespace + "PayeePartyCreditorFinancialAccount",
+                new XElement(RamNamespace.Namespace + "IBANID", XmlTools.EncodeXml(GetOwnIban()))
             )
         );
 
         // Conditionally add AccountName if it exists
         if (GetAccountName() != null)
         {
-            settlementPaymentMeans.Element($"{RamNamespace.Prefix}:PayeePartyCreditorFinancialAccount")?
-                .Add(new XElement($"{RamNamespace.Prefix}:AccountName", XmlTools.EncodeXml(GetAccountName())));
+            settlementPaymentMeans.Element(RamNamespace.Namespace + "PayeePartyCreditorFinancialAccount")?
+                .Add(new XElement(RamNamespace.Namespace + "AccountName", XmlTools.EncodeXml(GetAccountName())));
         }
 
         // Add BICID element for financial institution details
-        settlementPaymentMeans.Add(new XElement($"{RamNamespace.Prefix}:PayeeSpecifiedCreditorFinancialInstitution",
-            new XElement($"{RamNamespace.Prefix}:BICID", XmlTools.EncodeXml(GetOwnBic()))
+        settlementPaymentMeans.Add(new XElement(RamNamespace.Namespace + "PayeeSpecifiedCreditorFinancialInstitution",
+            new XElement(RamNamespace.Namespace + "BICID", XmlTools.EncodeXml(GetOwnBic()))
         ));
 
         return settlementPaymentMeans;
