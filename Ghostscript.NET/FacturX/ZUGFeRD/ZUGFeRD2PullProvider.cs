@@ -15,6 +15,8 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         protected internal IExportableTransaction Trans;
         protected internal byte[] ZugferdData;
 
+        private XElement _exemptionReason;
+
         /// <summary>
         /// Enables the flag to indicate a test invoice in the XML structure
         /// </summary>
@@ -81,10 +83,11 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                     new XElement(RamNamespace.Namespace + "ID", XmlTools.EncodeXml(trans.GetNumber())),
                     new XElement(RamNamespace.Namespace + "TypeCode", "380"),
                     new XElement(RamNamespace.Namespace + "IssueDateTime",
-                        new XElement(UdtNamespace.Namespace + "DateTimeString", ((DateTime)trans.GetIssueDate()).ToString(invoiceDateFormat))),
-                    BuildNotesSection(trans),
-                    BuildRebateAgreement(trans),
+                        new XElement(UdtNamespace.Namespace + "DateTimeString", ((DateTime)trans.GetIssueDate()).ToString(invoiceDateFormat)),
+                            new XAttribute("format", "102")),
+                    BuildNotesSection(trans.GetNotes()),
                     BuildSubjectNoteSection(trans)),
+                    BuildRebateAgreement(trans),
                 new XElement(RsmNamespace.Namespace + "SupplyChainTradeTransaction",
                     BuildTradeLineItems(trans),
                     BuildApplicableHeaderTradeAgreement(trans),
@@ -100,19 +103,18 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// <summary>
         /// Builds the notes section for the XML
         /// </summary>
-        private XElement BuildNotesSection(IExportableTransaction trans)
+        private List<XElement> BuildNotesSection(string[] noteContents)
         {
-            XElement notesSection = new XElement("Notes");
-            if (trans.GetNotes() != null)
+            List<XElement> notesXml = [];
+
+            foreach (string note in noteContents)
             {
-                foreach (string note in trans.GetNotes())
-                {
-                    notesSection.Add(new XElement(RamNamespace.Namespace + "IncludedNote",
-                        new XElement(RamNamespace.Namespace + "Content", XmlTools.EncodeXml(note))
-                    ));
-                }
+                notesXml.Add(new XElement(RamNamespace.Namespace + "IncludedNote",
+                    new XElement(RamNamespace.Namespace + "Content", XmlTools.EncodeXml(note))
+                ));
             }
-            return notesSection;
+            
+            return notesXml;
         }
 
         /// <summary>
@@ -150,9 +152,12 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                 lineId++;
                 XElement lineItem = new XElement(RamNamespace.Namespace + "IncludedSupplyChainTradeLineItem",
                     new XElement(RamNamespace.Namespace + "AssociatedDocumentLineDocument",
-                        new XElement(RamNamespace.Namespace + "LineID", lineId)
+                        new XElement(RamNamespace.Namespace + "LineID", lineId),
+                        BuildNotesSection(item.GetNotes())
                     ),
                     new XElement(RamNamespace.Namespace + "SpecifiedTradeProduct",
+                        item.GetProduct().GetSellerAssignedId() != null ? new XElement(RamNamespace.Namespace + "SellerAssignedID", XmlTools.EncodeXml(item.GetProduct().GetSellerAssignedId())) : null,
+                        item.GetProduct().GetBuyerAssignedId() != null ? new XElement(RamNamespace.Namespace + "BuyerAssignedID", XmlTools.EncodeXml(item.GetProduct().GetBuyerAssignedId())) : null,
                         new XElement(RamNamespace.Namespace + "Name", XmlTools.EncodeXml(item.GetProduct().GetName())),
                         new XElement(RamNamespace.Namespace + "Description", XmlTools.EncodeXml(item.GetProduct().GetDescription()))
                     ),
@@ -172,7 +177,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// </summary>
         private XElement BuildPriceDetails(IZUGFeRDExportableItem item)
         {
-            LineCalculator lc = new LineCalculator(item);
+            LineCalculator lc = new (item);
             return new XElement(RamNamespace.Namespace + "SpecifiedLineTradeAgreement",
                 new XElement(RamNamespace.Namespace + "GrossPriceProductTradePrice",
                     new XElement(RamNamespace.Namespace + "ChargeAmount", PriceFormat(lc.GetPriceGross())),
@@ -200,16 +205,119 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// </summary>
         private XElement BuildSettlementDetails(IZUGFeRDExportableItem item)
         {
+            _exemptionReason = BuildExemptionReason(item);
             return new XElement(RamNamespace.Namespace + "SpecifiedLineTradeSettlement",
                 new XElement(RamNamespace.Namespace + "ApplicableTradeTax",
                     new XElement(RamNamespace.Namespace + "TypeCode", "VAT"),
+                    _exemptionReason,
                     new XElement(RamNamespace.Namespace + "CategoryCode", item.GetProduct().GetTaxCategoryCode()),
                     new XElement(RamNamespace.Namespace + "RateApplicablePercent", VatFormat(item.GetProduct().GetVatPercent()))
                 ),
                 new XElement(RamNamespace.Namespace + "SpecifiedTradeSettlementLineMonetarySummation",
                     new XElement(RamNamespace.Namespace + "LineTotalAmount", CurrencyFormat(new LineCalculator(item).GetItemTotalNetAmount()))
-                )
+                ),
+                BuildBillingSpecifiedPeriod(item),
+                BuildSpecifiedTradeSettlementLineMonetarySummation(item),
+                BuildAdditionalReferencedDocument(item)
             );
+        }
+
+        /// <summary>
+        /// Builds the exemption reason for a trade item
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns></returns>
+        private XElement BuildExemptionReason(IZUGFeRDExportableItem item)
+        {
+            if (item.GetProduct().GetTaxExemptionReason() != null)
+            {
+                return new XElement(RamNamespace.Namespace + "SpecifiedLineTradeSettlement", item.GetProduct().GetTaxExemptionReason());
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Builds the BillingSpecifiedPeriod for a trade item
+        /// </summary>
+        private XElement BuildBillingSpecifiedPeriod(IZUGFeRDExportableItem item)
+        {
+            if (item.GetDetailedDeliveryPeriodFrom() != null || item.GetDetailedDeliveryPeriodTo() != null)
+            {
+                return new XElement(RamNamespace.Namespace + "BillingSpecifiedPeriod",
+                    item.GetDetailedDeliveryPeriodFrom() != null ?
+                        new XElement(RamNamespace.Namespace + "StartDateTime",
+                            new XElement(UdtNamespace.Namespace + "DateTimeString",
+                                new XAttribute("format", "102"), item.GetDetailedDeliveryPeriodFrom().Value.ToString(invoiceDateFormat)
+                            )
+                        )
+                        : null,
+                    item.GetDetailedDeliveryPeriodFrom() != null ?
+                        new XElement(RamNamespace.Namespace + "EndDateTime",
+                            new XElement(UdtNamespace.Namespace + "DateTimeString",
+                                new XAttribute("format", "102"), item.GetDetailedDeliveryPeriodTo().Value.ToString(invoiceDateFormat)
+                            )
+                        )
+                        : null
+                );
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Builds the BillingSpecifiedPeriod for a trade item
+        /// </summary>
+        private XElement BuildBillingSpecifiedPeriod(IExportableTransaction transaction)
+        {
+            if (transaction.GetDetailedDeliveryPeriodFrom() != null || transaction.GetDetailedDeliveryPeriodTo() != null)
+            {
+                return new XElement(RamNamespace.Namespace + "BillingSpecifiedPeriod",
+                    transaction.GetDetailedDeliveryPeriodFrom() != null ?
+                        new XElement(RamNamespace.Namespace + "StartDateTime",
+                            new XElement(UdtNamespace.Namespace + "DateTimeString",
+                                new XAttribute("format", "102"), transaction.GetDetailedDeliveryPeriodFrom().Value.ToString(invoiceDateFormat)
+                            )
+                        )
+                        : null,
+                    transaction.GetDetailedDeliveryPeriodFrom() != null ?
+                        new XElement(RamNamespace.Namespace + "EndDateTime",
+                            new XElement(UdtNamespace.Namespace + "DateTimeString",
+                                new XAttribute("format", "102"), transaction.GetDetailedDeliveryPeriodTo().Value.ToString(invoiceDateFormat)
+                            )
+                        )
+                        : null
+                );
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Builds the SpecifiedTradeSettlementLineMonetarySummation for a trade item
+        /// </summary>
+        private XElement BuildSpecifiedTradeSettlementLineMonetarySummation(IZUGFeRDExportableItem item)
+        {
+            LineCalculator lc = new (item);
+            return new XElement(RamNamespace.Namespace + "SpecifiedTradeSettlementLineMonetarySummation", 
+                new XElement(RamNamespace.Namespace + "LineTotalAmount", CurrencyFormat(lc.GetItemTotalNetAmount()))
+            );
+        }
+
+        /// <summary>
+        /// Builds the AdditionalReferencedDocument for a trade item
+        /// </summary>
+        private XElement BuildAdditionalReferencedDocument(IZUGFeRDExportableItem item)
+        {
+            if (item.GetAdditionalReferencedDocumentId() != null)
+            {
+                return new XElement(RamNamespace.Namespace + "AdditionalReferencedDocument",
+                    new XElement(RamNamespace.Namespace + "IssuerAssignedID", item.GetAdditionalReferencedDocumentId()),
+                    new XElement(RamNamespace.Namespace + "TypeCode", "130")
+                );
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -218,22 +326,60 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         private XElement BuildApplicableHeaderTradeAgreement(IExportableTransaction trans)
         {
             return new XElement(RamNamespace.Namespace + "ApplicableHeaderTradeAgreement",
+                BuildBuyerReference(trans),
                 new XElement(RamNamespace.Namespace + "SellerTradeParty",
                     GetTradePartyAsXml(trans.GetSender(), true, false)),
                 new XElement(RamNamespace.Namespace + "BuyerTradeParty",
                     GetTradePartyAsXml(trans.GetRecipient(), false, false)),
-                trans.GetReferenceNumber() != null
-                    ? new XElement(RamNamespace.Namespace + "BuyerReference", XmlTools.EncodeXml(trans.GetReferenceNumber()))
-                    : null,
-                trans.GetBuyerOrderReferencedDocumentId() != null
-                    ? new XElement(RamNamespace.Namespace + "BuyerOrderReferencedDocument",
-                        new XElement(RamNamespace.Namespace + "IssuerAssignedID", XmlTools.EncodeXml(trans.GetBuyerOrderReferencedDocumentId())))
-                    : null,
-                trans.GetContractReferencedDocument() != null
-                    ? new XElement(RamNamespace.Namespace + "ContractReferencedDocument",
-                        new XElement(RamNamespace.Namespace + "IssuerAssignedID", XmlTools.EncodeXml(trans.GetContractReferencedDocument())))
-                    : null
+                BuildBuyerOrderReferencedDocument(trans),
+                BuildContractReferencedDocument(trans)
             );
+        }
+
+        /// <summary>
+        /// Builds the buyer order referenced document.
+        /// </summary>
+        /// <param name="trans">The trans.</param>
+        /// <returns></returns>
+        private XElement BuildBuyerOrderReferencedDocument(IExportableTransaction trans)
+        {
+            if (trans.GetContractReferencedDocument() != null)
+            {
+                return new XElement(RamNamespace.Namespace + "ContractReferencedDocument",
+                    new XElement(RamNamespace.Namespace + "IssuerAssignedID", XmlTools.EncodeXml(trans.GetContractReferencedDocument())));
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Builds the contract referenced document.
+        /// </summary>
+        /// <param name="trans">The trans.</param>
+        /// <returns></returns>
+        private XElement BuildContractReferencedDocument(IExportableTransaction trans)
+        {
+            if (trans.GetContractReferencedDocument() != null)
+            {
+                return new XElement(RamNamespace.Namespace + "ContractReferencedDocument",
+                    new XElement(RamNamespace.Namespace + "IssuerAssignedID", XmlTools.EncodeXml(trans.GetContractReferencedDocument())));
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Builds the build buyer reference.
+        /// </summary>
+        /// <param name="trans">The trans.</param>
+        /// <returns></returns>
+        private XElement BuildBuyerReference(IExportableTransaction trans)
+        {
+            if (trans.GetReferenceNumber() != null)
+            {
+                return new XElement(RamNamespace.Namespace + "BuyerReference", XmlTools.EncodeXml(trans.GetReferenceNumber()));
+            }
+            return null;
         }
 
         /// <summary>
@@ -262,20 +408,61 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// </summary>
         private XElement BuildApplicableHeaderTradeSettlement(IExportableTransaction trans)
         {
-            List<XElement> settlementElements = new List<XElement>();
+            // settlementElements
+            List<XElement> settlementElements = [];
+            bool hasDueDate = false;
 
             if (trans.GetTradeSettlementPayment() != null)
             {
                 foreach (IZUGFeRDTradeSettlementPayment payment in trans.GetTradeSettlementPayment())
                 {
+                    hasDueDate = true;
                     settlementElements.Add(payment.GetSettlementXml());
                 }
             }
 
+            if (trans.GetTradeSettlement() != null)
+            {
+                foreach (IZUGFeRDTradeSettlement payment in trans.GetTradeSettlement())
+                {
+                    if (payment is IZUGFeRDTradeSettlementPayment) hasDueDate = true;
+                    settlementElements.Add(payment.GetSettlementXml());
+                }
+            }
+            // applicableTradeTaxElements
+            List<XElement> applicableTradeTaxElements = [];
+
+            Dictionary<decimal, VatAmount> vatPercentAmountMap = Calc.GetVatPercentAmountMap();
+            foreach (decimal currentTaxPercent in vatPercentAmountMap.Keys)
+            {
+                VatAmount amount = vatPercentAmountMap[currentTaxPercent];
+                if (amount != null)
+                {
+                    applicableTradeTaxElements.Add(
+                        new XElement(RamNamespace.Namespace + "ApplicableTradeTax",
+                                new XElement(RamNamespace.Namespace + "CalculatedAmount", CurrencyFormat(amount.GetCalculated())),
+                                new XElement(RamNamespace.Namespace + "TypeCode", "VAT"),
+                                _exemptionReason, //TODO: This does not seem right... _exemptionReason is build up new for every loop of an IZUGFeRDExportableItem in trans.GetZfItems(), so this will be set to the last item looped (it is the same as writing "BuildExemptionReason(trans.GetZfItems().Last())")
+                                new XElement(RamNamespace.Namespace + "BasisAmount", CurrencyFormat(amount.GetBasis())),
+                                new XElement(RamNamespace.Namespace + "CategoryCode", amount.GetCategoryCode()),
+                                new XElement(RamNamespace.Namespace + "RateApplicablePercent", VatFormat(currentTaxPercent))
+                             )
+                        );
+                }
+            }
+
+            // billingSpecifiedPeriod
+            XElement billingSpecifiedPeriod = null;
+            if (trans.GetDetailedDeliveryPeriodFrom() != null || trans.GetDetailedDeliveryPeriodTo() != null)
+            {
+                billingSpecifiedPeriod = BuildBillingSpecifiedPeriod(trans);
+            }
+
+            // paymentTerms
             XElement paymentTerms = trans.GetPaymentTerms() == null
                 ? new XElement(RamNamespace.Namespace + "SpecifiedTradePaymentTerms",
                     new XElement(RamNamespace.Namespace + "Description", _paymentTermsDescription),
-                    trans.GetDueDate() != null
+                    hasDueDate && trans.GetDueDate() != null
                         ? new XElement(RamNamespace.Namespace + "DueDateDateTime",
                             new XElement(UdtNamespace.Namespace + "DateTimeString",
                                 new XAttribute("format", "102"),
@@ -284,39 +471,28 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                 )
                 : BuildPaymentTermsXml();
 
+            // specifiedTradeSettlementHeaderMonetarySummation
+            XElement specifiedTradeSettlementHeaderMonetarySummation = 
+                new XElement(RamNamespace.Namespace + "SpecifiedTradeSettlementHeaderMonetarySummation",
+                    new XElement(RamNamespace.Namespace + "LineTotalAmount", CurrencyFormat(Calc.GetTotal())),
+                    new XElement(RamNamespace.Namespace + "TaxBasisTotalAmount", CurrencyFormat(Calc.GetTaxBasis())),
+                    new XElement(RamNamespace.Namespace + "TaxTotalAmount", CurrencyFormat(Calc.GetGrandTotal() - Calc.GetTaxBasis()),
+                        new XAttribute("currencyID", trans.GetCurrency())
+                    ),
+                    new XElement(RamNamespace.Namespace + "GrandTotalAmount", CurrencyFormat(Calc.GetGrandTotal())),
+                    new XElement(RamNamespace.Namespace + "TotalPrepaidAmount", CurrencyFormat(Calc.GetTotalPrepaid())),
+                    new XElement(RamNamespace.Namespace + "DuePayableAmount", CurrencyFormat(Calc.GetGrandTotal() - Calc.GetTotalPrepaid()))
+                );
+
             return new XElement(RamNamespace.Namespace + "ApplicableHeaderTradeSettlement",
                 new XElement(RamNamespace.Namespace + "PaymentReference", XmlTools.EncodeXml(trans.GetNumber())),
                 new XElement(RamNamespace.Namespace + "InvoiceCurrencyCode", trans.GetCurrency()),
                 settlementElements,
+                applicableTradeTaxElements,
+                billingSpecifiedPeriod,
                 paymentTerms,
-                BuildVatSummary(trans)
+                specifiedTradeSettlementHeaderMonetarySummation
             );
-        }
-
-        /// <summary>
-        /// Builds the VAT summary section
-        /// </summary>
-        private XElement BuildVatSummary(IExportableTransaction trans)
-        {
-            Dictionary<decimal, VatAmount> vatPercentAmountMap = Calc.GetVatPercentAmountMap();
-            List<XElement> vatSummaryElements = new List<XElement>();
-
-            foreach (decimal taxPercent in vatPercentAmountMap.Keys)
-            {
-                VatAmount amount = vatPercentAmountMap[taxPercent];
-                if (amount != null)
-                {
-                    vatSummaryElements.Add(new XElement(RamNamespace.Namespace + "ApplicableTradeTax",
-                        new XElement(RamNamespace.Namespace + "CalculatedAmount", CurrencyFormat(amount.GetCalculated())),
-                        new XElement(RamNamespace.Namespace + "TypeCode", "VAT"),
-                        new XElement(RamNamespace.Namespace + "BasisAmount", CurrencyFormat(amount.GetBasis())),
-                        new XElement(RamNamespace.Namespace + "CategoryCode", amount.GetCategoryCode()),
-                        new XElement(RamNamespace.Namespace + "RateApplicablePercent", VatFormat(taxPercent))
-                    ));
-                }
-            }
-
-            return new XElement(RamNamespace.Namespace + "ApplicableTradeTaxes", vatSummaryElements);
         }
 
         /// <summary>
@@ -346,27 +522,27 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         /// <summary>
         /// Builds the XML representation for a trade party
         /// </summary>
-        private XElement GetTradePartyAsXml(IZUGFeRDExportableTradeParty party, bool isSender, bool isShipToTradeParty)
+        private List<XElement> GetTradePartyAsXml(IZUGFeRDExportableTradeParty party, bool isSender, bool isShipToTradeParty)
         {
-            XElement tradePartyElement = new XElement(RamNamespace.Namespace + "TradeParty");
+            List<XElement> elements = [];
 
             if (party.GetId() != null)
             {
-                tradePartyElement.Add(new XElement(RamNamespace.Namespace + "ID", XmlTools.EncodeXml(party.GetId())));
+                elements.Add(new XElement(RamNamespace.Namespace + "ID", XmlTools.EncodeXml(party.GetId())));
             }
             else if (party.GetGlobalIdScheme() != null && party.GetGlobalId() != null)
             {
-                tradePartyElement.Add(new XElement(RamNamespace.Namespace + "GlobalID",
+                elements.Add(new XElement(RamNamespace.Namespace + "GlobalID",
                     new XAttribute("schemeID", XmlTools.EncodeXml(party.GetGlobalIdScheme())),
                     XmlTools.EncodeXml(party.GetGlobalId())
                 ));
             }
 
-            tradePartyElement.Add(new XElement(RamNamespace.Namespace + "Name", XmlTools.EncodeXml(party.GetName())));
+            elements.Add(new XElement(RamNamespace.Namespace + "Name", XmlTools.EncodeXml(party.GetName())));
 
             if (party.GetContact() != null && (isSender || Profile == Profiles.GetByName("Extended")))
             {
-                XElement contactElement = new XElement(RamNamespace.Namespace + "DefinedTradeContact",
+                XElement contactElement = new (RamNamespace.Namespace + "DefinedTradeContact",
                     new XElement(RamNamespace.Namespace + "PersonName", XmlTools.EncodeXml(party.GetContact().GetName())));
 
                 if (party.GetContact().GetPhone() != null)
@@ -387,7 +563,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                         new XElement(RamNamespace.Namespace + "URIID", XmlTools.EncodeXml(party.GetContact().GetEMail()))));
                 }
 
-                tradePartyElement.Add(contactElement);
+                elements.Add(contactElement);
             }
 
             XElement postalAddress = new XElement(RamNamespace.Namespace + "PostalTradeAddress",
@@ -404,21 +580,21 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                 new XElement(RamNamespace.Namespace + "CountryID", XmlTools.EncodeXml(party.GetCountry()))
             );
 
-            tradePartyElement.Add(postalAddress);
+            elements.Add(postalAddress);
 
             if (party.GetVatid() != null && !isShipToTradeParty)
             {
-                tradePartyElement.Add(new XElement(RamNamespace.Namespace + "SpecifiedTaxRegistration",
+                elements.Add(new XElement(RamNamespace.Namespace + "SpecifiedTaxRegistration",
                     new XElement(RamNamespace.Namespace + "ID", new XAttribute("schemeID", "VA"), XmlTools.EncodeXml(party.GetVatid()))));
             }
 
             if (party.GetTaxId() != null && !isShipToTradeParty)
             {
-                tradePartyElement.Add(new XElement(RamNamespace.Namespace + "SpecifiedTaxRegistration",
+                elements.Add(new XElement(RamNamespace.Namespace + "SpecifiedTaxRegistration",
                     new XElement(RamNamespace.Namespace + "ID", new XAttribute("schemeID", "FC"), XmlTools.EncodeXml(party.GetTaxId()))));
             }
 
-            return tradePartyElement;
+            return elements;
         }
     }
 }
