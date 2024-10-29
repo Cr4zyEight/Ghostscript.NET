@@ -89,7 +89,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                     BuildSubjectNoteSection(trans)),
                     BuildRebateAgreement(trans),
                 new XElement(RsmNamespace.Namespace + "SupplyChainTradeTransaction",
-                    BuildTradeLineItems(trans),
+                    BuildIncludedSupplyChainTradeLineItem(trans),
                     BuildApplicableHeaderTradeAgreement(trans),
                     BuildApplicableHeaderTradeDelivery(trans),
                     BuildApplicableHeaderTradeSettlement(trans))
@@ -107,7 +107,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         {
             List<XElement> notesXml = [];
 
-            foreach (string note in noteContents)
+            foreach (string note in noteContents ?? [])
             {
                 notesXml.Add(new XElement(RamNamespace.Namespace + "IncludedNote",
                     new XElement(RamNamespace.Namespace + "Content", XmlTools.EncodeXml(note))
@@ -141,13 +141,13 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         }
 
         /// <summary>
-        /// Builds the trade line items section for the XML
+        /// Builds the IncludedSupplyChainTradeLineItem items section for the XML
         /// </summary>
-        private XElement BuildTradeLineItems(IExportableTransaction trans)
+        private XElement BuildIncludedSupplyChainTradeLineItem(IExportableTransaction trans)
         {
             List<XElement> lineItems = new List<XElement>();
             int lineId = 0;
-            foreach (IZUGFeRDExportableItem item in trans.GetZfItems())
+            foreach (IZUGFeRDExportableItem item in trans.GetZfItems() ?? [])
             {
                 lineId++;
                 XElement lineItem = new XElement(RamNamespace.Namespace + "IncludedSupplyChainTradeLineItem",
@@ -414,7 +414,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
             if (trans.GetTradeSettlementPayment() != null)
             {
-                foreach (IZUGFeRDTradeSettlementPayment payment in trans.GetTradeSettlementPayment())
+                foreach (IZUGFeRDTradeSettlementPayment payment in trans.GetTradeSettlementPayment() ?? [])
                 {
                     hasDueDate = true;
                     settlementElements.Add(payment.GetSettlementXml());
@@ -423,7 +423,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
             if (trans.GetTradeSettlement() != null)
             {
-                foreach (IZUGFeRDTradeSettlement payment in trans.GetTradeSettlement())
+                foreach (IZUGFeRDTradeSettlement payment in trans.GetTradeSettlement() ?? [])
                 {
                     if (payment is IZUGFeRDTradeSettlementPayment) hasDueDate = true;
                     settlementElements.Add(payment.GetSettlementXml());
