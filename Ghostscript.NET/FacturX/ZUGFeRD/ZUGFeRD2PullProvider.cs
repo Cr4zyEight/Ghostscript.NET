@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Linq;
+using Ghostscript.NET.Helpers;
 
 namespace Ghostscript.NET.FacturX.ZUGFeRD
 {
@@ -69,34 +70,43 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             Trans = trans;
             Calc = new TransactionCalculator(trans);
             _paymentTermsDescription = trans.GetPaymentTermDescription() ?? $"Zahlbar ohne Abzug bis {((DateTime)trans.GetDueDate()).ToString(germanDateFormat)}";
+            
+            XDocument xml = new XDocument(
+                new XElement(RsmNamespace.Namespace + "CrossIndustryInvoice",
+                    new XAttribute(XNamespace.Xmlns + XsiNamespace.Prefix, XsiNamespace.Namespace),
+                    new XAttribute(XNamespace.Xmlns + RsmNamespace.Prefix, RsmNamespace.Namespace),
+                    new XAttribute(XNamespace.Xmlns + RamNamespace.Prefix, RamNamespace.Namespace),
+                    new XAttribute(XNamespace.Xmlns + UdtNamespace.Prefix, UdtNamespace.Namespace),
 
-            XElement xml = new XElement(RsmNamespace.Namespace + "CrossIndustryInvoice",
-                new XAttribute(XNamespace.Xmlns + XsiNamespace.Prefix, XsiNamespace.Namespace),
-                new XAttribute(XNamespace.Xmlns + RsmNamespace.Prefix, RsmNamespace.Namespace),
-                new XAttribute(XNamespace.Xmlns + RamNamespace.Prefix, RamNamespace.Namespace),
-                new XAttribute(XNamespace.Xmlns + UdtNamespace.Prefix, UdtNamespace.Namespace),
-
-                new XElement(RsmNamespace.Namespace + "ExchangedDocumentContext",
-                    new XElement(RamNamespace.Namespace + "GuidelineSpecifiedDocumentContextParameter",
-                        new XElement(RamNamespace.Namespace + "ID", GetProfile().GetId()))),
-                new XElement(RsmNamespace.Namespace + "ExchangedDocument",
-                    new XElement(RamNamespace.Namespace + "ID", XmlTools.EncodeXml(trans.GetNumber())),
-                    new XElement(RamNamespace.Namespace + "TypeCode", "380"),
-                    new XElement(RamNamespace.Namespace + "IssueDateTime",
-                        new XElement(UdtNamespace.Namespace + "DateTimeString", ((DateTime)trans.GetIssueDate()).ToString(invoiceDateFormat)),
-                            new XAttribute("format", "102")),
-                    BuildNotesSection(trans.GetNotes()),
-                    BuildSubjectNoteSection(trans)),
-                    BuildRebateAgreement(trans),
-                new XElement(RsmNamespace.Namespace + "SupplyChainTradeTransaction",
-                    BuildIncludedSupplyChainTradeLineItem(trans),
-                    BuildApplicableHeaderTradeAgreement(trans),
-                    BuildApplicableHeaderTradeDelivery(trans),
-                    BuildApplicableHeaderTradeSettlement(trans))
+                    new XElement(RsmNamespace.Namespace + "ExchangedDocumentContext",
+                        new XElement(RamNamespace.Namespace + "GuidelineSpecifiedDocumentContextParameter",
+                            new XElement(RamNamespace.Namespace + "ID", GetProfile().GetId()))),
+                    new XElement(RsmNamespace.Namespace + "ExchangedDocument",
+                        new XElement(RamNamespace.Namespace + "ID", trans.GetNumber()),
+                        new XElement(RamNamespace.Namespace + "TypeCode", "380"),
+                        new XElement(RamNamespace.Namespace + "IssueDateTime",
+                            new XElement(UdtNamespace.Namespace + "DateTimeString", 
+                                ((DateTime)trans.GetIssueDate()).ToString(invoiceDateFormat),
+                                new XAttribute("format", "102")
+                            )
+                        ),
+                        BuildNotesSection(trans.GetNotes()),
+                        BuildSubjectNoteSection(trans)),
+                        BuildRebateAgreement(trans),
+                    new XElement(RsmNamespace.Namespace + "SupplyChainTradeTransaction",
+                        BuildIncludedSupplyChainTradeLineItem(trans),
+                        BuildApplicableHeaderTradeAgreement(trans),
+                        BuildApplicableHeaderTradeDelivery(trans),
+                        BuildApplicableHeaderTradeSettlement(trans))
+                )
             );
 
-            UTF8Encoding encoding = new UTF8Encoding();
-            byte[] zugferdRaw = encoding.GetBytes(xml.ToString());
+            StringBuilder builder = new ();
+            using Utf8StringWriter writer = new (builder);
+            xml.Save(writer);
+
+            UTF8Encoding encoding = new ();
+            byte[] zugferdRaw = encoding.GetBytes(builder.ToString());
             ZugferdData = XmlTools.RemoveBom(zugferdRaw);
         }
 
@@ -110,7 +120,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             foreach (string note in noteContents ?? [])
             {
                 notesXml.Add(new XElement(RamNamespace.Namespace + "IncludedNote",
-                    new XElement(RamNamespace.Namespace + "Content", XmlTools.EncodeXml(note))
+                    new XElement(RamNamespace.Namespace + "Content", note)
                 ));
             }
             
@@ -136,14 +146,14 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         {
             return trans.GetSubjectNote() != null
                 ? new XElement(RamNamespace.Namespace + "IncludedNote",
-                    new XElement(RamNamespace.Namespace + "Content", XmlTools.EncodeXml(trans.GetSubjectNote())))
+                    new XElement(RamNamespace.Namespace + "Content", trans.GetSubjectNote()))
                 : null;
         }
 
         /// <summary>
         /// Builds the IncludedSupplyChainTradeLineItem items section for the XML
         /// </summary>
-        private XElement BuildIncludedSupplyChainTradeLineItem(IExportableTransaction trans)
+        private List<XElement> BuildIncludedSupplyChainTradeLineItem(IExportableTransaction trans)
         {
             List<XElement> lineItems = new List<XElement>();
             int lineId = 0;
@@ -156,10 +166,10 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                         BuildNotesSection(item.GetNotes())
                     ),
                     new XElement(RamNamespace.Namespace + "SpecifiedTradeProduct",
-                        item.GetProduct().GetSellerAssignedId() != null ? new XElement(RamNamespace.Namespace + "SellerAssignedID", XmlTools.EncodeXml(item.GetProduct().GetSellerAssignedId())) : null,
-                        item.GetProduct().GetBuyerAssignedId() != null ? new XElement(RamNamespace.Namespace + "BuyerAssignedID", XmlTools.EncodeXml(item.GetProduct().GetBuyerAssignedId())) : null,
-                        new XElement(RamNamespace.Namespace + "Name", XmlTools.EncodeXml(item.GetProduct().GetName())),
-                        new XElement(RamNamespace.Namespace + "Description", XmlTools.EncodeXml(item.GetProduct().GetDescription()))
+                        item.GetProduct().GetSellerAssignedId() != null ? new XElement(RamNamespace.Namespace + "SellerAssignedID", item.GetProduct().GetSellerAssignedId()) : null,
+                        item.GetProduct().GetBuyerAssignedId() != null ? new XElement(RamNamespace.Namespace + "BuyerAssignedID", item.GetProduct().GetBuyerAssignedId()) : null,
+                        new XElement(RamNamespace.Namespace + "Name", item.GetProduct().GetName()),
+                        new XElement(RamNamespace.Namespace + "Description", item.GetProduct().GetDescription())
                     ),
                     BuildPriceDetails(item),
                     BuildDeliveryDetails(item),
@@ -169,7 +179,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                 lineItems.Add(lineItem);
             }
 
-            return new XElement("TradeLineItems", lineItems);
+            return lineItems;
         }
 
         /// <summary>
@@ -181,11 +191,11 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             return new XElement(RamNamespace.Namespace + "SpecifiedLineTradeAgreement",
                 new XElement(RamNamespace.Namespace + "GrossPriceProductTradePrice",
                     new XElement(RamNamespace.Namespace + "ChargeAmount", PriceFormat(lc.GetPriceGross())),
-                    new XElement(RamNamespace.Namespace + "BasisQuantity", QuantityFormat(item.GetBasisQuantity()), new XAttribute("unitCode", XmlTools.EncodeXml(item.GetProduct().GetUnit())))
+                    new XElement(RamNamespace.Namespace + "BasisQuantity", QuantityFormat(item.GetBasisQuantity()), new XAttribute("unitCode", item.GetProduct().GetUnit()))
                 ),
                 new XElement(RamNamespace.Namespace + "NetPriceProductTradePrice",
                     new XElement(RamNamespace.Namespace + "ChargeAmount", PriceFormat(lc.GetPrice())),
-                    new XElement(RamNamespace.Namespace + "BasisQuantity", QuantityFormat(item.GetBasisQuantity()), new XAttribute("unitCode", XmlTools.EncodeXml(item.GetProduct().GetUnit())))
+                    new XElement(RamNamespace.Namespace + "BasisQuantity", QuantityFormat(item.GetBasisQuantity()), new XAttribute("unitCode", item.GetProduct().GetUnit()))
                 )
             );
         }
@@ -196,7 +206,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         private XElement BuildDeliveryDetails(IZUGFeRDExportableItem item)
         {
             return new XElement(RamNamespace.Namespace + "SpecifiedLineTradeDelivery",
-                new XElement(RamNamespace.Namespace + "BilledQuantity", QuantityFormat(item.GetQuantity()), new XAttribute("unitCode", XmlTools.EncodeXml(item.GetProduct().GetUnit())))
+                new XElement(RamNamespace.Namespace + "BilledQuantity", QuantityFormat(item.GetQuantity()), new XAttribute("unitCode", item.GetProduct().GetUnit()))
             );
         }
 
@@ -212,9 +222,6 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                     _exemptionReason,
                     new XElement(RamNamespace.Namespace + "CategoryCode", item.GetProduct().GetTaxCategoryCode()),
                     new XElement(RamNamespace.Namespace + "RateApplicablePercent", VatFormat(item.GetProduct().GetVatPercent()))
-                ),
-                new XElement(RamNamespace.Namespace + "SpecifiedTradeSettlementLineMonetarySummation",
-                    new XElement(RamNamespace.Namespace + "LineTotalAmount", CurrencyFormat(new LineCalculator(item).GetItemTotalNetAmount()))
                 ),
                 BuildBillingSpecifiedPeriod(item),
                 BuildSpecifiedTradeSettlementLineMonetarySummation(item),
@@ -346,7 +353,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             if (trans.GetContractReferencedDocument() != null)
             {
                 return new XElement(RamNamespace.Namespace + "ContractReferencedDocument",
-                    new XElement(RamNamespace.Namespace + "IssuerAssignedID", XmlTools.EncodeXml(trans.GetContractReferencedDocument())));
+                    new XElement(RamNamespace.Namespace + "IssuerAssignedID", trans.GetContractReferencedDocument()));
             }
 
             return null;
@@ -362,7 +369,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             if (trans.GetContractReferencedDocument() != null)
             {
                 return new XElement(RamNamespace.Namespace + "ContractReferencedDocument",
-                    new XElement(RamNamespace.Namespace + "IssuerAssignedID", XmlTools.EncodeXml(trans.GetContractReferencedDocument())));
+                    new XElement(RamNamespace.Namespace + "IssuerAssignedID", trans.GetContractReferencedDocument()));
             }
 
             return null;
@@ -377,7 +384,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
         {
             if (trans.GetReferenceNumber() != null)
             {
-                return new XElement(RamNamespace.Namespace + "BuyerReference", XmlTools.EncodeXml(trans.GetReferenceNumber()));
+                return new XElement(RamNamespace.Namespace + "BuyerReference", trans.GetReferenceNumber());
             }
             return null;
         }
@@ -485,7 +492,7 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
                 );
 
             return new XElement(RamNamespace.Namespace + "ApplicableHeaderTradeSettlement",
-                new XElement(RamNamespace.Namespace + "PaymentReference", XmlTools.EncodeXml(trans.GetNumber())),
+                new XElement(RamNamespace.Namespace + "PaymentReference", trans.GetNumber()),
                 new XElement(RamNamespace.Namespace + "InvoiceCurrencyCode", trans.GetCurrency()),
                 settlementElements,
                 applicableTradeTaxElements,
@@ -528,56 +535,57 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
 
             if (party.GetId() != null)
             {
-                elements.Add(new XElement(RamNamespace.Namespace + "ID", XmlTools.EncodeXml(party.GetId())));
+                elements.Add(new XElement(RamNamespace.Namespace + "ID", party.GetId()));
             }
             else if (party.GetGlobalIdScheme() != null && party.GetGlobalId() != null)
             {
                 elements.Add(new XElement(RamNamespace.Namespace + "GlobalID",
-                    new XAttribute("schemeID", XmlTools.EncodeXml(party.GetGlobalIdScheme())),
-                    XmlTools.EncodeXml(party.GetGlobalId())
+                    new XAttribute("schemeID", party.GetGlobalIdScheme()),
+                    party.GetGlobalId()
                 ));
             }
 
-            elements.Add(new XElement(RamNamespace.Namespace + "Name", XmlTools.EncodeXml(party.GetName())));
+            elements.Add(new XElement(RamNamespace.Namespace + "Name", party.GetName()));
 
             if (party.GetContact() != null && (isSender || Profile == Profiles.GetByName("Extended")))
             {
                 XElement contactElement = new (RamNamespace.Namespace + "DefinedTradeContact",
-                    new XElement(RamNamespace.Namespace + "PersonName", XmlTools.EncodeXml(party.GetContact().GetName())));
+                    new XElement(RamNamespace.Namespace + "PersonName", party.GetContact().GetName()));
 
                 if (party.GetContact().GetPhone() != null)
                 {
                     contactElement.Add(new XElement(RamNamespace.Namespace + "TelephoneUniversalCommunication",
-                        new XElement(RamNamespace.Namespace + "CompleteNumber", XmlTools.EncodeXml(party.GetContact().GetPhone()))));
+                        new XElement(RamNamespace.Namespace + "CompleteNumber", party.GetContact().GetPhone())));
                 }
 
                 if (party.GetContact().GetFax() != null && Profile == Profiles.GetByName("Extended"))
                 {
                     contactElement.Add(new XElement(RamNamespace.Namespace + "FaxUniversalCommunication",
-                        new XElement(RamNamespace.Namespace + "CompleteNumber", XmlTools.EncodeXml(party.GetContact().GetFax()))));
+                        new XElement(RamNamespace.Namespace + "CompleteNumber", party.GetContact().GetFax())));
                 }
 
                 if (party.GetContact().GetEMail() != null)
                 {
                     contactElement.Add(new XElement(RamNamespace.Namespace + "EmailURIUniversalCommunication",
-                        new XElement(RamNamespace.Namespace + "URIID", XmlTools.EncodeXml(party.GetContact().GetEMail()))));
+                        new XElement(RamNamespace.Namespace + "URIID", party.GetContact().GetEMail())));
                 }
 
                 elements.Add(contactElement);
             }
 
             XElement postalAddress = new XElement(RamNamespace.Namespace + "PostalTradeAddress",
-                new XElement(RamNamespace.Namespace + "PostcodeCode", XmlTools.EncodeXml(party.GetZip())),
-                new XElement(RamNamespace.Namespace + "LineOne", XmlTools.EncodeXml(party.GetStreet())));
+                new XElement(RamNamespace.Namespace + "PostcodeCode", party.GetZip()),
+                new XElement(RamNamespace.Namespace + "LineOne", party.GetStreet())
+            );
 
             if (party.GetAdditionalAddress() != null)
             {
-                postalAddress.Add(new XElement(RamNamespace.Namespace + "LineTwo", XmlTools.EncodeXml(party.GetAdditionalAddress())));
+                postalAddress.Add(new XElement(RamNamespace.Namespace + "LineTwo", party.GetAdditionalAddress()));
             }
 
             postalAddress.Add(
-                new XElement(RamNamespace.Namespace + "CityName", XmlTools.EncodeXml(party.GetLocation())),
-                new XElement(RamNamespace.Namespace + "CountryID", XmlTools.EncodeXml(party.GetCountry()))
+                new XElement(RamNamespace.Namespace + "CityName", party.GetLocation()),
+                new XElement(RamNamespace.Namespace + "CountryID", party.GetCountry())
             );
 
             elements.Add(postalAddress);
@@ -585,13 +593,13 @@ namespace Ghostscript.NET.FacturX.ZUGFeRD
             if (party.GetVatid() != null && !isShipToTradeParty)
             {
                 elements.Add(new XElement(RamNamespace.Namespace + "SpecifiedTaxRegistration",
-                    new XElement(RamNamespace.Namespace + "ID", new XAttribute("schemeID", "VA"), XmlTools.EncodeXml(party.GetVatid()))));
+                    new XElement(RamNamespace.Namespace + "ID", new XAttribute("schemeID", "VA"), party.GetVatid())));
             }
 
             if (party.GetTaxId() != null && !isShipToTradeParty)
             {
                 elements.Add(new XElement(RamNamespace.Namespace + "SpecifiedTaxRegistration",
-                    new XElement(RamNamespace.Namespace + "ID", new XAttribute("schemeID", "FC"), XmlTools.EncodeXml(party.GetTaxId()))));
+                    new XElement(RamNamespace.Namespace + "ID", new XAttribute("schemeID", "FC"), party.GetTaxId())));
             }
 
             return elements;
