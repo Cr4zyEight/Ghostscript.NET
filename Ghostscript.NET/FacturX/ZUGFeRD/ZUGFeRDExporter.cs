@@ -54,12 +54,11 @@ public class ZUGFeRDExporter
         ZUGFeRD2PullProvider zf2P = new();
         zf2P.SetProfile(Profiles.GetByName(Profile));
         zf2P.GenerateXml(Trans);
-        UTF8Encoding encoding = new();
 
-        string tempfilename = Path.GetTempPath() + "\\factur-x.xml";
-        File.WriteAllBytes(tempfilename, zf2P.GetXml());
+        string tempFilename = Path.GetTempPath() + "\\factur-x.xml";
+        File.WriteAllBytes(tempFilename, zf2P.GetXml());
 
-        pc.EmbedXmlForZf(tempfilename, Convert.ToString(Version));
+        pc.EmbedXmlForZf(tempFilename, Convert.ToString(Version));
         pc.ConvertToPdfa3(GsDll);
         File.Delete(Path.GetTempPath() + "\\factur-x.xml");
         if (!NoSourceCopy) File.Delete(SourcePdf);

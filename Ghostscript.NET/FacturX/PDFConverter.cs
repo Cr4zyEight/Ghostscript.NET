@@ -373,7 +373,7 @@ bind def
     ///     ''' Wandelt eine PDF-Datei (Dateiname in inputfile) in eine PDF A/3 (Outputfilename) um und hngt die aktuelle E-rechnung an 
     ///     ''' </summary>
     ///     ''' <returns>True wenn die Konvertierung funktioniert hat</returns>
-    public bool ConvertToPdfa3(string gsdll)
+    public void ConvertToPdfa3(string gsdll)
     {
         _fileGsdllDll = gsdll;
         _gsVersion = new GhostscriptVersionInfo(_fileGsdllDll);
@@ -411,37 +411,33 @@ bind def
         gsL = new GhostscriptLibrary(_gsVersion);
         GhostscriptPipedOutput gsPipedOutput = new();
 
-        List<string> switches = new();
+        List<string> switches =
+        [
+            "", // ' Der allererste Parameter wird mitunter ignoriert weil EXEs da ihren eigenen Namen bergeben bekommen
+            "-P", // Zugriff auf Ressourcen unterhalb des aktuellen Verzeichnisses erlauben
+            "-dPDFA=3", // 'in A/3 umwandeln Teil 1 von 3
+            // switches.Add("-dCompressStreams=false") ''hatten mal Probleme weil scheinbar auch die XMP Metadaten von ZUGFeRD komprimiert wurden, das hat sich mittlerweile erledigt
+            "-sColorConversionStrategy=RGB", // ' muss fr PDF/A angegeben werden
+            "-sDEVICE=pdfwrite", // ' ein Device muss frs Rastern angegeben werden
+            "-o" + MPdfOutFile, // ' Ausgabedatei
+            "-dPDFACompatibilityPolicy=1", // 'in A/3 umwandeln Teil 2 von 3
+            "-dRenderIntent=3", // 'in A/3 umwandeln Teil 3 von 3
+            //switches.Add("-sGenericResourceDir=\"" + resourceDir + "/\""); // ' hier kann ein zustzliches Verzeichnis angegeben werden in dem Ressourcen wie die icc-Datei liegen drfen
+            _fileBigscriptPs, // ' die PDFMark-Programmdatei die interpretiert werden soll. Anders als die ICC und ggf. einzubettende XML-Datei ist das keine Ressourcendatei und die kann liegen wo sie will.
+            // siehe https://www.adobe.com/content/dam/acom/en/devnet/acrobat/pdfs/pdfmark_reference.pdf
+            // und https://gitlab.com/crossref/pdfmark
+            MPdfInFile // ' PDF-Eingabedatei
+        ];
         // works : "C:\Program Files (x86)\gs\gs9.52\bin\gswin32c.exe" -dPDFA=1 -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o RG_10690-pdfa.pdf -dPDFACompatibilityPolicy=1 "C:\Program Files (x86)\gs\gs9.52\lib\PDFA_def.ps" RG_10690.pdf
         // "C:\Program Files (x86)\gs\gs9.52\bin\gswin64c.exe" -dPDFA=1 -dNOOUTERSAVE -sProcessColorModel=DeviceRGB -sDEVICE=pdfwrite -o RG_10690-pdfa.pdf -dPDFACompatibilityPolicy=1 "C:\Program Files (x86)\gs\gs9.52\lib\PDFA_def.ps" RG_10690.pdf
-        switches.Add(""); // ' Der allererste Parameter wird mitunter ignoriert weil EXEs da ihren eigenen Namen bergeben bekommen
-        switches.Add("-P"); // Zugriff auf Ressourcen unterhalb des aktuellen Verzeichnisses erlauben
-        switches.Add("-dPDFA=3"); // 'in A/3 umwandeln Teil 1 von 3
         // switches.Add("-dCompressStreams=false") ''hatten mal Probleme weil scheinbar auch die XMP Metadaten von ZUGFeRD komprimiert wurden, das hat sich mittlerweile erledigt
-        switches.Add("-sColorConversionStrategy=RGB"); // ' muss fr PDF/A angegeben werden
-        switches.Add("-sDEVICE=pdfwrite"); // ' ein Device muss frs Rastern angegeben werden
-        switches.Add("-o" + MPdfOutFile); // ' Ausgabedatei
-        switches.Add("-dPDFACompatibilityPolicy=1"); // 'in A/3 umwandeln Teil 2 von 3
-        switches.Add("-dRenderIntent=3"); // 'in A/3 umwandeln Teil 3 von 3
         //switches.Add("-sGenericResourceDir=\"" + resourceDir + "/\""); // ' hier kann ein zustzliches Verzeichnis angegeben werden in dem Ressourcen wie die icc-Datei liegen drfen
-        switches.Add(_fileBigscriptPs); // ' die PDFMark-Programmdatei die interpretiert werden soll. Anders als die ICC und ggf. einzubettende XML-Datei ist das keine Ressourcendatei und die kann liegen wo sie will.
         // siehe https://www.adobe.com/content/dam/acom/en/devnet/acrobat/pdfs/pdfmark_reference.pdf
         // und https://gitlab.com/crossref/pdfmark
-        switches.Add(MPdfInFile); // ' PDF-Eingabedatei
 
-        bool success = false;
-        using (GhostscriptProcessor gsProcessor = new(gsL))
-        {
-            VerboseMsgBoxOutput stdio = new();
-            // gsProcessor.StartProcessing(switches.ToArray(), stdio)
-            gsProcessor.StartProcessing(switches.ToArray(), null /* TODO Change to default(_) if this is not a reference type */);
+        using GhostscriptProcessor gsProcessor = new(gsL);
 
-            // (erfolglose) Versuche, das Hngen zu vermeiden...
-            gsProcessor.Dispose();
-        }
-
-        success = true;
-        return success;
+        gsProcessor.StartProcessing(switches.ToArray(), null /* TODO Change to default(_) if this is not a reference type */);
     }
 
     // <summary>

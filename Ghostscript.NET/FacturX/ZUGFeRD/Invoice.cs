@@ -377,6 +377,11 @@ public class Invoice : IExportableTransaction
         return this;
     }
 
+    /// <summary>
+    /// Rechnungsnummer
+    /// </summary>
+    /// <param name="number"></param>
+    /// <returns></returns>
     public virtual Invoice SetNumber(string number)
     {
         Number = number;
@@ -416,6 +421,11 @@ public class Invoice : IExportableTransaction
         return this;
     }
 
+    /// <summary>
+    /// Die Leitweg-ID des Rechnungsempfängers.
+    /// </summary>
+    /// <param name="referenceNumber">The reference number.</param>
+    /// <returns></returns>
     public virtual Invoice SetReferenceNumber(string referenceNumber)
     {
         ReferenceNumber = referenceNumber;
