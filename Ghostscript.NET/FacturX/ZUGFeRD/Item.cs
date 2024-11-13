@@ -12,7 +12,7 @@ public class Item : IZUGFeRDExportableItem
     protected internal DateTime? DetailedDeliveryPeriodFrom, DetailedDeliveryPeriodTo;
     protected internal string Id;
     protected internal List<string> Notes;
-    protected internal decimal Price, Quantity, Tax, GrossPrice, LineTotalAmount;
+    protected internal decimal NetPrice, Quantity, Tax, GrossPrice, LineTotalAmount;
     protected internal Product Product;
 
     protected internal string ReferencedLineId;
@@ -23,11 +23,11 @@ public class Item : IZUGFeRDExportableItem
     ///*
     /// default constructor </summary>
     /// <param name="product"> contains the products name, tax rate, and unit </param>
-    /// <param name="price"> the base price of one item the product </param>
+    /// <param name="netPrice"> the net base price of one item the product </param>
     /// <param name="quantity"> the number, dimensions or the weight of the delivered product or good in this context </param>
-    public Item(Product product, decimal price, decimal quantity)
+    public Item(Product product, decimal netPrice, decimal quantity)
     {
-        Price = price;
+        NetPrice = netPrice;
         Quantity = quantity;
         Product = product;
     }
@@ -55,7 +55,7 @@ public class Item : IZUGFeRDExportableItem
 
     public decimal GetPrice()
     {
-        return Price;
+        return NetPrice;
     }
 
 
@@ -195,7 +195,7 @@ public class Item : IZUGFeRDExportableItem
 
     public virtual Item SetPrice(decimal price)
     {
-        Price = price;
+        NetPrice = price;
         return this;
     }
 
